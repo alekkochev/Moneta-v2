@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="mk">
 <head>
     <meta charset="UTF-8" />
@@ -42,75 +42,7 @@
     <link href="../vendor/aos.css" rel="stylesheet" media="print" onload="this.media='all'" />
     <noscript><link rel="stylesheet" href="../vendor/aos.css" /></noscript>
     <link rel="icon" type="image/svg+xml" href="../images/favicon/favicon.svg" />
-    <link rel="stylesheet" href="../styles.css" />
-    <style>
-        /* МОНЕТА page-specific layout helpers */
-        .grid-3 { grid-template-columns: repeat(3, 1fr); }
-        .grid-4 { grid-template-columns: repeat(4, 1fr); }
-        @media (max-width: 900px) { .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 560px) { .grid-3, .grid-4 { grid-template-columns: 1fr; } }
-        .card__desc { color: rgba(255,255,255,.9); font-size: 13.5px; line-height: 1.5; text-align: center; margin: 0; }
-        .hero-img { margin-top: 30px; }
-        .hero-img img { width: min(380px, 100%); border-radius: 24px; box-shadow: 0 24px 60px rgba(0,0,0,.45); border: 1px solid rgba(255,255,255,.18); }
-        .order-bar { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 44px; }
-        .spec-list { list-style: none; margin: 0; padding: 0; text-align: left; display: inline-block; }
-        .spec-list li { padding: 2px 0; }
-        .related-head { padding-top: 70px; }
-
-        /* Insole layers */
-        .layers-section { padding: 20px 32px 70px; }
-        .layers-content { display: grid; grid-template-columns: 1fr 1fr; gap: 44px; align-items: center; padding: 10px 24px 28px; }
-        @media (max-width: 860px) { .layers-content { grid-template-columns: 1fr; } }
-        .layers-visual { display: flex; justify-content: center; }
-        .layers-visual img { width: min(340px, 100%); border-radius: 20px; box-shadow: 0 18px 45px rgba(0,0,0,.14); border: 1px solid rgba(0,0,0,.06); background: #fff; }
-        .layers-stack { display: flex; flex-direction: column; gap: 14px; }
-        .layer-row { display: flex; gap: 16px; align-items: flex-start; background: #fff; border: 1px solid #eee; border-radius: 14px; padding: 14px 18px; box-shadow: 0 6px 18px rgba(0,0,0,.05); }
-        .layer-row__num { flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%; background: #D4144A; color: #fff; font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 14px; }
-        .layer-row__info strong { display: block; margin-bottom: 3px; font-family: Manrope, 'Plus Jakarta Sans', sans-serif; }
-        .layer-row__info p { margin: 0; font-size: 13.5px; line-height: 1.55; color: #555; }
-
-        /* ===== Product layout: image left + info frame right (accordion) ===== */
-        .model-layout { display: grid; grid-template-columns: 400px minmax(0,1fr); gap: 48px; align-items: start; margin-top: 34px; }
-        @media (max-width: 980px) { .model-layout { grid-template-columns: 1fr; gap: 26px; } }
-        .model-layout__media { display: flex; flex-direction: column; gap: 16px; }
-        .model-layout__media .hero-img { margin-top: 0; }
-        .model-layout__media .hero-img img { width: 100%; max-width: 400px; margin: 0 auto; }
-        .model-layer-diagram { display: flex; justify-content: center; }
-        .model-layer-diagram img { width: min(300px, 100%); border-radius: 20px; box-shadow: 0 14px 34px rgba(0,0,0,.14); border: 1px solid rgba(0,0,0,.06); background: #fff; }
-        .model-layout__info { min-width: 0; }
-        .model-info-frame { background: #fff; border: 1px solid #efe9e6; border-radius: 22px; padding: 26px 28px; box-shadow: 0 18px 50px rgba(0,0,0,.08); }
-        .model-info-frame .system-hero__badge { margin-bottom: 12px; }
-        .model-info-frame .system-hero__title { font-size: clamp(26px, 3.6vw, 38px); margin: 0 0 6px; }
-        .model-info-frame .system-hero__subtitle { font-size: 14.5px; margin: 0 0 16px; }
-        .model-info-frame .order-bar { margin: 18px 0 20px; justify-content: flex-start; flex-wrap: wrap; }
-        @media (max-width: 560px) { .model-info-frame .order-bar { justify-content: center; } }
-        /* Accordion */
-        .model-acc { display: flex; flex-direction: column; gap: 10px; }
-        .model-acc__item { border: 1px solid #f0eae6; border-radius: 14px; background: #FCFAF9; overflow: hidden; }
-        .model-acc__item[open] { background: #fff; }
-        .model-acc__head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 13px 16px; cursor: pointer; list-style: none; font-weight: 700; font-size: 14px; font-family: Manrope, 'Plus Jakarta Sans', sans-serif; color: #2b2b33; user-select: none; }
-        .model-acc__head::-webkit-details-marker { display: none; }
-        .model-acc__head::after { content: '+'; font-size: 20px; font-weight: 400; color: #D4144A; line-height: 1; transition: transform .2s ease; }
-        .model-acc__item[open] .model-acc__head::after { transform: rotate(45deg); }
-        .model-acc__body { padding: 2px 16px 16px; }
-        /* Карактеристики → компактни редови */
-        .model-features { display: flex; flex-direction: column; gap: 8px; }
-        .model-features .feature-card { display: flex; gap: 12px; align-items: flex-start; background: #FBF8F6; border: 1px solid #f1ebe7; border-radius: 12px; padding: 10px 12px; margin: 0; box-shadow: none; }
-        .model-features .feature-card__icon { width: 36px; height: 36px; flex-shrink: 0; border-radius: 10px; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,.06); }
-        .model-features .feature-card h3 { font-size: 14px; margin: 0 0 2px; }
-        .model-features .feature-card p { font-size: 12.5px; line-height: 1.5; color: #666; margin: 0; }
-        /* Слоеви → компактни редови */
-        .model-layers { display: flex; flex-direction: column; gap: 8px; }
-        .model-layers .layer-row { padding: 9px 12px; }
-        .model-layers .layer-row__num { width: 24px; height: 24px; font-size: 12px; }
-        .model-layers .layer-row__info p { font-size: 12.5px; }
-        /* Спецификации */
-        .model-specs { overflow-x: auto; }
-        .model-specs table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 0; }
-        .model-specs td { padding: 7px 10px; border-bottom: 1px solid #f3efec; vertical-align: top; }
-        .model-specs td:first-child { color: #999; white-space: nowrap; width: 34%; }
-        .model-specs tr:last-child td { border-bottom: none; }
-    </style>
+    <link rel="stylesheet" href="../styles.css?v=20260804-premium8-final" />
 </head>
 <body class="page-sistem">
 
@@ -487,3 +419,10 @@
     <script src="../script.js" defer></script>
 </body>
 </html>
+
+
+
+
+
+
+

@@ -13,6 +13,7 @@ Icon/
 .env.local
 _pgbackup/
 _pginfo/
+_design-backup-*/
 
 # OS / editor
 .DS_Store
