@@ -18,3 +18,4 @@ _design-backup-*/
 # OS / editor
 .DS_Store
 Thumbs.db
+.vercel
