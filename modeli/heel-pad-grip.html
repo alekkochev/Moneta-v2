@@ -61,7 +61,19 @@
                     <span class="search-btn__label" data-mk="Пребарај..." data-sq="Kërko..." data-en="Search...">Пребарај...</span>
                 </button>
                 <ul class="navbar__links" id="navLinks">
-                    <li><a href="../index.html#kategorii" data-mk="Влошки" data-sq="Tabana" data-en="Insoles">Влошки</a></li>
+                    <li class="navbar__dd">
+                    <button type="button" class="navbar__dd-trigger" aria-haspopup="true" aria-expanded="false" data-mk="Влошки" data-sq="Tabana" data-en="Insoles">Влошки
+                        <svg class="navbar__dd-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="navbar__dd-menu" role="menu">
+      <a href="../sportski.html" role="menuitem" data-mk="Спортски" data-sq="Sportive" data-en="Sports">Спортски</a>
+      <a href="../kozni.html" role="menuitem" data-mk="Кожни" data-sq="Lëkure" data-en="Leather">Кожни</a>
+      <a href="../letni.html" role="menuitem" data-mk="Летни" data-sq="Verore" data-en="Summer">Летни</a>
+      <a href="../zimski.html" role="menuitem" data-mk="Зимски" data-sq="Dimëror" data-en="Winter">Зимски</a>
+      <a href="../hunter.html" role="menuitem" data-mk="HUNTER" data-sq="HUNTER" data-en="HUNTER">HUNTER</a>
+      <a href="../detski.html" role="menuitem" data-mk="Детски" data-sq="Për fëmijë" data-en="Kids">Детски</a>
+                    </div>
+                </li>
                     <li><a href="../sistem.html" data-mk="МОНЕТА систем" data-sq="Sistemi MONETA" data-en="MONETA System">МОНЕТА систем</a></li>
                                         <li class="navbar__guide-item">
                         <a href="../kviz.html" class="navbar__guide-btn">
@@ -110,10 +122,17 @@
                 <span>/</span>
                 <span>Heel Pad Grip</span>
             </div>
-            <div class="model-layout">
+
+<div class="categories-toolbar categories-toolbar--top">
+                    <a href="../kozni.html#modeli" class="btn-back" aria-label="Назад" title="Назад" data-mk-title="Назад" data-sq-title="Prapa" data-en-title="Back">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                    </a>
+                </div>
+
+<div class="model-layout">
                 <div class="model-layout__media">
                     <div class="hero-img">
-                <img src="../images/cards/heel-pad-grip.webp" alt="Heel Pad Grip" width="400" height="300" decoding="async">
+                <img src="../images/cards/heel-pad-grip.webp" alt="Heel Pad Grip" width="400" height="667" decoding="async">
             </div>
                     <div class="model-icons">
                 <div class="model-icons__item">
@@ -175,7 +194,7 @@
             </div>
                         
                         <div class="model-acc">
-                            <details class="model-acc__item" open>
+                            <details class="model-acc__item">
                                 <summary class="model-acc__head" data-mk="Клучни карактеристики" data-sq="Karakteristikat kryesore" data-en="Key Features">Клучни карактеристики</summary>
                                 <div class="model-acc__body">
                                     <div class="model-features">
@@ -338,7 +357,7 @@
                 <div class="card__overlay">
                     <div class="card__icon"><img src="../images/icons/leather.svg" alt="Heel Pad" width="26" height="26" loading="lazy" decoding="async"></div>
                     <h4>Heel Pad</h4>
-                    <span class="card__link" data-mk="Погледни →" data-sq="Shiko →" data-en="View →">Погледни →</span>
+                    <span class="card__link" data-mk="Heel Pad →" data-sq="Heel Pad →" data-en="Heel Pad →">Heel Pad →</span>
                 </div>
             </a>
             <a href="heel-pad-fix.html" class="card card--image">
@@ -346,7 +365,7 @@
                 <div class="card__overlay">
                     <div class="card__icon"><img src="../images/icons/leather.svg" alt="Heel Pad FIX" width="26" height="26" loading="lazy" decoding="async"></div>
                     <h4>Heel Pad FIX</h4>
-                    <span class="card__link" data-mk="Погледни →" data-sq="Shiko →" data-en="View →">Погледни →</span>
+                    <span class="card__link" data-mk="Heel Pad FIX →" data-sq="Heel Pad FIX →" data-en="Heel Pad FIX →">Heel Pad FIX →</span>
                 </div>
             </a>
             <a href="vital.html" class="card card--image">
@@ -354,7 +373,7 @@
                 <div class="card__overlay">
                     <div class="card__icon"><img src="../images/icons/leather.svg" alt="Vital" width="26" height="26" loading="lazy" decoding="async"></div>
                     <h4>Vital</h4>
-                    <span class="card__link" data-mk="Погледни →" data-sq="Shiko →" data-en="View →">Погледни →</span>
+                    <span class="card__link" data-mk="Vital →" data-sq="Vital →" data-en="Vital →">Vital →</span>
                 </div>
             </a>
         </div>

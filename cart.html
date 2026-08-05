@@ -53,7 +53,19 @@
                     <span class="search-btn__label" data-mk="Пребарај..." data-sq="Kërko..." data-en="Search...">Пребарај...</span>
                 </button>
                 <ul class="navbar__links" id="navLinks">
-                    <li><a href="./index.html#kategorii" data-mk="Влошки" data-sq="Tabana" data-en="Insoles">Влошки</a></li>
+                    <li class="navbar__dd">
+                    <button type="button" class="navbar__dd-trigger" aria-haspopup="true" aria-expanded="false" data-mk="Влошки" data-sq="Tabana" data-en="Insoles">Влошки
+                        <svg class="navbar__dd-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="navbar__dd-menu" role="menu">
+      <a href="./sportski.html" role="menuitem" data-mk="Спортски" data-sq="Sportive" data-en="Sports">Спортски</a>
+      <a href="./kozni.html" role="menuitem" data-mk="Кожни" data-sq="Lëkure" data-en="Leather">Кожни</a>
+      <a href="./letni.html" role="menuitem" data-mk="Летни" data-sq="Verore" data-en="Summer">Летни</a>
+      <a href="./zimski.html" role="menuitem" data-mk="Зимски" data-sq="Dimëror" data-en="Winter">Зимски</a>
+      <a href="./hunter.html" role="menuitem" data-mk="HUNTER" data-sq="HUNTER" data-en="HUNTER">HUNTER</a>
+      <a href="./detski.html" role="menuitem" data-mk="Детски" data-sq="Për fëmijë" data-en="Kids">Детски</a>
+                    </div>
+                </li>
                     <li><a href="./sistem.html" data-mk="МОНЕТА систем" data-sq="Sistemi MONETA" data-en="MONETA System">МОНЕТА систем</a></li>
                                         <li class="navbar__guide-item">
                         <a href="./kviz.html" class="navbar__guide-btn">
@@ -173,6 +185,15 @@
             const isEn = () => document.documentElement.lang === 'en';
             const fmt = (n) => n.toLocaleString('mk-MK') + ' ' + (isEn() ? 'MKD' : 'ден.');
 
+            // Неактивни ставки (чекбокс) — се исклучуваат од нарачката
+            const loadInactive = () => {
+                try { return JSON.parse(localStorage.getItem('moneta_cart_inactive')) || {}; }
+                catch (e) { return {}; }
+            };
+            const ik = (slug, size) => slug + '|' + size;
+            let inactiveState = loadInactive();
+            const isInactive = (slug, size) => !!inactiveState[ik(slug, size)];
+
             const render = () => {
                 const cart = window.MonetaCart.getCart();
                 // Варијанта 2: секоја големина = посебна ставка со своја слика
@@ -182,8 +203,9 @@
                         lines.push({ slug: it.slug, code: it.code, price: it.price, nameMk: it.nameMk, nameEn: it.nameEn, size: sz, qty: q });
                     });
                 });
-                const total = lines.reduce((s, l) => s + l.qty * (l.price || 0), 0);
-                const totalQty = lines.reduce((s, l) => s + l.qty, 0);
+                const active = lines.filter((l) => !isInactive(l.slug, l.size));
+                const total = active.reduce((s, l) => s + l.qty * (l.price || 0), 0);
+                const totalQty = active.reduce((s, l) => s + l.qty, 0);
 
                 if (lines.length === 0) {
                     container.innerHTML = `
@@ -199,11 +221,19 @@
                     return;
                 }
 
-                container.innerHTML = lines.map((l) => `
-                    <div class="cart__item" data-cart-item="${l.slug}" data-size="${l.size}">
-                        <a href="./modeli/${l.slug}.html" class="cart__item-thumb" aria-label="${isEn() ? l.nameEn : l.nameMk}">
-                            <img src="./images/cards/${l.slug}.webp" alt="${isEn() ? l.nameEn : l.nameMk}" loading="lazy">
-                        </a>
+                container.innerHTML = lines.map((l) => {
+                    const inact = isInactive(l.slug, l.size);
+                    return `
+                    <div class="cart__item${inact ? ' is-inactive' : ''}" data-cart-item="${l.slug}" data-size="${l.size}">
+                        <button type="button" class="cart__check${inact ? ' is-unchecked' : ' is-checked'}" data-cart-check data-size="${l.size}" aria-label="${isEn() ? 'Active' : 'Активен'}" title="${isEn() ? 'Click to deactivate' : 'Кликни за деактивирање'}">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        </button>
+                        <div class="cart__thumb-wrap">
+                            <a href="./modeli/${l.slug}.html" class="cart__item-thumb" aria-label="${isEn() ? l.nameEn : l.nameMk}">
+                                <img src="./images/cards/${l.slug}.webp" alt="${isEn() ? l.nameEn : l.nameMk}" loading="lazy">
+                            </a>
+                            <button type="button" class="cart__thumb-remove" data-cart-remove data-size="${l.size}" aria-label="${isEn() ? 'Remove' : 'Отстрани'}" title="${isEn() ? 'Remove' : 'Отстрани'}"${inact ? ' disabled' : ''}>✕</button>
+                        </div>
                         <div>
                             <a href="./modeli/${l.slug}.html" class="cart__item-name">${isEn() ? l.nameEn : l.nameMk} — ${isEn() ? 'Size' : 'Број'} ${l.size || (isEn() ? 'Universal' : 'Универзална')}</a>
                             <div class="cart__item-code">${isEn() ? 'Code' : 'Код'}: ${l.code}</div>
@@ -212,9 +242,9 @@
                         </div>
                         <div class="cart__item-right">
                             <span class="cart__line-total">${fmt(l.qty * (l.price || 0))}</span>
-                            <button type="button" class="cart__remove" data-cart-remove data-size="${l.size}" aria-label="${isEn() ? 'Remove' : 'Отстрани'}" title="${isEn() ? 'Remove' : 'Отстрани'}">✕ ${isEn() ? 'Remove' : 'Отстрани'}</button>
                         </div>
-                    </div>`).join('') + `
+                    </div>`;
+                }).join('') + `
                     <div class="cart__summary">
                         <div class="cart__free-ship" data-free-ship>
                             <div class="cart__free-ship__text">
@@ -247,6 +277,17 @@
                 container.querySelectorAll('[data-mk][data-en]').forEach((el) => {
                     const t = el.getAttribute('data-' + curLang);
                     if (t) el.textContent = t;
+                });
+                // Чекбокс: активен / неактивен производ
+                container.querySelectorAll('[data-cart-check]').forEach((cb) => {
+                    cb.addEventListener('click', () => {
+                        const item = cb.closest('.cart__item');
+                        const key = ik(item.dataset.cartItem, item.dataset.size);
+                        if (inactiveState[key]) { delete inactiveState[key]; }
+                        else { inactiveState[key] = true; }
+                        localStorage.setItem('moneta_cart_inactive', JSON.stringify(inactiveState));
+                        render();
+                    });
                 });
                 renderHistory();
             };

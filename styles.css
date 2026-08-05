@@ -7718,6 +7718,162 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
     line-height: 1.65;
     margin-top: 14px;
 }
+
+/* ========================================
+   МОДЕЛ СТРАНИЦИ — НОВ ДИЗАЈН (ист како главните карти)
+   Правоаголен контејнер со градиент + магента 2px рамка,
+   влошката портрет 3:5, транспарентна, со суптилна сенка надесно.
+   ======================================== */
+.page-sistem .model-layout .hero-img {
+    border: 2px solid #EC1752 !important;
+    border-radius: 28px !important;
+    box-shadow: 0 10px 34px rgba(236, 23, 82, 0.14) !important;
+    padding: clamp(16px, 3vw, 26px);
+    background: radial-gradient(circle at 50% 30%, rgba(236, 23, 82, 0.10), transparent 18rem);
+}
+.page-sistem .model-layout .hero-img img {
+    width: min(480px, 100%);
+    height: auto;
+    aspect-ratio: 3 / 5;
+    object-fit: contain;
+    object-position: center;
+    border-radius: 22px;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    filter: brightness(0.95) drop-shadow(10px 14px 8px rgba(0, 0, 0, 0.22)) !important;
+}
+@media (max-width: 680px) {
+    .page-sistem .model-layout .hero-img { border-radius: 28px !important; }
+}
+
+/* ========================================
+   КАТЕГОРИСКИ СТРАНИЦИ + ПОВРЗАНИ ПРОИЗВОДИ (grid-3) — НОВ ДИЗАЈН
+   Ист како главните карти: портрет 3:5, транспарентна позадина,
+   магента 2px рамка, влошка со суптилна сенка надесно, бело копче.
+   Насловот (h4) останува бидејќи е име на производот.
+   ======================================== */
+.categories__grid.grid-3 .card--sport,
+.categories__grid.grid-3 .card--image {
+    aspect-ratio: 3 / 5;
+    min-height: 0;
+    background: transparent;
+    border: 2px solid #EC1752;
+    box-shadow: 0 10px 34px rgba(236, 23, 82, 0.14);
+    overflow: hidden;
+}
+.categories__grid.grid-3 .card--sport .card__image img,
+.categories__grid.grid-3 .card--image .card__image img {
+    width: 84%;
+    height: 84%;
+    margin: 8%;
+    object-fit: contain;
+    object-position: center;
+    box-sizing: border-box;
+    filter: brightness(0.95) drop-shadow(10px 14px 8px rgba(0, 0, 0, 0.22));
+}
+/* Сенката да остане и при hover/active/scroll-focus (base правилата ја бришат) */
+.categories__grid.grid-3 .card.is-active .card__image img,
+.categories__grid.grid-3 .card.is-scroll-focused .card__image img,
+.categories__grid.grid-3 .card:hover .card__image img {
+    filter: brightness(0.95) drop-shadow(10px 14px 8px rgba(0, 0, 0, 0.22));
+}
+.categories__grid.grid-3 .card--sport .card__overlay,
+.categories__grid.grid-3 .card--image .card__overlay,
+.categories__grid.grid-3 .card--sport:hover .card__overlay,
+.categories__grid.grid-3 .card--sport.is-active .card__overlay,
+.categories__grid.grid-3 .card--sport.is-scroll-focused .card__overlay,
+.categories__grid.grid-3 .card--image:hover .card__overlay,
+.categories__grid.grid-3 .card--image.is-active .card__overlay,
+.categories__grid.grid-3 .card--image.is-scroll-focused .card__overlay {
+    flex: 1;
+    background: transparent;
+    min-height: 0;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    padding: 14px;
+}
+/* Насловот (h4) се крие — името е во копчето (како главните карти) */
+.categories__grid.grid-3 .card--sport h4,
+.categories__grid.grid-3 .card--image h4 {
+    display: none;
+}
+/* Описот се крие (минимален изглед, како главните карти) */
+.categories__grid.grid-3 .card--sport .card__desc,
+.categories__grid.grid-3 .card--image .card__desc {
+    display: none;
+}
+.categories__grid.grid-3 .card--sport .card__link,
+.categories__grid.grid-3 .card--image .card__link {
+    background: #ffffff;
+    color: #EC1752;
+    font-weight: 700;
+    margin-top: 0;
+    padding: 10px 20px;
+    border-radius: 999px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.14);
+}
+
+/* ========================================
+   КОПЧЕ НА ПЕРИМЕТАР — преполовено на магентата линија (2px),
+   линијата прекината околу копчето со 5px празнина лево/десно.
+   Важи за: главни карти (index) + категориски + поврзани производи.
+   Ширината на прекинот (--btnw) ја поставува JS (script.js) = копче + 10px.
+   ======================================== */
+.categories__grid:not(.grid-3) .card--sport,
+.categories__grid:not(.grid-3) .card--image,
+.categories__grid.grid-3 .card--sport,
+.categories__grid.grid-3 .card--image {
+    border: none !important;
+    overflow: visible;
+}
+/* Магента рамка преку pseudo-елемент (за да може да се прекине долу-центар) */
+.categories__grid:not(.grid-3) .card--sport::after,
+.categories__grid:not(.grid-3) .card--image::after,
+.categories__grid.grid-3 .card--sport::after,
+.categories__grid.grid-3 .card--image::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 2px solid #EC1752;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 1;
+    -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0),
+        linear-gradient(#fff 0 0) 50% 100% / var(--btnw, 160px) 40px no-repeat;
+    -webkit-mask-composite: xor, destination-out;
+    mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0),
+        linear-gradient(#fff 0 0) 50% 100% / var(--btnw, 160px) 40px no-repeat;
+    mask-composite: exclude, subtract;
+}
+/* Копчето: половина внатре, половина надвор од линијата */
+.categories__grid:not(.grid-3) .card--sport .card__overlay,
+.categories__grid:not(.grid-3) .card--image .card__overlay,
+.categories__grid.grid-3 .card--sport .card__overlay,
+.categories__grid.grid-3 .card--image .card__overlay {
+    padding-bottom: 0;
+    align-items: center;
+}
+.categories__grid:not(.grid-3) .card--sport .card__link,
+.categories__grid:not(.grid-3) .card--image .card__link,
+.categories__grid.grid-3 .card--sport .card__link,
+.categories__grid.grid-3 .card--image .card__link {
+    transform: translateY(calc(50% + 1px));
+    inset: auto;
+    margin-top: auto;
+    position: relative;
+    z-index: 4;
+}
+
+/* Отстранување на „MONETA" балончето од модел-сликата (сите производи) */
+.page-sistem .hero-img::before {
+    content: none;
+}
 .checkout__summary-item {
     display: flex;
     justify-content: space-between;
@@ -8021,6 +8177,69 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
 }
 
 /* ========================================
+   ГЛАВНИ КАТЕГОРИСКИ КАРТИ (index) — нов дизајн (ПОРТРЕТ)
+   Само .categories__grid БЕЗ grid-3 (= главните карти на index).
+   Категориските/модел страниците (grid-3) остануваат непроменети.
+   Портрет 3:5, транспарентна позадина + магента 2px рамка,
+   целата влошка видлива (отсечени слики) со 5px padding,
+   копчето во бело балонче со розов текст, насловот (h4) скриен.
+   ======================================== */
+.categories__grid:not(.grid-3) .card--sport,
+.categories__grid:not(.grid-3) .card--image {
+    aspect-ratio: 3 / 5;
+    min-height: 0;
+    align-self: start;
+    background: transparent;
+    border: 2px solid #EC1752;
+    box-shadow: 0 10px 34px rgba(236, 23, 82, 0.14);
+}
+.categories__grid:not(.grid-3) .card--sport .card__image img,
+.categories__grid:not(.grid-3) .card--image .card__image img {
+    width: 84%;
+    height: 84%;
+    margin: 8%;
+    object-fit: contain;
+    object-position: center;
+    box-sizing: border-box;
+    filter: brightness(0.95) drop-shadow(10px 14px 8px rgba(0, 0, 0, 0.22));
+}
+/* Сенката да остане и при hover/active/scroll-focus (base правилата ја бришат) */
+.categories__grid:not(.grid-3) .card.is-active .card__image img,
+.categories__grid:not(.grid-3) .card.is-scroll-focused .card__image img,
+.categories__grid:not(.grid-3) .card:hover .card__image img {
+    filter: brightness(0.95) drop-shadow(10px 14px 8px rgba(0, 0, 0, 0.22));
+}
+.categories__grid:not(.grid-3) .card--sport .card__overlay,
+.categories__grid:not(.grid-3) .card--image .card__overlay {
+    flex: 1;
+    background: transparent;
+    min-height: 0;
+    justify-content: flex-end;
+    padding: 14px;
+}
+.categories__grid:not(.grid-3) .card--sport .card__overlay,
+.categories__grid:not(.grid-3) .card--sport:hover .card__overlay,
+.categories__grid:not(.grid-3) .card--sport.is-active .card__overlay,
+.categories__grid:not(.grid-3) .card--sport.is-scroll-focused .card__overlay,
+.categories__grid:not(.grid-3) .card--image .card__overlay,
+.categories__grid:not(.grid-3) .card--image:hover .card__overlay,
+.categories__grid:not(.grid-3) .card--image.is-active .card__overlay,
+.categories__grid:not(.grid-3) .card--image.is-scroll-focused .card__overlay {
+    background: transparent;
+}
+/* Отстранување на дупликат-текстот (насловот h4) во главните карти */
+.categories__grid:not(.grid-3) .card--sport h4,
+.categories__grid:not(.grid-3) .card--image h4 {
+    display: none;
+}
+.categories__grid:not(.grid-3) .card--sport .card__link,
+.categories__grid:not(.grid-3) .card--image .card__link {
+    background: #ffffff;
+    color: #EC1752;
+    font-weight: 700;
+}
+
+/* ========================================
    КОПЧИЊА „Детали" ВО ТАБЕЛИТЕ → КРУЖНА ИКОНА (→)
    Важи за ДЕСКТОП и МОБИЛЕН. Стрелката е апсолутно центрирана во кругот.
    ======================================== */
@@ -8086,4 +8305,196 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
 .freeship-popup__btn,
 .model-cart__add {
     font-weight: 400 !important;
+}
+
+/* ========================================
+   НАВБАР — без underline hover на „МОНЕТА водич" и кошницата
+   (само промена на боја; десктоп + мобилен)
+   ======================================== */
+.navbar__links .navbar__guide-btn::after,
+.navbar__links .navbar__cart::after {
+    display: none !important;
+}
+
+/* ========================================
+   КОПЧЕ „НАЗАД" (кружок со стрелка) НАД ПРОИЗВОДИТЕ
+   Порамнето со левата колона на мрежата од влошки
+   ======================================== */
+.categories-toolbar {
+    max-width: var(--wrap);
+    margin: 0 auto;
+    padding: 34px 32px 0;
+    margin-bottom: 36px;
+    display: flex;
+    justify-content: flex-start;
+}
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid #EC1752;
+    background: #ffffff;
+    color: #EC1752;
+    box-shadow: 0 4px 14px rgba(236, 23, 82, 0.16);
+    transition: background 0.25s ease, color 0.25s ease, transform 0.25s ease;
+}
+.btn-back:hover {
+    background: #EC1752;
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+/* Варијанта за копчето на врвот од модел-страниците (под breadcrumbs) */
+.categories-toolbar--top {
+    max-width: none;
+    margin: 0 0 12px;
+    padding: 0;
+}
+
+/* ========================================
+   BACK КОПЧИЊА — скрол до првиот ред производи
+   (простор за sticky navbar при ајнкор скролање)
+   ======================================== */
+.categories-section {
+    scroll-margin-top: 130px;
+}
+
+/* ========================================
+   КОШНИЧКА — чекбокс активен/неактивен производ
+   ======================================== */
+.cart__item {
+    grid-template-columns: auto 104px minmax(0, 1fr) auto;
+}
+.cart__check {
+    width: 28px;
+    height: 28px;
+    border-radius: 9px;
+    border: 2px solid #EC1752;
+    background: #ffffff;
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.cart__check svg { display: none; }
+.cart__check.is-checked { background: #EC1752; }
+.cart__check.is-checked svg { display: block; }
+/* Неактивен производ — изразит чекбокс кој „повикува" да се кликне */
+.cart__check.is-unchecked {
+    background: rgba(236, 23, 82, 0.12);
+    border-color: #EC1752;
+    box-shadow: 0 0 0 4px rgba(236, 23, 82, 0.22);
+}
+.cart__item.is-inactive { opacity: 0.45; }
+.cart__item.is-inactive .cart__item-thumb img { filter: grayscale(1); }
+/* Копче ✕ на аголот од сликичката */
+.cart__thumb-wrap {
+    position: relative;
+    width: 104px;
+}
+.cart__thumb-remove {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid #ffffff;
+    background: #EC1752;
+    color: #ffffff;
+    font-size: 11px;
+    line-height: 1;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+}
+/* Кога производот е неактивен (сив) — и ✕ е неактивно */
+.cart__thumb-remove:disabled {
+    background: #c9c9cf;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+@media (max-width: 680px) {
+    .cart__item { grid-template-columns: auto 82px minmax(0, 1fr) auto; gap: 10px; }
+    .cart__thumb-wrap { width: 82px; }
+}
+
+/* ========================================
+   НАВБАР — „Влошки" брзо бирање на категории (dropdown)
+   ======================================== */
+.navbar__dd {
+    position: relative;
+}
+.navbar__links .navbar__dd-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 750 !important;
+    color: rgba(23, 23, 28, 0.70);
+    cursor: pointer;
+}
+.navbar__links .navbar__dd-trigger:hover,
+.navbar__links .navbar__dd-trigger.is-active {
+    color: var(--pink);
+}
+.navbar__dd-chevron {
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+}
+.navbar__dd.is-open .navbar__dd-chevron {
+    transform: rotate(180deg);
+}
+.navbar__dd-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0;
+    min-width: 200px;
+    background: #ffffff;
+    border: 1px solid #efe9e6;
+    border-radius: 14px;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.12);
+    padding: 6px;
+    display: none;
+    z-index: 300;
+}
+.navbar__dd.is-open .navbar__dd-menu {
+    display: block;
+    animation: langDropdownIn 0.16s ease-out;
+}
+.navbar__dd-menu a {
+    display: block;
+    padding: 9px 12px;
+    border-radius: 10px;
+    color: var(--ink-900);
+    font-weight: 700;
+    font-size: 14px;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+.navbar__dd-menu a:hover {
+    background: rgba(236, 23, 82, 0.08);
+    color: #EC1752;
+}
+@media (max-width: 860px) {
+    .navbar__dd-menu {
+        position: static;
+        box-shadow: none;
+        border: 1px solid #efe9e6;
+        margin: 6px 0 0;
+        min-width: 0;
+    }
 }

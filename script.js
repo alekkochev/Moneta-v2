@@ -3448,7 +3448,7 @@ console.log('%c Вебсајт во развој 💪', 'color:#6B6B76;font-size
         popupAnchor: [0, -34]
     });
 
-    const map = L.map(mapEl, { scrollWheelZoom: false, attributionControl: true }).setView([41.65, 21.55], 8);
+    const map = L.map(mapEl, { scrollWheelZoom: false, attributionControl: true }).setView([42.0008, 21.4310], 15);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 18,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors'
@@ -3492,5 +3492,54 @@ console.log('%c Вебсајт во развој 💪', 'color:#6B6B76;font-size
     } else {
         window.addEventListener('load', loadMapAssets, { once: true, passive: true });
     }
+})();
+
+// ========================================
+// КОПЧЕ НА ПЕРИМЕТАР — прекин на магентата линија (5px празнина)
+// Ширината на прекинот (--btnw) = ширина на копчето + 10px
+// ========================================
+function syncCardLinkGap() {
+    document.querySelectorAll('.categories__grid .card--sport, .categories__grid .card--image').forEach((card) => {
+        const link = card.querySelector('.card__link');
+        if (!link) return;
+        const w = Math.ceil(link.getBoundingClientRect().width);
+        card.style.setProperty('--btnw', (w + 10) + 'px');
+    });
+}
+if (window.MonetaOnLangChange) {
+    window.MonetaOnLangChange(() => setTimeout(syncCardLinkGap, 60));
+}
+document.addEventListener('DOMContentLoaded', syncCardLinkGap, { passive: true });
+window.addEventListener('load', () => setTimeout(syncCardLinkGap, 400), { passive: true });
+window.addEventListener('resize', syncCardLinkGap, { passive: true });
+
+// ========================================
+// НАВБАР — „Влошки" брзо бирање на категории (dropdown)
+// ========================================
+(function initNavbarCategoryDropdown() {
+    document.querySelectorAll('.navbar__dd').forEach((dd) => {
+        const trigger = dd.querySelector('.navbar__dd-trigger');
+        const menu = dd.querySelector('.navbar__dd-menu');
+        if (!trigger || !menu) return;
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = dd.classList.toggle('is-open');
+            trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+        menu.querySelectorAll('a').forEach((a) => {
+            a.addEventListener('click', () => {
+                dd.classList.remove('is-open');
+                trigger.setAttribute('aria-expanded', 'false');
+            });
+        });
+    });
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.navbar__dd.is-open').forEach((dd) => dd.classList.remove('is-open'));
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.navbar__dd.is-open').forEach((dd) => dd.classList.remove('is-open'));
+        }
+    });
 })();
 

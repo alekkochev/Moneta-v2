@@ -127,7 +127,19 @@
                     <span class="search-btn__label" data-mk="Пребарај..." data-sq="Kërko..." data-en="Search...">Пребарај...</span>
                 </button>
                 <ul class="navbar__links" id="navLinks">
-                    <li><a href="./index.html#kategorii" data-mk="Влошки" data-sq="Tabana" data-en="Insoles">Влошки</a></li>
+                    <li class="navbar__dd">
+                    <button type="button" class="navbar__dd-trigger" aria-haspopup="true" aria-expanded="false" data-mk="Влошки" data-sq="Tabana" data-en="Insoles">Влошки
+                        <svg class="navbar__dd-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="navbar__dd-menu" role="menu">
+      <a href="./sportski.html" role="menuitem" data-mk="Спортски" data-sq="Sportive" data-en="Sports">Спортски</a>
+      <a href="./kozni.html" role="menuitem" data-mk="Кожни" data-sq="Lëkure" data-en="Leather">Кожни</a>
+      <a href="./letni.html" role="menuitem" data-mk="Летни" data-sq="Verore" data-en="Summer">Летни</a>
+      <a href="./zimski.html" role="menuitem" data-mk="Зимски" data-sq="Dimëror" data-en="Winter">Зимски</a>
+      <a href="./hunter.html" role="menuitem" data-mk="HUNTER" data-sq="HUNTER" data-en="HUNTER">HUNTER</a>
+      <a href="./detski.html" role="menuitem" data-mk="Детски" data-sq="Për fëmijë" data-en="Kids">Детски</a>
+                    </div>
+                </li>
                     <li><a href="./sistem.html" data-mk="МОНЕТА систем" data-sq="Sistemi MONETA" data-en="MONETA System">МОНЕТА систем</a></li>
                                         <li class="navbar__guide-item">
                         <a href="./kviz.html" class="navbar__guide-btn">
@@ -826,7 +838,7 @@
                 <div class="footer__tracker">
                     <div class="order-tracker__header">
                         <div class="order-tracker__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
-                        <div class="order-tracker__titles"><h3 data-mk="Следете ја вашата нарачка" data-sq="Ndiq porosinë tuaj" data-en="Track Your Order">Следете ја вашата нарачка</h3><p data-mk="Бројот за следење ќе го добиете по е-пошта од Карго Експрес. Следете ја пратката директно кај нив." data-sq="Numrin e ndjekjes do ta merrni me e-mail nga Kargo Express. Ndiqni parcelën direkt tek ata." data-en="You'll receive your tracking number by email from Kargo Express. Track your package directly with them.">Бројот за следење ќе го добиете по е-пошта од Карго Експрес. Следете ја пратката директно кај нив.</p></div>
+                        <div class="order-tracker__titles"><h3 data-mk="Следете ја вашата нарачка" data-sq="Ndiq porosinë tuaj" data-en="Track Your Order">Следете ја вашата нарачка</h3><p data-mk="Побарајте број за следење, истиот ќе ви биде пратен на Вашиот e-mail." data-sq="Kërkoni një numër ndjekjeje, i njëjti do t'ju dërgohet në e-mail-in tuaj." data-en="Request a tracking number, it will be sent to your email.">Побарајте број за следење, истиот ќе ви биде пратен на Вашиот e-mail.</p></div>
                     </div>
                     <!-- Точка 6: tracking → директен линк до Карго Експрес (броевите доаѓаат по email) -->
                     <a class="order-tracker__submit order-tracker__link" href="https://www.kargoekspres.mk/ProverkaPratka.aspx" target="_blank" rel="noopener">
