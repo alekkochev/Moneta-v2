@@ -21,7 +21,7 @@ app.use(express.static(__dirname, {
     // Cache images, fonts, JS, and CSS for 7 days
     if (/\.(webp|png|jpg|jpeg|svg|ico|css|js|woff2?|ttf|eot)$/i.test(filepath)) {
       res.setHeader('Cache-Control', 'public, max-age=604800, stale-while-revalidate=86400');
-    } else if (/\.html$/i.test(filepath)) {
+    } else if (/\.html$|\.json$/i.test(filepath)) {
       res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
     }
   }

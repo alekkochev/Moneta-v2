@@ -30,7 +30,7 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&family=Manrope:wght@700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
     <link href="./vendor/aos.css" rel="stylesheet" media="print" onload="this.media='all'" />
     <noscript><link rel="stylesheet" href="./vendor/aos.css" /></noscript>
     <link rel="icon" type="image/svg+xml" href="./images/favicon/favicon.svg" />
@@ -219,6 +219,14 @@
 
             const isEn = () => document.documentElement.lang === 'en';
             const fmt = (n) => n.toLocaleString('mk-MK') + ' ' + (isEn() ? 'MKD' : 'ден.');
+            // Количини по големина — за резимето и нарачката
+            const sizeBreakdown = (it) => {
+                const sizes = (it && it.sizes) || {};
+                return Object.entries(sizes)
+                    .filter(([, q]) => q > 0)
+                    .map(([sz, q]) => `${isEn() ? 'Size' : 'Број'} ${sz || (isEn() ? 'Universal' : 'Универзална')} × ${q}`)
+                    .join(', ');
+            };
 
             const renderSummary = () => {
                 const cart = window.MonetaCart.getCart();
@@ -237,11 +245,14 @@
                 const delivery = freeShip ? 0 : 160;
                 const grand = total + delivery;
 
-                summaryEl.innerHTML = items.map((it) => `
+                summaryEl.innerHTML = items.map((it) => {
+                    const bd = sizeBreakdown(it);
+                    return `
                     <div class="checkout__summary-item">
-                        <span class="n">${isEn() ? it.nameEn : it.nameMk} × ${it.qty}</span>
+                        <span class="n">${isEn() ? it.nameEn : it.nameMk}${bd ? ' — ' + bd : ' × ' + it.qty}</span>
                         <span>${fmt(it.qty * (it.price || 0))}</span>
-                    </div>`).join('') + `
+                    </div>`;
+                }).join('') + `
                     <div class="checkout__summary-item">
                         <span class="n" data-mk="Достава" data-sq="Dorëzimi" data-en="Delivery">Достава</span>
                         <span>${delivery === 0 ? (isEn() ? 'FREE' : 'БЕСПЛАТНА') : fmt(delivery)}</span>
@@ -251,10 +262,19 @@
                         <span>${fmt(grand)}</span>
                     </div>
                     <p class="checkout__note">${freeShip ? (isEn() ? '🎉 Free delivery included!' : '🎉 Вклучена бесплатна достава!') : (isEn() ? 'Add ' + (window.MonetaCart.FREE_SHIP_THRESHOLD - total) + ' MKD more for free delivery.' : 'Додадете уште ' + (window.MonetaCart.FREE_SHIP_THRESHOLD - total) + ' ден. за бесплатна достава.')}</p>`;
+                // Примени го тековниот јазик на свежо рендерираните елементи
+                const curLang = document.documentElement.lang;
+                summaryEl.querySelectorAll('[data-mk][data-en]').forEach((el) => {
+                    const t = el.getAttribute('data-' + curLang);
+                    if (t) el.textContent = t;
+                });
             };
 
             renderSummary();
             window.MonetaCartOnChange = renderSummary;
+            // Промена на јазик → пререндерирање на резимето
+            window.MonetaLangCallbacks = window.MonetaLangCallbacks || [];
+            window.MonetaLangCallbacks.push(() => renderSummary());
 
             // Плаќање избор
             document.querySelectorAll('input[name="coPay"]').forEach((r) => {
@@ -293,7 +313,10 @@
                 if (note) body += 'Забелешка: ' + note + '\n';
                 body += 'Плаќање: ' + pay + '\n\n';
                 body += '--- ПРОИЗВОДИ ---\n';
-                items.forEach((it) => { body += (isEn() ? it.nameEn : it.nameMk) + ' x' + it.qty + ' = ' + (it.qty * it.price) + ' ден.\n'; });
+                items.forEach((it) => {
+                    const bd = sizeBreakdown(it);
+                    body += (isEn() ? it.nameEn : it.nameMk) + (bd ? ' (' + bd + ')' : '') + ' x' + it.qty + ' = ' + (it.qty * it.price) + ' ден.\n';
+                });
                 body += '\nДостава: ' + (delivery === 0 ? 'БЕСПЛАТНА' : delivery + ' ден.') + '\n';
                 body += 'ВКУПНО: ' + (total + delivery) + ' ден.\n';
 

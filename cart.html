@@ -30,7 +30,7 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&family=Manrope:wght@700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
     <link href="./vendor/aos.css" rel="stylesheet" media="print" onload="this.media='all'" />
     <noscript><link rel="stylesheet" href="./vendor/aos.css" /></noscript>
     <link rel="icon" type="image/svg+xml" href="./images/favicon/favicon.svg" />
@@ -108,6 +108,7 @@
     <section class="cart-section">
         <div class="cart__inner">
             <div class="cart__frame" id="cartContainer"></div>
+            <div id="cartHistory" class="cart__history"></div>
         </div>
     </section>
 
@@ -174,10 +175,17 @@
 
             const render = () => {
                 const cart = window.MonetaCart.getCart();
-                const items = Object.values(cart).filter((it) => it.qty > 0);
-                const total = items.reduce((s, it) => s + it.qty * (it.price || 0), 0);
+                // Варијанта 2: секоја големина = посебна ставка со своја слика
+                const lines = [];
+                Object.values(cart).filter((it) => it.qty > 0).forEach((it) => {
+                    Object.entries(it.sizes || {}).filter(([, q]) => q > 0).forEach(([sz, q]) => {
+                        lines.push({ slug: it.slug, code: it.code, price: it.price, nameMk: it.nameMk, nameEn: it.nameEn, size: sz, qty: q });
+                    });
+                });
+                const total = lines.reduce((s, l) => s + l.qty * (l.price || 0), 0);
+                const totalQty = lines.reduce((s, l) => s + l.qty, 0);
 
-                if (items.length === 0) {
+                if (lines.length === 0) {
                     container.innerHTML = `
                         <div class="cart__empty">
                             <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -191,28 +199,20 @@
                     return;
                 }
 
-                container.innerHTML = items.map((it) => `
-                    <div class="cart__item" data-cart-item="${it.slug}">
-                        <a href="./modeli/${it.slug}.html" class="cart__item-thumb" aria-label="${isEn() ? it.nameEn : it.nameMk}">
-                            <img src="./images/cards/${it.slug}.webp" alt="${isEn() ? it.nameEn : it.nameMk}" loading="lazy">
+                container.innerHTML = lines.map((l) => `
+                    <div class="cart__item" data-cart-item="${l.slug}" data-size="${l.size}">
+                        <a href="./modeli/${l.slug}.html" class="cart__item-thumb" aria-label="${isEn() ? l.nameEn : l.nameMk}">
+                            <img src="./images/cards/${l.slug}.webp" alt="${isEn() ? l.nameEn : l.nameMk}" loading="lazy">
                         </a>
                         <div>
-                            <a href="./modeli/${it.slug}.html" class="cart__item-name">${isEn() ? it.nameEn : it.nameMk}</a>
-                            <div class="cart__item-code">${isEn() ? 'Code' : 'Код'}: ${it.code}</div>
-                            <div class="cart__item-price">${fmt(it.price)} / ${isEn() ? 'pair' : 'пар'}</div>
+                            <a href="./modeli/${l.slug}.html" class="cart__item-name">${isEn() ? l.nameEn : l.nameMk} — ${isEn() ? 'Size' : 'Број'} ${l.size || (isEn() ? 'Universal' : 'Универзална')}</a>
+                            <div class="cart__item-code">${isEn() ? 'Code' : 'Код'}: ${l.code}</div>
+                            <div class="cart__item-price">${fmt(l.price)} / ${isEn() ? 'pair' : 'пар'}</div>
+                            <div class="cart__line-qty">${isEn() ? 'Quantity' : 'Количина'}: ${l.qty}</div>
                         </div>
                         <div class="cart__item-right">
-                            <div class="model-cart" data-model="${it.slug}" data-code="${it.code}" data-price="${it.price}" data-name-mk="${it.nameMk}" data-name-en="${it.nameEn}">
-                                <button type="button" class="model-cart__btn model-cart__minus" data-cart-minus aria-label="Намали" title="Намали" style="display:${it.qty > 1 ? 'flex' : 'none'}">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                </button>
-                                <span class="model-cart__qty" data-cart-qty>${it.qty}</span>
-                                <button type="button" class="model-cart__btn model-cart__add" data-cart-add aria-label="Додади" title="Додади">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                </button>
-                            </div>
-                            <span class="cart__line-total">${fmt(it.qty * (it.price || 0))}</span>
-                            <button type="button" class="cart__remove" data-cart-remove aria-label="Отстрани" title="Отстрани">${isEn() ? 'Remove' : 'Отстрани'}</button>
+                            <span class="cart__line-total">${fmt(l.qty * (l.price || 0))}</span>
+                            <button type="button" class="cart__remove" data-cart-remove data-size="${l.size}" aria-label="${isEn() ? 'Remove' : 'Отстрани'}" title="${isEn() ? 'Remove' : 'Отстрани'}">✕ ${isEn() ? 'Remove' : 'Отстрани'}</button>
                         </div>
                     </div>`).join('') + `
                     <div class="cart__summary">
@@ -231,7 +231,7 @@
                             <span class="cart__total-label" data-mk="Вкупно:" data-sq="Gjithsej:" data-en="Total:">Вкупно:</span>
                             <span class="cart__total-value">${fmt(total)}</span>
                         </div>
-                        <div class="cart__count-badge">${isEn() ? 'Total items: ' : 'Вкупен број на артикли: '} ${items.reduce((s, it) => s + it.qty, 0)}</div>
+                        <div class="cart__count-badge">${isEn() ? 'Total items: ' : 'Вкупен број на артикли: '} ${totalQty}</div>
                         <div class="cart__actions">
                             <a href="./index.html#kategorii" class="hero__cta hero__cta--secondary" data-mk="Продолжи со купување" data-sq="Vazhdo blerjen" data-en="Continue Shopping">Продолжи со купување</a>
                             <a href="./naracka.html" class="hero__cta hero__cta--primary" data-mk="Нарачај сега" data-sq="Porosit tani" data-en="Order Now">Нарачај сега</a>
@@ -242,7 +242,43 @@
                 if (window.MonetaCart.renderFreeShip) {
                     window.MonetaCart.renderFreeShip(window.MonetaCart.getCart());
                 }
+                // Примени го тековниот јазик на свежо рендерираните елементи
+                const curLang = document.documentElement.lang;
+                container.querySelectorAll('[data-mk][data-en]').forEach((el) => {
+                    const t = el.getAttribute('data-' + curLang);
+                    if (t) el.textContent = t;
+                });
+                renderHistory();
             };
+
+            // ===== Историја на пазарење (мали thumbnails) =====
+            const renderHistory = () => {
+                const histEl = document.getElementById('cartHistory');
+                if (!histEl) return;
+                const viewed = (window.MonetaCart.getViewed && window.MonetaCart.getViewed()) || [];
+                const added = (window.MonetaCart.getRecentlyAdded && window.MonetaCart.getRecentlyAdded()) || [];
+                const chip = (it) => `
+                    <a href="./modeli/${it.slug}.html" class="history-chip" title="${isEn() ? it.name : it.name}">
+                        <img src="./images/cards/${it.slug}.webp" alt="${isEn() ? it.name : it.name}" loading="lazy">
+                        <span>${isEn() ? it.name : it.name}</span>
+                    </a>`;
+                const group = (title, list) => list.length ? `
+                    <div class="history-group">
+                        <h4 class="history-title">${title}</h4>
+                        <div class="history-strip">${list.map(chip).join('')}</div>
+                    </div>` : '';
+                histEl.innerHTML = group(isEn() ? 'Recently viewed' : 'Неодамна разгледани', viewed)
+                    + group(isEn() ? 'Recently added to cart' : 'Неодамна додадени во кошничка', added);
+            };
+
+            // ===== Точка 3: Пререндерирање на кошничката =====
+            // По секоја промена (додади/намали/отстрани) листата се освежува
+            window.MonetaCartOnChange = () => render();
+            // При враќање назад (bfcache) исто така се освежува
+            window.addEventListener('pageshow', () => render());
+            // Промена на јазик → пререндерирање на динамичките содржини
+            window.MonetaLangCallbacks = window.MonetaLangCallbacks || [];
+            window.MonetaLangCallbacks.push(() => render());
 
             render();
         });

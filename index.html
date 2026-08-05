@@ -48,7 +48,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preload" href="./images/hero-foot-insole.webp" as="image" fetchpriority="high" />
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&family=Manrope:wght@700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
     <link href="./vendor/aos.css" rel="stylesheet" media="print" onload="this.media='all'" />
     <noscript><link rel="stylesheet" href="./vendor/aos.css" /></noscript>
     <link rel="icon" type="image/svg+xml" href="./images/favicon/favicon.svg" />
@@ -167,7 +167,6 @@
     <section class="hero">
         <div class="hero__content-wrapper">
             <div class="hero__inner">
-                <div class="hero__eyebrow" data-mk="Анатомски влошки за секојдневен комфор" data-sq="Tabana anatomikë për rehati të përditshme" data-en="Anatomical insoles for everyday comfort">Анатомски влошки за секојдневен комфор</div>
                 <h1 class="hero__title-animated">
                     <span class="hero__white" data-mk="РЕШЕНИЕ ЗА ПОДОБАР ЧЕКОР," data-sq="ZGJIDHJE PËR HAP MË TË MIRË," data-en="SOLUTION FOR A BETTER STEP,">РЕШЕНИЕ ЗА ПОДОБАР ЧЕКОР,</span><br>
                     <span class="hero__pink" data-mk="ПОМАЛ ЗАМОР И ПОГОЛЕМА УДОБНОСТ" data-sq="MË PAK LODHJE DHE MË SHUMË REHATI" data-en="LESS FATIGUE &amp; GREATER COMFORT">ПОМАЛ ЗАМОР И ПОГОЛЕМА УДОБНОСТ</span>
@@ -175,6 +174,7 @@
                 <p class="hero__subtitle-dark" data-mk="Вашите стапала ве носат низ целиот ден. Дајте им ја поддршката што ја заслужуваат." data-sq="Këmbët tuaja ju mbajnë gjithë ditën. Jepuni mbështetjen që meritojnë." data-en="Your feet carry you through the whole day. Give them the support they deserve.">
                     Вашите стапала ве носат низ целиот ден. Дајте им ја поддршката што ја заслужуваат.
                 </p>
+                <div class="hero__eyebrow" data-mk="Анатомски влошки за секојдневен комфор" data-sq="Tabana anatomikë për rehati të përditshme" data-en="Anatomical insoles for everyday comfort">Анатомски влошки за секојдневен комфор</div>
                 <div class="hero__cta-group" aria-label="Главни акции">
                     <a class="hero__cta hero__cta--primary" href="./kviz.html" data-mk="Пронајди ја твојата влошка" data-sq="Gjej tabanin tënd" data-en="Find your insole">Пронајди ја твојата влошка</a>
                     <a class="hero__cta hero__cta--secondary" href="#kategorii" data-mk="Види ги моделите" data-sq="Shiko modelet" data-en="Browse models">Види ги моделите</a>
@@ -298,8 +298,8 @@
                         <button type="button" class="compare-tab-btn is-active" id="compareTabInteractive" role="tab" aria-selected="true" data-mk="⇄ 1:1 Интерактивна споредба" data-sq="⇄ Krahasim interaktiv 1:1" data-en="⇄ 1:1 Interactive Comparison">
                             ⇄ 1:1 Интерактивна споредба
                         </button>
-                        <button type="button" class="compare-tab-btn" id="compareTabOverview" role="tab" aria-selected="false" data-mk="📊 Сите модели (Табела)" data-sq="📊 Të gjitha modelet (Tabela)" data-en="📊 All Models (Table)">
-                            📊 Сите 6 модели (Табела)
+                        <button type="button" class="compare-tab-btn" id="compareTabOverview" role="tab" aria-selected="false" data-mk="📊 Сите 20 модели (Табела)" data-sq="📊 Të 20 modelet (Tabela)" data-en="📊 All 20 Models (Table)">
+                            📊 Сите 20 модели (Табела)
                         </button>
                     </div>
 
@@ -432,30 +432,7 @@
                 </div>
 
                 <div class="compare-overview-view" id="compareOverviewView" style="display: none;">
-                    <div class="compare-models__table-scroll">
-                        <table class="compare-table">
-                            <thead>
-                                <tr>
-                                    <th class="compare-table__feature-col">Модел / Особини</th>
-                                    <th><div class="compare-th-item"><img src="./images/cards/Sportski.webp" alt="Спортски" class="compare-th-img" width="60" height="60" loading="lazy" decoding="async"><strong>Спортски</strong></div></th>
-                                    <th><div class="compare-th-item"><img src="./images/cards/Kozni.webp" alt="Кожни" class="compare-th-img" width="60" height="60" loading="lazy" decoding="async"><strong>Кожни</strong></div></th>
-                                    <th><div class="compare-th-item"><img src="./images/cards/Letni.webp" alt="Летни" class="compare-th-img" width="60" height="60" loading="lazy" decoding="async"><strong>Летни</strong></div></th>
-                                    <th><div class="compare-th-item"><img src="./images/cards/thermo_alu.webp" alt="Зимски" class="compare-th-img" width="60" height="60" loading="lazy" decoding="async"><strong>Зимски</strong></div></th>
-                                    <th><div class="compare-th-item"><img src="./images/cards/hunter_vloski.webp" alt="HUNTER" class="compare-th-img" width="60" height="60" loading="lazy" decoding="async"><strong>HUNTER</strong></div></th>
-                                    <th><div class="compare-th-item"><img src="./images/cards/detski.webp" alt="Детски" class="compare-th-img" width="60" height="60" loading="lazy" decoding="async"><strong>Детски</strong></div></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td class="compare-table__label">Материјал</td><td>EVA пена & Gel перничиња</td><td>100% природна кожа & Латекс</td><td>Памук/Лен со активен јаглен</td><td>Природна волна & Алуминиум</td><td>Гумена база & Мемори пена</td><td>Хипоалергенска мека пена</td></tr>
-                                <tr><td class="compare-table__label">Главна намена</td><td>Спорт, трчање, активно вежбање</td><td>Елегантни & деловни обувки</td><td>Летни обувки, без чорапи</td><td>Зимски чизми, студено време</td><td>Лов, планинарење, тешки услови</td><td>Детски обувки & училиште</td></tr>
-                                <tr><td class="compare-table__label">Поддршка за свод</td><td><span class="compare-badge compare-badge--high">Висока</span></td><td><span class="compare-badge compare-badge--medium">Средна</span></td><td><span class="compare-badge compare-badge--light">Лесна</span></td><td><span class="compare-badge compare-badge--medium">Средна</span></td><td><span class="compare-badge compare-badge--max">Максимална</span></td><td><span class="compare-badge compare-badge--gentle">Деликатна</span></td></tr>
-                                <tr><td class="compare-table__label">Апсорпција на шок</td><td><span class="compare-stars">★★★★★</span></td><td><span class="compare-stars">★★★☆☆</span></td><td><span class="compare-stars">★★☆☆☆</span></td><td><span class="compare-stars">★★★★☆</span></td><td><span class="compare-stars">★★★★★</span></td><td><span class="compare-stars">★★★☆☆</span></td></tr>
-                                <tr><td class="compare-table__label">Дебелина</td><td>4 - 6 mm</td><td>3 - 4 mm</td><td>2 - 3 mm</td><td>5 - 7 mm</td><td>6 - 8 mm</td><td>3 - 4 mm</td></tr>
-                                <tr><td class="compare-table__label">Клучна одлика</td><td>Гел амортизација на петата</td><td>Природно апсорбира влага</td><td>Неутрализира мириси</td><td>Изолација од ладен под</td><td>Водоотпорна & длабока пета</td><td>Поддржува правилен развој</td></tr>
-                                <tr><td class="compare-table__label">Детали</td><td><a href="./sportski.html" class="compare-link-btn">Види модел →</a></td><td><a href="./kozni.html" class="compare-link-btn">Види модел →</a></td><td><a href="./letni.html" class="compare-link-btn">Види модел →</a></td><td><a href="./zimski.html" class="compare-link-btn">Види модел →</a></td><td><a href="./hunter.html" class="compare-link-btn">Види модел →</a></td><td><a href="./detski.html" class="compare-link-btn">Види модел →</a></td></tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <!-- Табелата „Сите 20 модели“ се рендерира динамички од script.js (renderOverviewTable) -->
                 </div>
             </div>
         </div>
@@ -849,21 +826,13 @@
                 <div class="footer__tracker">
                     <div class="order-tracker__header">
                         <div class="order-tracker__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
-                        <div class="order-tracker__titles"><h3 data-mk="Следете ја вашата нарачка" data-sq="Ndiq porosinë tuaj" data-en="Track Your Order">Следете ја вашата нарачка</h3><p data-mk="Внесете го вашиот број на нарачка за статус во реално време" data-sq="Shkruani numrin e porosisë për status në kohë reale" data-en="Enter your order number for real-time tracking status">Внесете го вашиот број на нарачка за статус во реално време</p></div>
+                        <div class="order-tracker__titles"><h3 data-mk="Следете ја вашата нарачка" data-sq="Ndiq porosinë tuaj" data-en="Track Your Order">Следете ја вашата нарачка</h3><p data-mk="Бројот за следење ќе го добиете по е-пошта од Карго Експрес. Следете ја пратката директно кај нив." data-sq="Numrin e ndjekjes do ta merrni me e-mail nga Kargo Express. Ndiqni parcelën direkt tek ata." data-en="You'll receive your tracking number by email from Kargo Express. Track your package directly with them.">Бројот за следење ќе го добиете по е-пошта од Карго Експрес. Следете ја пратката директно кај нив.</p></div>
                     </div>
-                    <form class="order-tracker__form" id="orderTrackerForm">
-                        <div class="order-tracker__input-group">
-                            <input type="text" id="orderIdInput" placeholder="Внесете бр. на нарачка (пр. MN-8492)" data-mk-placeholder="Внесете бр. на нарачка (пр. MN-8492)" data-sq-placeholder="Shkruani nr. e porosisë (p.sh. MN-8492)" data-en-placeholder="Enter order no. (e.g. MN-8492)" required autocomplete="off">
-                            <button type="submit" class="order-tracker__submit"><span data-mk="Следи пратка" data-sq="Ndiq parcelën" data-en="Track Package">Следи пратка</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
-                        </div>
-                    </form>
-                    <div class="order-tracker__samples">
-                        <span class="samples-label" data-mk="Брз тест:" data-sq="Test i shpejtë:" data-en="Quick test:">Брз тест:</span>
-                        <button type="button" class="order-sample-chip" data-sample="MN-8492">MN-8492</button>
-                        <button type="button" class="order-sample-chip" data-sample="MN-3021">MN-3021</button>
-                        <button type="button" class="order-sample-chip" data-sample="MN-1094">MN-1094</button>
-                    </div>
-                    <div class="order-tracker__result" id="orderStatusResult" aria-live="polite"></div>
+                    <!-- Точка 6: tracking → директен линк до Карго Експрес (броевите доаѓаат по email) -->
+                    <a class="order-tracker__submit order-tracker__link" href="https://www.kargoekspres.mk/ProverkaPratka.aspx" target="_blank" rel="noopener">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                        <span data-mk="Следи пратка во Карго Експрес" data-sq="Ndiq parcelën në Kargo Express" data-en="Track Package with Kargo Express">Следи пратка во Карго Експрес</span>
+                    </a>
                 </div>
             </div>
 

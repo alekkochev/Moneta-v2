@@ -257,16 +257,44 @@ document.addEventListener('click', (e) => {
                     });
                 }
             });
-            // Спречи „скок/фрлање" при отворање — врати ја позицијата на скролање
+            // Спречи „скок/фрлање" при отворање — држи го summary-то на истата
+            // позиција во viewport-от. Нативниот details-скрол се исклучува со
+            // preventDefault (рачно го префрламе open), па останува само
+            // поместувањето од затворањето на претходната секција, кое го коригираме.
             const head = item.querySelector('summary');
             if (head) {
-                head.addEventListener('click', () => {
-                    const y = window.scrollY;
-                    const fix = () => {
-                        if (Math.abs(window.scrollY - y) > 4) window.scrollTo({ top: y, behavior: 'auto' });
+                head.addEventListener('click', (e) => {
+                    const details = head.closest('details');
+                    if (!details) return;
+                    // Спречи нативен toggle + нативен scroll-into-view
+                    e.preventDefault();
+                    details.open = !details.open;
+
+                    const origTop = head.getBoundingClientRect().top;
+                    const root = document.documentElement;
+                    const prevBehavior = root.style.scrollBehavior;
+                    const prevAnchor = root.style.overflowAnchor;
+                    root.style.scrollBehavior = 'auto';
+                    root.style.overflowAnchor = 'none';
+                    let cleaned = false;
+                    const cleanup = () => {
+                        if (!cleaned) { cleaned = true; root.style.scrollBehavior = prevBehavior; root.style.overflowAnchor = prevAnchor; }
                     };
-                    requestAnimationFrame(fix);
-                    setTimeout(fix, 120);
+                    // Континуирано држи го summary-то на истата визуелна позиција
+                    // додека layout-от (затворање на претходната секција) не се стабилизира.
+                    const start = performance.now();
+                    const stabilize = () => {
+                        const delta = Math.round(head.getBoundingClientRect().top - origTop);
+                        if (Math.abs(delta) > 1) window.scrollBy(0, delta);
+                        const elapsed = performance.now() - start;
+                        // Работи барем 350ms (да го фати асинхрониот toggle), а најмногу 1200ms
+                        if (elapsed < 350 || (Math.abs(delta) > 1 && elapsed < 1200)) {
+                            requestAnimationFrame(stabilize);
+                        } else {
+                            cleanup();
+                        }
+                    };
+                    requestAnimationFrame(stabilize);
                 });
             }
         });
@@ -459,6 +487,33 @@ if (faqAccordion) {
 
         questionBtn.addEventListener('click', () => {
             const isOpen = item.classList.contains('is-open');
+
+            // — Анти-„скок" стабилизација (исто правило како кај модел accordion-ите):
+            // држи го кликнатото прашање на истата позиција во viewport-от додека
+            // GSAP ги затвора/отвора одговорите (layout shift од високата секција горе).
+            const origTop = questionBtn.getBoundingClientRect().top;
+            const rootEl = document.documentElement;
+            const prevBehavior = rootEl.style.scrollBehavior;
+            const prevAnchor = rootEl.style.overflowAnchor;
+            rootEl.style.scrollBehavior = 'auto';
+            rootEl.style.overflowAnchor = 'none';
+            let cleaned = false;
+            const cleanupStab = () => {
+                if (!cleaned) { cleaned = true; rootEl.style.scrollBehavior = prevBehavior; rootEl.style.overflowAnchor = prevAnchor; }
+            };
+            const startStab = performance.now();
+            const stabilizeFaq = () => {
+                const delta = Math.round(questionBtn.getBoundingClientRect().top - origTop);
+                if (Math.abs(delta) > 1) window.scrollBy(0, delta);
+                const elapsed = performance.now() - startStab;
+                // Работи барем 700ms (покрива 0.38s GSAP анимации + маргина), најмногу 1500ms
+                if (elapsed < 700 || (Math.abs(delta) > 1 && elapsed < 1500)) {
+                    requestAnimationFrame(stabilizeFaq);
+                } else {
+                    cleanupStab();
+                }
+            };
+            requestAnimationFrame(stabilizeFaq);
 
             // Close all items first for a clean single-open accordion experience
             faqItems.forEach((otherItem) => {
@@ -895,136 +950,12 @@ if (sizeModal) {
 }
 
 // ========================================
-// ORDER TRACKER LOGIC
+// ORDER TRACKER — Точка 6 (2026-08-05)
+// Следeњето е директен линк до Карго Експрес
+// (https://www.kargoekspres.mk/ProverkaPratka.aspx) во index.html —
+// броевите за следење клиентот ги добива по email од Карго.
+// Демо логиката (knownOrders/trackOrder) е отстранета.
 // ========================================
-const orderTrackerForm = document.getElementById('orderTrackerForm');
-const orderIdInput = document.getElementById('orderIdInput');
-const orderStatusResult = document.getElementById('orderStatusResult');
-const sampleChips = document.querySelectorAll('.order-sample-chip');
-
-if (orderTrackerForm && orderIdInput && orderStatusResult) {
-    const knownOrders = {
-        'MN-8492': {
-            id: 'MN-8492',
-            statusText: 'Во достава од курир',
-            badgeClass: 'order-result__badge--delivering',
-            currentStep: 3, // Step 3 active
-            courier: 'Карго Експрес МК',
-            date: 'Денес, до 15:30 ч.',
-            item: '1x Спортски анатомски влошки (41-42)'
-        },
-        'MN-3021': {
-            id: 'MN-3021',
-            statusText: 'Испратена од централен магацин',
-            badgeClass: 'order-result__badge--shipped',
-            currentStep: 2,
-            courier: 'Брза Пошта МК',
-            date: 'Очекувана достава утре',
-            item: '2x Кожни елегантни влошки (39-40)'
-        },
-        'MN-1094': {
-            id: 'MN-1094',
-            statusText: 'Успешно испорачана',
-            badgeClass: 'order-result__badge--delivered',
-            currentStep: 4,
-            courier: 'Врачено на примач',
-            date: 'Испорачано на 27 Илунденска бр. 12',
-            item: '1x Зимски термо влошки (43-44)'
-        }
-    };
-
-    const trackOrder = (queryId) => {
-        const cleanId = queryId.trim().toUpperCase();
-        if (!cleanId) return;
-
-        let orderData = knownOrders[cleanId];
-
-        // Fallback generator for custom inputs (e.g., MN-5512)
-        if (!orderData) {
-            const formattedId = cleanId.startsWith('MN-') ? cleanId : `MN-${cleanId}`;
-            orderData = {
-                id: formattedId,
-                statusText: 'Се подготвува за пакување',
-                badgeClass: 'order-result__badge--processing',
-                currentStep: 1,
-                courier: 'МОНЕТА Централен магацин Скопје',
-                date: 'Очекувано испраќање за 24ч',
-                item: '1x МОНЕТА Анатомски влошки'
-            };
-        }
-
-        const steps = [
-            { num: 1, label: 'Примена' },
-            { num: 2, label: 'Испратена' },
-            { num: 3, label: 'Во достава' },
-            { num: 4, label: 'Испорачана' }
-        ];
-
-        const timelineHtml = steps.map((s) => {
-            let stateClass = '';
-            let iconText = s.num;
-
-            if (s.num < orderData.currentStep) {
-                stateClass = 'is-done';
-                iconText = '✓';
-            } else if (s.num === orderData.currentStep) {
-                stateClass = orderData.currentStep === 4 ? 'is-done' : 'is-active';
-                if (orderData.currentStep === 4) iconText = '✓';
-            }
-
-            return `
-                <div class="timeline-step ${stateClass}">
-                    <div class="timeline-step__dot">${iconText}</div>
-                    <span class="timeline-step__label">${s.label}</span>
-                </div>
-            `;
-        }).join('');
-
-        orderStatusResult.style.display = 'block';
-        orderStatusResult.innerHTML = `
-            <div class="order-result__header">
-                <div class="order-result__id">
-                    <span>Пратка #${orderData.id}</span>
-                </div>
-                <span class="order-result__badge ${orderData.badgeClass}">${orderData.statusText}</span>
-            </div>
-
-            <div class="order-result__timeline">
-                ${timelineHtml}
-            </div>
-
-            <div class="order-result__details">
-                <div class="order-detail-item">
-                    <span>Курирска служба:</span>
-                    <strong>${orderData.courier}</strong>
-                </div>
-                <div class="order-detail-item">
-                    <span>Статус / Време:</span>
-                    <strong>${orderData.date}</strong>
-                </div>
-                <div class="order-detail-item">
-                    <span>Содржина на пакет:</span>
-                    <strong>${orderData.item}</strong>
-                </div>
-            </div>
-        `;
-    };
-
-    orderTrackerForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        trackOrder(orderIdInput.value);
-    });
-
-    sampleChips.forEach((chip) => {
-        chip.addEventListener('click', () => {
-            const sampleId = chip.dataset.sample;
-            if (sampleId) {
-                orderIdInput.value = sampleId;
-                trackOrder(sampleId);
-            }
-        });
-    });
-}
 
 // ========================================
 // NEWSLETTER SUBSCRIPTION LOGIC
@@ -1129,7 +1060,11 @@ if (compareToggleBtn && compareModelsSection) {
                     opacity: 0,
                     y: -20,
                     duration: 0.25,
-                    ease: 'power2.in'
+                    ease: 'power2.in',
+                    onComplete: () => {
+                        // Точка 10: без transform на картата (transform на предок го крши sticky)
+                        gsap.set(compareCard, { clearProps: 'transform' });
+                    }
                 });
                 gsap.to(compareModelsSection, {
                     height: 0,
@@ -1163,6 +1098,8 @@ if (compareToggleBtn && compareModelsSection) {
                     delay: 0.08,
                     ease: 'power2.out',
                     onComplete: () => {
+                        // Точка 10: без transform на картата (transform на предок го крши sticky)
+                        gsap.set(compareCard, { clearProps: 'transform' });
                         compareModelsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                     }
                 });
@@ -1209,127 +1146,427 @@ if (compareToggleBtn && compareModelsSection) {
     if (!compareSelect1 || !compareSelect2 || !compareInteractiveContainer) return;
 
     // Full Specs Data Matrix
-    const COMPARE_PRODUCTS = {
-        sportski: {
-            id: 'sportski',
-            name: { mk: 'Спортски влошки', en: 'Sports Insoles' },
-            shortName: { mk: 'Спортски', en: 'Sports' },
-            image: './images/cards/Sportski.webp',
-            link: './index.html#kategorii',
-            price: '230 – 620 ден.',
+                const COMPARE_PRODUCTS = {
+        'active-gel': {
+            id: "active-gel",
+            category: "sportski",
+            name: { mk: "Active Gel", en: "Active Gel" },
+            shortName: { mk: "Спортски", en: "Sports" },
+            image: "./images/cards/active-gel.webp",
+            link: "./modeli/active-gel.html",
+            price: "620 ден.",
             specs: {
-                material: { mk: 'EVA пена & Gel перничиња', en: 'EVA foam & Gel cushioning' },
-                purpose: { mk: 'Спорт, трчање, активно вежбање', en: 'Sports, running, active workouts' },
-                archSupport: { mk: 'Висока', en: 'High', levelPercent: 85, badgeClass: 'compare-badge--high' },
-                shockAbsorption: { stars: '★★★★★', score: '5/5', mk: 'Максимална (5/5)', en: 'Maximum (5/5)' },
-                thickness: { mk: '4 - 6 mm', en: '4 - 6 mm' },
-                keyFeature: { mk: 'Гел амортизација за пета и шок-апсорпција', en: 'Gel heel cushioning & high shock absorption' },
-                footwear: { mk: 'Спортски патики, тренинг и активни обувки', en: 'Athletic sneakers, running & workout shoes' },
-                odorControl: { mk: 'Перфорирана дишлива EVA пена', en: 'Perforated breathable EVA foam' },
-                care: { mk: 'Рачно миење со блага сапуница и млака вода', en: 'Hand wash with mild soap and warm water' },
-                fatigue: { mk: 'Намалува притисок во зглобовите до 95%', en: 'Reduces joint pressure by up to 95%' }
+                material: { mk: "Мек плиш & Активен гел", en: "Soft plush & active gel" },
+                purpose: { mk: "Спорт, трчање, фитнес, рекреативен спорт", en: "Sports, running, fitness, recreational sport" },
+                archSupport: { mk: "Средна", en: "Medium", levelPercent: 60, badgeClass: "compare-badge--medium" },
+                shockAbsorption: { stars: "★★★★☆", score: "4/5", mk: "Висока (4/5)", en: "High (4/5)" },
+                thickness: { mk: "3–4 mm", en: "3–4 mm" },
+                keyFeature: { mk: "Активен гел за амортизација, се сече по големина", en: "Active gel cushioning, cut to size" },
+                footwear: { mk: "Спортски патики, обувки за трчање, фитнес обувки", en: "Sports sneakers, running & fitness shoes" },
+                odorControl: { mk: "Перфорирана дишлива површина", en: "Breathable perforated surface" },
+                care: { mk: "Влажна крпа, природно сушење", en: "Wipe with damp cloth, air dry" },
+                fatigue: { mk: "Намалува замор при трчање и стоење", en: "Reduces fatigue when running & standing" }
             }
         },
-        kozhni: {
-            id: 'kozhni',
-            name: { mk: 'Кожни влошки', en: 'Leather Insoles' },
-            shortName: { mk: 'Кожни', en: 'Leather' },
-            image: './images/cards/Kozni.webp',
-            link: './index.html#kategorii',
-            price: '100 – 820 ден.',
+        'anatomiX': {
+            id: "anatomiX",
+            category: "sportski",
+            name: { mk: "AnatomiX", en: "AnatomiX" },
+            shortName: { mk: "Спортски", en: "Sports" },
+            image: "./images/cards/anatomiX.webp",
+            link: "./modeli/anatomiX.html",
+            price: "430 ден.",
             specs: {
-                material: { mk: '100% природна кожа & мек латекс', en: '100% genuine leather & soft latex' },
-                purpose: { mk: 'Елегантни, деловни и секојдневни обувки', en: 'Elegant, business & everyday shoes' },
-                archSupport: { mk: 'Средна', en: 'Medium', levelPercent: 65, badgeClass: 'compare-badge--medium' },
-                shockAbsorption: { stars: '★★★☆☆', score: '3/5', mk: 'Умерена (3/5)', en: 'Moderate (3/5)' },
-                thickness: { mk: '3 - 4 mm', en: '3 - 4 mm' },
-                keyFeature: { mk: 'Природна кожа која абсорбира влага и мирис', en: 'Natural leather moisture & odor absorption' },
-                footwear: { mk: 'Деловни чевли, чизми и суви обувки', en: 'Dress shoes, leather boots & formal shoes' },
-                odorControl: { mk: 'Природни макропори против потење', en: 'Natural pores resisting sweat' },
-                care: { mk: 'Бришење со влажна/сува памучна крпа', en: 'Wipe clean with damp or dry cloth' },
-                fatigue: { mk: 'Спречува лизгање и дава елегантна удобност', en: 'Prevents slippage with elegant comfort' }
+                material: { mk: "Текстил со активен јаглен, рециклирана антибактериска пена, карбосан пена", en: "Textile with activated carbon, recycled antibacterial foam, dual-density carbosan" },
+                purpose: { mk: "Трчање, trail running, планинарење, trekking", en: "Running, trail running, hiking, trekking" },
+                archSupport: { mk: "Висока", en: "High", levelPercent: 85, badgeClass: "compare-badge--high" },
+                shockAbsorption: { stars: "★★★★★", score: "5/5", mk: "Максимална (5/5)", en: "Maximum (5/5)" },
+                thickness: { mk: "4–5 mm", en: "4–5 mm" },
+                keyFeature: { mk: "Премиум RUN & HIKING, перење до 30°C", en: "Premium RUN & HIKING, washable up to 30°C" },
+                footwear: { mk: "Спортски, trail, планинарски, trekking обувки", en: "Sports, trail, hiking, trekking shoes" },
+                odorControl: { mk: "Текстил со активен јаглен", en: "Activated carbon textile" },
+                care: { mk: "Перење до 30°C, природно сушење", en: "Machine/hand wash up to 30°C, air dry" },
+                fatigue: { mk: "Поддршка при долги трки и искачувања", en: "Support for long runs & climbs" }
             }
         },
-        letni: {
-            id: 'letni',
-            name: { mk: 'Летни влошки', en: 'Summer Insoles' },
-            shortName: { mk: 'Летни', en: 'Summer' },
-            image: './images/cards/Letni.webp',
-            link: './index.html#kategorii',
-            price: '120 – 170 ден.',
+        'memosole': {
+            id: "memosole",
+            category: "sportski",
+            name: { mk: "MEMOSOLE", en: "MEMOSOLE" },
+            shortName: { mk: "Спортски", en: "Sports" },
+            image: "./images/cards/memosole.webp",
+            link: "./modeli/memosole.html",
+            price: "400 ден.",
             specs: {
-                material: { mk: 'Памук / Лен со активен јаглен', en: 'Cotton / Linen with activated carbon' },
-                purpose: { mk: 'Летни обувки, носење на босо стапало', en: 'Summer footwear, barefoot wear' },
-                archSupport: { mk: 'Лесна', en: 'Light', levelPercent: 40, badgeClass: 'compare-badge--light' },
-                shockAbsorption: { stars: '★★☆☆☆', score: '2/5', mk: 'Лесна (2/5)', en: 'Light (2/5)' },
-                thickness: { mk: '2 - 3 mm', en: '2 - 3 mm' },
-                keyFeature: { mk: 'Фитер од активен јаглен против непријатни мириси', en: 'Activated carbon filter neutralizing odors' },
-                footwear: { mk: 'Мокасини, еспадрили, патики и летни чевли', en: 'Loafers, espadrilles, sneakers & summer shoes' },
-                odorControl: { mk: 'Максимална заштита со активен јаглен', en: 'Maximum active carbon odor protection' },
-                care: { mk: 'Рачно перење на температура до 30°C', en: 'Hand wash at temperatures up to 30°C' },
-                fatigue: { mk: 'Свежина и чувство на сувост во топли денови', en: 'Freshness and dryness on hot days' }
+                material: { mk: "Текстилен слој, мемориска пена, латекс со активен јаглен", en: "Textile layer, memory foam, latex with active carbon" },
+                purpose: { mk: "Пешачење, трчање, секојдневни активности", en: "Walking, running, daily activities" },
+                archSupport: { mk: "Средна", en: "Medium", levelPercent: 70, badgeClass: "compare-badge--medium" },
+                shockAbsorption: { stars: "★★★★☆", score: "4/5", mk: "Висока (4/5)", en: "High (4/5)" },
+                thickness: { mk: "4–6 mm", en: "4–6 mm" },
+                keyFeature: { mk: "Мемориска пена што се прилагодува на стапалото", en: "Memory foam that adapts to the foot" },
+                footwear: { mk: "Спортски патики, обувки за трчање, работни обувки", en: "Sports sneakers, running shoes, work shoes" },
+                odorControl: { mk: "Латекс со активен јаглен", en: "Latex with active carbon" },
+                care: { mk: "Влажна крпа, природно сушење", en: "Wipe with damp cloth, air dry" },
+                fatigue: { mk: "Адаптација кон формата на стапалото", en: "Adapts to the shape of the foot" }
             }
         },
-        zimski: {
-            id: 'zimski',
-            name: { mk: 'Зимски влошки', en: 'Winter Insoles' },
-            shortName: { mk: 'Зимски', en: 'Winter' },
-            image: './images/cards/thermo_alu.webp',
-            link: './index.html#kategorii',
-            price: '210 ден.',
+        'sport-style': {
+            id: "sport-style",
+            category: "sportski",
+            name: { mk: "Sport Style", en: "Sport Style" },
+            shortName: { mk: "Спортски", en: "Sports" },
+            image: "./images/cards/sport-style.webp",
+            link: "./modeli/sport-style.html",
+            price: "300 ден.",
             specs: {
-                material: { mk: '100% природна волна & алуминиумски слој', en: '100% natural wool & aluminium barrier' },
-                purpose: { mk: 'Зимски чизми, топлотна изолација во студ', en: 'Winter boots, cold weather isolation' },
-                archSupport: { mk: 'Средна', en: 'Medium', levelPercent: 60, badgeClass: 'compare-badge--medium' },
-                shockAbsorption: { stars: '★★★★☆', score: '4/5', mk: 'Висока (4/5)', en: 'High (4/5)' },
-                thickness: { mk: '5 - 7 mm', en: '5 - 7 mm' },
-                keyFeature: { mk: 'Термо-алуминиумска заштита од ладен под', en: 'Thermo-aluminium cold ground barrier' },
-                footwear: { mk: 'Зимски чизми, спортски чизми за снег', en: 'Winter boots, snow boots, heavy shoes' },
-                odorControl: { mk: 'Природна волнена саморегулација', en: 'Natural self-regulating wool' },
-                care: { mk: 'Нежно четкање со сува четка', en: 'Gentle dry brushing' },
-                fatigue: { mk: 'Ги одржува стапалата топли во екстремен студ', en: 'Keeps feet warm in extreme cold conditions' }
+                material: { mk: "100% памучен фротир, ароматизирана латекс пена, пластичен носач, карбосан", en: "100% cotton terry, aromatic latex foam, plastic arch support, carbosan" },
+                purpose: { mk: "Трчање, фитнес, рекреативен спорт, секојдневно", en: "Running, fitness, recreational sport, daily use" },
+                archSupport: { mk: "Средна", en: "Medium", levelPercent: 65, badgeClass: "compare-badge--medium" },
+                shockAbsorption: { stars: "★★★☆☆", score: "3/5", mk: "Умерена (3/5)", en: "Moderate (3/5)" },
+                thickness: { mk: "4–5 mm", en: "4–5 mm" },
+                keyFeature: { mk: "Памучен фротир + пластичен носач за стабилност", en: "Cotton terry + plastic arch support for stability" },
+                footwear: { mk: "Спортски патики, фитнес, секојдневни спортски обувки", en: "Sports sneakers, fitness, everyday sports shoes" },
+                odorControl: { mk: "Ароматизирана латекс пена", en: "Aromatic latex foam" },
+                care: { mk: "Влажна крпа, природно сушење", en: "Wipe with damp cloth, air dry" },
+                fatigue: { mk: "Стабилност при секојдневно носење", en: "Stability for daily wear" }
             }
         },
-        hunter: {
-            id: 'hunter',
-            name: { mk: 'HUNTER влошки', en: 'HUNTER Insoles' },
-            shortName: { mk: 'HUNTER', en: 'HUNTER' },
-            image: './images/cards/hunter_vloski.webp',
-            link: './index.html#kategorii',
-            price: '330 ден.',
+        'sportex': {
+            id: "sportex",
+            category: "sportski",
+            name: { mk: "Sportex", en: "Sportex" },
+            shortName: { mk: "Спортски", en: "Sports" },
+            image: "./images/cards/sportex.webp",
+            link: "./modeli/sportex.html",
+            price: "230 ден.",
             specs: {
-                material: { mk: 'Гумена база & мемори пена за екстремни услови', en: 'Heavy rubber base & high-density memory foam' },
-                purpose: { mk: 'Лов, планинарење, теренска работа', en: 'Hunting, hiking, extreme outdoor duty' },
-                archSupport: { mk: 'Максимална', en: 'Maximum', levelPercent: 100, badgeClass: 'compare-badge--max' },
-                shockAbsorption: { stars: '★★★★★', score: '5/5', mk: 'Максимална (5/5)', en: 'Maximum (5/5)' },
-                thickness: { mk: '6 - 8 mm', en: '6 - 8 mm' },
-                keyFeature: { mk: 'Водоотпорна гумена чашка и длабоко фиксирање', en: 'Waterproof rubber base & deep heel cup' },
-                footwear: { mk: 'Ловечки чизми, планински и работни обувки', en: 'Hunting boots, hiking boots, work boots' },
-                odorControl: { mk: 'Хидрофобна антибактериска површина', en: 'Hydrophobic antibacterial layer' },
-                care: { mk: 'Директно миење под млаз вода со сапун', en: 'Direct rinse with water and soap' },
-                fatigue: { mk: 'Спречува извиткување на глуждот на нерамен терен', en: 'Prevents ankle rolls on rugged terrain' }
+                material: { mk: "PES текстил, полиуретанска антибактериска карбосан пена, воздушно перниче", en: "PES textile, polyurethane antibacterial carbosan foam, air cushion" },
+                purpose: { mk: "Трчање, пешачење, фитнес, рекреација", en: "Running, walking, fitness, recreation" },
+                archSupport: { mk: "Средна", en: "Medium", levelPercent: 60, badgeClass: "compare-badge--medium" },
+                shockAbsorption: { stars: "★★★★☆", score: "4/5", mk: "Висока (4/5)", en: "High (4/5)" },
+                thickness: { mk: "4–5 mm", en: "4–5 mm" },
+                keyFeature: { mk: "Воздушно перниче во петата + алое вера", en: "Heel air cushion + aloe vera" },
+                footwear: { mk: "Спортски патики, тренинг, рекреативни обувки", en: "Sports sneakers, training, recreational shoes" },
+                odorControl: { mk: "Антибактериски + свеж мирис на алое вера", en: "Antibacterial + fresh aloe vera scent" },
+                care: { mk: "Влажна крпа, природно сушење", en: "Wipe with damp cloth, air dry" },
+                fatigue: { mk: "Амортизација при движење", en: "Shock absorption during movement" }
             }
         },
-        detski: {
-            id: 'detski',
-            name: { mk: 'Детски влошки', en: 'Kids Insoles' },
-            shortName: { mk: 'Детски', en: 'Kids' },
-            image: './images/cards/detski.webp',
-            link: './index.html#kategorii',
-            price: '490 ден.',
+        'x-treme': {
+            id: "x-treme",
+            category: "sportski",
+            name: { mk: "X-TREME", en: "X-TREME" },
+            shortName: { mk: "Спортски", en: "Sports" },
+            image: "./images/cards/x-treme.webp",
+            link: "./modeli/x-treme.html",
+            price: "420 ден.",
             specs: {
-                material: { mk: 'Хипоалергенска мека анатомична пена', en: 'Hypoallergenic soft anatomical foam' },
-                purpose: { mk: 'Детски обувки, училиште & спорт', en: 'Children shoes, school & playtime' },
-                archSupport: { mk: 'Деликатна', en: 'Gentle', levelPercent: 50, badgeClass: 'compare-badge--gentle' },
-                shockAbsorption: { stars: '★★★☆☆', score: '3/5', mk: 'Средна (3/5)', en: 'Medium (3/5)' },
-                thickness: { mk: '3 - 4 mm', en: '3 - 4 mm' },
-                keyFeature: { mk: 'Анатомски обликувана за правилен раст на стапалото', en: 'Anatomically molded for healthy foot growth' },
-                footwear: { mk: 'Детски патики, училишни чевли', en: 'Kids sneakers, school shoes, boots' },
-                odorControl: { mk: 'Благ антибактериски слој за детска кожа', en: 'Gentle antibacterial layer for young skin' },
-                care: { mk: 'Брзо сушење по рачно миење', en: 'Quick drying after hand wash' },
-                fatigue: { mk: 'Поддржува правилно држење на детското тело', en: 'Supports healthy posture during development' }
+                material: { mk: "WAP високоапсорбирачки материјал, латекс со термо-филц, пластичен носач, карбосан", en: "WAP high-absorption material, latex with thermo-felt, plastic arch support, carbosan" },
+                purpose: { mk: "Планинарење, trekking, trail running, outdoor", en: "Hiking, trekking, trail running, outdoor" },
+                archSupport: { mk: "Максимална", en: "Maximum", levelPercent: 95, badgeClass: "compare-badge--max" },
+                shockAbsorption: { stars: "★★★★★", score: "5/5", mk: "Максимална (5/5)", en: "Maximum (5/5)" },
+                thickness: { mk: "5–7 mm", en: "5–7 mm" },
+                keyFeature: { mk: "4-слојна конструкција со WAP амортизирачка зона", en: "4-layer construction with WAP cushioning zone" },
+                footwear: { mk: "Планинарски, trekking, trail, работни обувки", en: "Hiking, trekking, trail, work boots" },
+                odorControl: { mk: "Хидрофобна антибактериска површина", en: "Hydrophobic antibacterial layer" },
+                care: { mk: "Проветрување, влажна крпа, природно сушење", en: "Air out, wipe with damp cloth, air dry" },
+                fatigue: { mk: "Стабилност на нерамен терен", en: "Stability on rugged terrain" }
             }
-        }
+        },
+        'topas': {
+            id: "topas",
+            category: "kozni",
+            name: { mk: "Topas", en: "Topas" },
+            shortName: { mk: "Кожни", en: "Leather" },
+            image: "./images/cards/topas.webp",
+            link: "./modeli/topas.html",
+            price: "490 ден.",
+            specs: {
+                material: { mk: "Мека перфорирана јагнешка кожа, пластичен носач, карбосан перниче", en: "Soft perforated lambskin, plastic arch support, carbosan heel cushion" },
+                purpose: { mk: "Работа, деловни обврски, секојдневно носење", en: "Work, business, everyday wear" },
+                archSupport: { mk: "Средна", en: "Medium", levelPercent: 60, badgeClass: "compare-badge--medium" },
+                shockAbsorption: { stars: "★★★☆☆", score: "3/5", mk: "Умерена (3/5)", en: "Moderate (3/5)" },
+                thickness: { mk: "3–4 mm", en: "3–4 mm" },
+                keyFeature: { mk: "3/4 дизајн за елегантни чевли со ограничен простор", en: "3/4 design for elegant shoes with limited space" },
+                footwear: { mk: "Елегантни чевли, мокасини, кожни чевли", en: "Elegant shoes, loafers, leather shoes" },
+                odorControl: { mk: "Природна кожа со макропори", en: "Natural leather with macropores" },
+                care: { mk: "Мека влажна крпа, не потопувај во вода", en: "Wipe with soft damp cloth, do not soak" },
+                fatigue: { mk: "Комфор во обувки со ограничен простор", en: "Comfort in shoes with limited space" }
+            }
+        },
+        'soft-gel': {
+            id: "soft-gel",
+            category: "kozni",
+            name: { mk: "Soft Gel", en: "Soft Gel" },
+            shortName: { mk: "Кожни", en: "Leather" },
+            image: "./images/cards/soft-gel.webp",
+            link: "./modeli/soft-gel.html",
+            price: "820 ден.",
+            specs: {
+                material: { mk: "Мека јагнешка кожа, две гел перничиња, латекс со активен јаглен, пластичен носач, карбосан", en: "Soft lambskin, two gel cushions, latex with active carbon, plastic arch support, carbosan" },
+                purpose: { mk: "Секојдневно, работа, подолг престој на нозе", en: "Daily use, work, long hours on feet" },
+                archSupport: { mk: "Средна", en: "Medium", levelPercent: 65, badgeClass: "compare-badge--medium" },
+                shockAbsorption: { stars: "★★★★☆", score: "4/5", mk: "Висока (4/5)", en: "High (4/5)" },
+                thickness: { mk: "3–4 mm", en: "3–4 mm" },
+                keyFeature: { mk: "Кожа + гел перничиња во зоните на најголем контакт", en: "Leather + gel cushions in high-contact zones" },
+                footwear: { mk: "Кожни чевли, спортско-елегантни, работни обувки", en: "Leather shoes, smart-casual, work shoes" },
+                odorControl: { mk: "Латекс со активен јаглен", en: "Latex with active carbon" },
+                care: { mk: "Мека влажна крпа, природно сушење", en: "Wipe with soft damp cloth, air dry" },
+                fatigue: { mk: "Удобност при долг престој на нозе", en: "Comfort during long hours on feet" }
+            }
+        },
+        'vital': {
+            id: "vital",
+            category: "kozni",
+            name: { mk: "Vital", en: "Vital" },
+            shortName: { mk: "Кожни", en: "Leather" },
+            image: "./images/cards/vital.webp",
+            link: "./modeli/vital.html",
+            price: "450 ден.",
+            specs: {
+                material: { mk: "Мека перфорирана јагнешка кожа, карбосан перниче, латекс со активен јаглен", en: "Soft perforated lambskin, carbosan heel cushion, latex with active carbon" },
+                purpose: { mk: "Работа, пешачење, секојдневни активности, деловни обврски", en: "Work, walking, daily activities, business" },
+                archSupport: { mk: "Средна", en: "Medium", levelPercent: 65, badgeClass: "compare-badge--medium" },
+                shockAbsorption: { stars: "★★★☆☆", score: "3/5", mk: "Умерена (3/5)", en: "Moderate (3/5)" },
+                thickness: { mk: "3–4 mm", en: "3–4 mm" },
+                keyFeature: { mk: "Карбосан перниче за дополнителен комфор на петата", en: "Carbosan cushion for extra heel comfort" },
+                footwear: { mk: "Кожни, секојдневни, спортско-елегантни, работни обувки", en: "Leather, everyday, smart-casual, work shoes" },
+                odorControl: { mk: "Латекс со активен јаглен", en: "Latex with active carbon" },
+                care: { mk: "Мека влажна крпа, природно сушење", en: "Wipe with soft damp cloth, air dry" },
+                fatigue: { mk: "Поддршка при долго стоење", en: "Support during prolonged standing" }
+            }
+        },
+        'relax': {
+            id: "relax",
+            category: "kozni",
+            name: { mk: "Relax", en: "Relax" },
+            shortName: { mk: "Кожни", en: "Leather" },
+            image: "./images/cards/relax.webp",
+            link: "./modeli/relax.html",
+            price: "570 ден.",
+            specs: {
+                material: { mk: "Мека перфорирана јагнешка кожа, латекс со активен јаглен, пластичен носач, карбосан", en: "Soft perforated lambskin, latex with active carbon, plastic arch support, carbosan" },
+                purpose: { mk: "Секојдневно, канцеларија, работа, пешачење", en: "Daily use, office, work, walking" },
+                archSupport: { mk: "Средна", en: "Medium", levelPercent: 65, badgeClass: "compare-badge--medium" },
+                shockAbsorption: { stars: "★★★☆☆", score: "3/5", mk: "Умерена (3/5)", en: "Moderate (3/5)" },
+                thickness: { mk: "3–4 mm", en: "3–4 mm" },
+                keyFeature: { mk: "Перфорирана кожа + пластичен носач", en: "Perforated leather + plastic arch support" },
+                footwear: { mk: "Кожни, работни обувки, чизми, секојдневни", en: "Leather, work shoes, boots, everyday" },
+                odorControl: { mk: "Перфорирана кожа за циркулација", en: "Perforated leather for air circulation" },
+                care: { mk: "Мека влажна крпа, природно сушење", en: "Wipe with soft damp cloth, air dry" },
+                fatigue: { mk: "Комфор при подолго стоење и работа", en: "Comfort during long standing & work" }
+            }
+        },
+        'heel-pad': {
+            id: "heel-pad",
+            category: "heelpad",
+            name: { mk: "Heel Pad", en: "Heel Pad" },
+            shortName: { mk: "Heel Pad", en: "Heel Pad" },
+            image: "./images/cards/heel-pad.webp",
+            link: "./modeli/heel-pad.html",
+            price: "250 ден.",
+            specs: {
+                material: { mk: "Мека јагнешка кожа, карбосан перниче, самолеплив слој", en: "Soft lambskin, carbosan cushion, self-adhesive layer" },
+                purpose: { mk: "Перниче за пета, секојдневно носење", en: "Heel cushion, everyday wear" },
+                archSupport: { mk: "Лесна", en: "Light", levelPercent: 30, badgeClass: "compare-badge--light" },
+                shockAbsorption: { stars: "★★★☆☆", score: "3/5", mk: "Умерена (3/5)", en: "Moderate (3/5)" },
+                thickness: { mk: "2–3 mm", en: "2–3 mm" },
+                keyFeature: { mk: "Самолепливо перниче за амортизација на петата", en: "Self-adhesive cushion for heel shock absorption" },
+                footwear: { mk: "Кожни чевли, патики, работни, обувки со ниска пета", en: "Leather shoes, sneakers, work shoes, low heels" },
+                odorControl: { mk: "Природна кожа", en: "Natural leather" },
+                care: { mk: "Мека влажна крпа, не потопувај во вода", en: "Wipe with soft damp cloth, do not soak" },
+                fatigue: { mk: "Амортизација на петата при одење", en: "Heel cushioning while walking" }
+            }
+        },
+        'heel-pad-fix': {
+            id: "heel-pad-fix",
+            category: "heelpad",
+            name: { mk: "Heel Pad Fix", en: "Heel Pad Fix" },
+            shortName: { mk: "Heel Pad", en: "Heel Pad" },
+            image: "./images/cards/heel-pad-fix.webp",
+            link: "./modeli/heel-pad-fix.html",
+            price: "210 ден.",
+            specs: {
+                material: { mk: "Мека јагнешка кожа, карбосан перниче, самолеплив слој", en: "Soft lambskin, carbosan cushion, self-adhesive layer" },
+                purpose: { mk: "Формирачко перниче за пета", en: "Forming heel cushion" },
+                archSupport: { mk: "Лесна", en: "Light", levelPercent: 30, badgeClass: "compare-badge--light" },
+                shockAbsorption: { stars: "★★★☆☆", score: "3/5", mk: "Умерена (3/5)", en: "Moderate (3/5)" },
+                thickness: { mk: "2–3 mm", en: "2–3 mm" },
+                keyFeature: { mk: "Формирачко перниче за стабилно позиционирање на петата", en: "Forming cushion for stable heel positioning" },
+                footwear: { mk: "Секојдневни, патики, кожни, обувки со рамна пета", en: "Everyday, sneakers, leather, flat-heel shoes" },
+                odorControl: { mk: "Природна кожа", en: "Natural leather" },
+                care: { mk: "Мека влажна крпа, природно сушење", en: "Wipe with soft damp cloth, air dry" },
+                fatigue: { mk: "Стабилност на петата", en: "Heel stability" }
+            }
+        },
+        'heel-pad-grip': {
+            id: "heel-pad-grip",
+            category: "heelpad",
+            name: { mk: "Heel Pad Grip", en: "Heel Pad Grip" },
+            shortName: { mk: "Heel Pad", en: "Heel Pad" },
+            image: "./images/cards/heel-pad-grip.webp",
+            link: "./modeli/heel-pad-grip.html",
+            price: "100 ден.",
+            specs: {
+                material: { mk: "Мека јагнешка кожа, карбосан пена, самолеплив слој", en: "Soft lambskin, carbosan foam, self-adhesive layer" },
+                purpose: { mk: "Grip за пета, спречува лизгање", en: "Heel grip, prevents slipping" },
+                archSupport: { mk: "Лесна", en: "Light", levelPercent: 20, badgeClass: "compare-badge--light" },
+                shockAbsorption: { stars: "★★☆☆☆", score: "2/5", mk: "Лесна (2/5)", en: "Light (2/5)" },
+                thickness: { mk: "2–3 mm", en: "2–3 mm" },
+                keyFeature: { mk: "Универзален самолеплив grip против лизгање", en: "Universal self-adhesive anti-slip grip" },
+                footwear: { mk: "Машки и женски обувки (универзален)", en: "Men's and women's shoes (universal)" },
+                odorControl: { mk: "Природна кожа", en: "Natural leather" },
+                care: { mk: "Мека влажна крпа, не перење со вода", en: "Wipe with soft damp cloth, no water washing" },
+                fatigue: { mk: "Помага петата да остане стабилна", en: "Keeps the heel stable" }
+            }
+        },
+        'carbon': {
+            id: "carbon",
+            category: "letni",
+            name: { mk: "Carbon", en: "Carbon" },
+            shortName: { mk: "Летни", en: "Summer" },
+            image: "./images/cards/carbon.webp",
+            link: "./modeli/carbon.html",
+            price: "170 ден.",
+            specs: {
+                material: { mk: "Памук/Лен со активен јаглен", en: "Cotton/Linen with activated carbon" },
+                purpose: { mk: "Летни обувки, носење на босо стапало", en: "Summer shoes, barefoot wear" },
+                archSupport: { mk: "Лесна", en: "Light", levelPercent: 40, badgeClass: "compare-badge--light" },
+                shockAbsorption: { stars: "★★☆☆☆", score: "2/5", mk: "Лесна (2/5)", en: "Light (2/5)" },
+                thickness: { mk: "2–3 mm", en: "2–3 mm" },
+                keyFeature: { mk: "Активен јаглен, универзална — се сече по големина", en: "Activated carbon, universal — cut to size" },
+                footwear: { mk: "Спортски, патики, платнени, лесни летни обувки", en: "Sports shoes, sneakers, canvas, light summer shoes" },
+                odorControl: { mk: "Максимална заштита со активен јаглен", en: "Maximum activated carbon protection" },
+                care: { mk: "Влажна крпа, сушење на собна температура", en: "Wipe with damp cloth, dry at room temperature" },
+                fatigue: { mk: "Свежина и сувост во топли денови", en: "Freshness and dryness on hot days" }
+            }
+        },
+        'simona': {
+            id: "simona",
+            category: "letni",
+            name: { mk: "Simona", en: "Simona" },
+            shortName: { mk: "Летни", en: "Summer" },
+            image: "./images/cards/simona.webp",
+            link: "./modeli/simona.html",
+            price: "120 ден.",
+            specs: {
+                material: { mk: "100% памучна ткаенина, латекс со активен јаглен, ароматична карбосан пена", en: "100% cotton fabric, latex with active carbon, aromatic carbosan foam" },
+                purpose: { mk: "Летни обувки, секојдневно носење", en: "Summer shoes, everyday wear" },
+                archSupport: { mk: "Лесна", en: "Light", levelPercent: 40, badgeClass: "compare-badge--light" },
+                shockAbsorption: { stars: "★★☆☆☆", score: "2/5", mk: "Лесна (2/5)", en: "Light (2/5)" },
+                thickness: { mk: "2–3 mm", en: "2–3 mm" },
+                keyFeature: { mk: "100% памук + ароматична пена", en: "100% cotton + aromatic foam" },
+                footwear: { mk: "Патики, летни обувки, мокасини, платнени", en: "Sneakers, summer shoes, loafers, canvas" },
+                odorControl: { mk: "Ароматична карбосан пена", en: "Aromatic carbosan foam" },
+                care: { mk: "Мека влажна крпа, природно сушење", en: "Wipe with soft damp cloth, air dry" },
+                fatigue: { mk: "Лесност и удобност во лето", en: "Lightness and comfort in summer" }
+            }
+        },
+        'thermo-alu': {
+            id: "thermo-alu",
+            category: "zimski",
+            name: { mk: "Thermo Alu", en: "Thermo Alu" },
+            shortName: { mk: "Зимски", en: "Winter" },
+            image: "./images/cards/thermo-alu.webp",
+            link: "./modeli/thermo-alu.html",
+            price: "210 ден.",
+            specs: {
+                material: { mk: "100% природна волна, латекс пена, алуминиумска фолија", en: "100% natural wool, latex foam, aluminium foil" },
+                purpose: { mk: "Зимски услови, топлотна изолација", en: "Winter conditions, thermal insulation" },
+                archSupport: { mk: "Средна", en: "Medium", levelPercent: 60, badgeClass: "compare-badge--medium" },
+                shockAbsorption: { stars: "★★★★☆", score: "4/5", mk: "Висока (4/5)", en: "High (4/5)" },
+                thickness: { mk: "5–7 mm", en: "5–7 mm" },
+                keyFeature: { mk: "Волна + алуминиумска изолација од ладен под", en: "Wool + aluminium cold-ground insulation" },
+                footwear: { mk: "Зимски чизми, планинарски, работни, гумени чизми", en: "Winter boots, hiking, work, rubber boots" },
+                odorControl: { mk: "Природна волнена саморегулација", en: "Natural self-regulating wool" },
+                care: { mk: "Мека четка/влажна крпа, без радијатор", en: "Soft brush/damp cloth, no radiator drying" },
+                fatigue: { mk: "Топлина во екстремен студ", en: "Warmth in extreme cold" }
+            }
+        },
+        'hunter-camo': {
+            id: "hunter-camo",
+            category: "hunter",
+            name: { mk: "Hunter CAMO", en: "Hunter CAMO" },
+            shortName: { mk: "HUNTER", en: "HUNTER" },
+            image: "./images/cards/hunter-camo.webp",
+            link: "./modeli/hunter-camo.html",
+            price: "330 ден.",
+            specs: {
+                material: { mk: "100% PES Atlas текстил, латекс пена со активен јаглен", en: "100% PES Atlas textile, latex foam with active carbon" },
+                purpose: { mk: "Лов, планинарење, trekking, outdoor", en: "Hunting, hiking, trekking, outdoor" },
+                archSupport: { mk: "Максимална", en: "Maximum", levelPercent: 100, badgeClass: "compare-badge--max" },
+                shockAbsorption: { stars: "★★★★★", score: "5/5", mk: "Максимална (5/5)", en: "Maximum (5/5)" },
+                thickness: { mk: "6–8 mm", en: "6–8 mm" },
+                keyFeature: { mk: "Камуфлажен дизајн + латекс со активен јаглен", en: "Camouflage design + latex with active carbon" },
+                footwear: { mk: "Ловечки, планинарски, trekking, работни чизми", en: "Hunting, hiking, trekking, work boots" },
+                odorControl: { mk: "Латекс со активен јаглен", en: "Latex with active carbon" },
+                care: { mk: "Влажна крпа, природно сушење", en: "Wipe with damp cloth, air dry" },
+                fatigue: { mk: "Комфор при долги outdoor активности", en: "Comfort during long outdoor activities" }
+            }
+        },
+        'hunter-flex': {
+            id: "hunter-flex",
+            category: "hunter",
+            name: { mk: "Hunter FLEX", en: "Hunter FLEX" },
+            shortName: { mk: "HUNTER", en: "HUNTER" },
+            image: "./images/cards/hunter-flex.webp",
+            link: "./modeli/hunter-flex.html",
+            price: "330 ден.",
+            specs: {
+                material: { mk: "100% Cambrella текстил, алуминиумска фолија, висококвалитетен филц", en: "100% Cambrella textile, aluminium foil, high-quality felt" },
+                purpose: { mk: "Лов, планинарење, риболов, постудени услови", en: "Hunting, hiking, fishing, colder conditions" },
+                archSupport: { mk: "Максимална", en: "Maximum", levelPercent: 100, badgeClass: "compare-badge--max" },
+                shockAbsorption: { stars: "★★★★★", score: "5/5", mk: "Максимална (5/5)", en: "Maximum (5/5)" },
+                thickness: { mk: "6–8 mm", en: "6–8 mm" },
+                keyFeature: { mk: "3-слојна: Cambrella + алуминиум + филц (топлина)", en: "3-layer: Cambrella + aluminium + felt (warmth)" },
+                footwear: { mk: "Планинарски, ловечки, зимски, работни чизми", en: "Hiking, hunting, winter, work boots" },
+                odorControl: { mk: "Текстил со висока отпорност на абење", en: "Abrasion-resistant textile" },
+                care: { mk: "Влажна крпа, природно сушење", en: "Wipe with damp cloth, air dry" },
+                fatigue: { mk: "Изолација во постудени услови", en: "Insulation in colder conditions" }
+            }
+        },
+        'hunter-outdoor': {
+            id: "hunter-outdoor",
+            category: "hunter",
+            name: { mk: "Hunter OUTDOOR", en: "Hunter OUTDOOR" },
+            shortName: { mk: "HUNTER", en: "HUNTER" },
+            image: "./images/cards/hunter-outdoor.webp",
+            link: "./modeli/hunter-outdoor.html",
+            price: "330 ден.",
+            specs: {
+                material: { mk: "PES перфорирана ткаенина, Viscolat мемориска пена, PES филц, алуминиумска фолија", en: "PES perforated fabric, Viscolat memory foam, PES felt, aluminium foil" },
+                purpose: { mk: "Планинарење, лов, trekking", en: "Hiking, hunting, trekking" },
+                archSupport: { mk: "Максимална", en: "Maximum", levelPercent: 100, badgeClass: "compare-badge--max" },
+                shockAbsorption: { stars: "★★★★★", score: "5/5", mk: "Максимална (5/5)", en: "Maximum (5/5)" },
+                thickness: { mk: "6–8 mm", en: "6–8 mm" },
+                keyFeature: { mk: "4-слојна со Viscolat мемориска пена", en: "4-layer with Viscolat memory foam" },
+                footwear: { mk: "Планинарски, ловечки, outdoor, работни чизми", en: "Hiking, hunting, outdoor, work boots" },
+                odorControl: { mk: "Перфорирана PES за циркулација", en: "Perforated PES for air circulation" },
+                care: { mk: "Влажна крпа, природно сушење", en: "Wipe with damp cloth, air dry" },
+                fatigue: { mk: "Адаптација кон обликот на стапалото", en: "Adapts to the shape of the foot" }
+            }
+        },
+        'duck': {
+            id: "duck",
+            category: "detski",
+            name: { mk: "Duck", en: "Duck" },
+            shortName: { mk: "Детски", en: "Kids" },
+            image: "./images/cards/duck.webp",
+            link: "./modeli/duck.html",
+            price: "490 ден.",
+            specs: {
+                material: { mk: "100% памучен фротир, ароматизирана латекс пена, пластичен + карбосан калап", en: "100% cotton terry, aromatic latex foam, plastic + carbosan mold" },
+                purpose: { mk: "Детски обувки, училиште, игра, спорт", en: "Kids' shoes, school, play, sports" },
+                archSupport: { mk: "Деликатна", en: "Gentle", levelPercent: 50, badgeClass: "compare-badge--gentle" },
+                shockAbsorption: { stars: "★★★☆☆", score: "3/5", mk: "Средна (3/5)", en: "Medium (3/5)" },
+                thickness: { mk: "3–4 mm", en: "3–4 mm" },
+                keyFeature: { mk: "Анатомски обликувана за правилен развој", en: "Anatomically shaped for healthy growth" },
+                footwear: { mk: "Детски патики, училишни чевли, лесни чизми", en: "Kids' sneakers, school shoes, light boots" },
+                odorControl: { mk: "Благ антибактериски слој", en: "Gentle antibacterial layer" },
+                care: { mk: "Влажна крпа, сушење на собна температура", en: "Wipe with damp cloth, dry at room temperature" },
+                fatigue: { mk: "Поддржува правилен раст на стапалото", en: "Supports healthy foot development" }
+            }
+        },
     };
 
     const SPEC_DEFINITIONS = [
@@ -1530,6 +1767,9 @@ if (compareToggleBtn && compareModelsSection) {
 
             compareInteractiveView.style.display = 'block';
             compareOverviewView.style.display = 'none';
+            // Точка 2: врати padding на картата за интерактивниот таб
+            const cardEl = compareOverviewView.closest('.compare-models__card');
+            if (cardEl) cardEl.classList.remove('compare--overview');
         });
 
         compareTabOverview.addEventListener('click', () => {
@@ -1540,16 +1780,161 @@ if (compareToggleBtn && compareModelsSection) {
 
             compareInteractiveView.style.display = 'none';
             compareOverviewView.style.display = 'block';
+            // Точка 2: табелата е flush со картата (без заостанат padding)
+            const cardEl = compareOverviewView.closest('.compare-models__card');
+            if (cardEl) cardEl.classList.add('compare--overview');
+            // Точка 10: пресметај ги ширините на колоните и sticky slider-от кога табелата е видлива
+            syncCompareHeadWidths();
+            syncCompareStrip();
         });
     }
 
+    // ==== Точка 2: Прегледна табела „Сите 20 модели (Табела)“ ====
+    // Динамички се рендерира од COMPARE_PRODUCTS (поединечни модели)
+    const renderOverviewTable = () => {
+        if (!compareOverviewView) return;
+        const lang = getLang();
+        const models = Object.values(COMPARE_PRODUCTS);
+        const rows = [
+            { key: 'material', label: { mk: 'Материјали', en: 'Materials' } },
+            { key: 'purpose', label: { mk: 'Главна намена', en: 'Primary Use' } },
+            { key: 'archSupport', label: { mk: 'Поддршка за свод', en: 'Arch Support' }, type: 'arch' },
+            { key: 'shockAbsorption', label: { mk: 'Апсорпција на шок', en: 'Shock Absorption' }, type: 'stars' },
+            { key: 'thickness', label: { mk: 'Дебелина', en: 'Thickness' } },
+            { key: 'keyFeature', label: { mk: 'Клучна одлика', en: 'Key Advantage' } },
+            { key: 'footwear', label: { mk: 'Препорачани обувки', en: 'Recommended Footwear' } }
+        ];
+
+        // Заглавие (thead) — се користи во sticky head-табелата
+        let theadHtml = '<thead><tr><th class="compare-table__feature-col">' + (lang === 'en' ? 'Model / Feature' : 'Модел / Особини') + '</th>';
+        models.forEach((m) => {
+            theadHtml += '<th><div class="compare-th-item">' +
+                '<img src="' + m.image + '" alt="' + m.name[lang] + '" class="compare-th-img" width="60" height="60" loading="lazy" decoding="async">' +
+                '<strong>' + m.name[lang] + '</strong>' +
+                '<span class="compare-th-price">' + m.price + '</span></div></th>';
+        });
+        theadHtml += '</tr></thead>';
+
+        // Точка 10: sticky заглавие — посебна табела што се лепи под навигацијата (top:90)
+        let html = '<div class="compare-table__sticky-head" aria-hidden="true"><table class="compare-table compare-table--head">' + theadHtml + '</table></div>';
+
+        // Телото — хоризонтално скрола ВО СВОЈОТ контејнер (не на ниво на страница)
+        html += '<div class="compare-models__table-scroll"><table class="compare-table compare-table--body"><tbody>';
+
+        rows.forEach((r) => {
+            html += '<tr><td class="compare-table__label">' + r.label[lang] + '</td>';
+            models.forEach((m) => {
+                const spec = m.specs[r.key];
+                if (r.type === 'arch') {
+                    html += '<td><span class="compare-badge ' + spec.badgeClass + '">' + spec[lang] + '</span></td>';
+                } else if (r.type === 'stars') {
+                    html += '<td><span class="compare-stars">' + spec.stars + '</span></td>';
+                } else {
+                    html += '<td>' + spec[lang] + '</td>';
+                }
+            });
+            html += '</tr>';
+        });
+
+        html += '<tr><td class="compare-table__label">' + (lang === 'en' ? 'Price' : 'Цена') + '</td>';
+        models.forEach((m) => { html += '<td>' + m.price + '</td>'; });
+        html += '</tr>';
+
+        html += '<tr><td class="compare-table__label">' + (lang === 'en' ? 'Details' : 'Детали') + '</td>';
+        models.forEach((m) => { html += '<td><a href="' + m.link + '" class="compare-link-btn">' + (lang === 'en' ? 'View Model →' : 'Види модел →') + '</a></td>'; });
+        html += '</tr>';
+
+        html += '</tbody></table></div>';
+        html += '<div class="compare-sticky-scroll" aria-hidden="true"><div class="compare-sticky-scroll__spacer"></div></div>';
+        compareOverviewView.innerHTML = html;
+
+        // Точка 10: синхронизација на sticky заглавието + слајдерот со хоризонталниот скрол на телото
+        const bodyScroller = compareOverviewView.querySelector('.compare-models__table-scroll');
+        const headEl = compareOverviewView.querySelector('.compare-table__sticky-head');
+        const strip = compareOverviewView.querySelector('.compare-sticky-scroll');
+        if (bodyScroller && headEl) {
+            // Изедначи ги ширините на колоните на head-табелата со тие на телото
+            syncCompareHeadWidths();
+            // body → head (1:1) и body → strip (сооднос)
+            bodyScroller.addEventListener('scroll', () => {
+                if (Math.abs(headEl.scrollLeft - bodyScroller.scrollLeft) > 0.5) headEl.scrollLeft = bodyScroller.scrollLeft;
+                const extent = bodyScroller.scrollWidth - bodyScroller.clientWidth;
+                const sm = strip ? strip.scrollWidth - strip.clientWidth : 0;
+                if (strip && extent > 0 && sm > 0) {
+                    const target = (bodyScroller.scrollLeft / extent) * sm;
+                    if (Math.abs(strip.scrollLeft - target) > 0.5) strip.scrollLeft = target;
+                }
+            }, { passive: true });
+            // strip → body (влечење на слајдерот ја движи табелата)
+            if (strip) {
+                strip.addEventListener('scroll', () => {
+                    const extent = bodyScroller.scrollWidth - bodyScroller.clientWidth;
+                    const sm = strip.scrollWidth - strip.clientWidth;
+                    if (!(extent > 0 && sm > 0)) return;
+                    const target = (strip.scrollLeft / sm) * extent;
+                    if (Math.abs(bodyScroller.scrollLeft - target) > 0.5) bodyScroller.scrollLeft = target;
+                });
+            }
+            // head → body (ако некој скрола над заглавието со shift+wheel)
+            headEl.addEventListener('scroll', () => {
+                if (Math.abs(bodyScroller.scrollLeft - headEl.scrollLeft) > 0.5) bodyScroller.scrollLeft = headEl.scrollLeft;
+            });
+        }
+        syncCompareStrip();
+    };
+
+    // Точка 10: синхронизација на sticky slider-от со хоризонталниот скрол на телото на табелата
+    const syncCompareStrip = () => {
+        const strip = compareOverviewView?.querySelector('.compare-sticky-scroll');
+        if (!strip) return;
+        // Слајдерот се појавува само кога табелата го исполнува екранот (header е залепен),
+        // а исчезнува кога се скрола нагоре кон другите категории
+        // (100 = толерантна граница; точната 90 може да откаже при фракциони позиции)
+        const show = compareOverviewView.getBoundingClientRect().top <= 100;
+        strip.style.opacity = show ? '1' : '0';
+        strip.style.pointerEvents = show ? 'auto' : 'none';
+        const bodyScroller = compareOverviewView.querySelector('.compare-models__table-scroll');
+        const spacer = strip.querySelector('.compare-sticky-scroll__spacer');
+        const extent = bodyScroller ? Math.max(bodyScroller.scrollWidth - bodyScroller.clientWidth, 0) : 0;
+        spacer.style.width = (extent + strip.clientWidth + 2) + 'px';
+        const sm = strip.scrollWidth - strip.clientWidth;
+        if (bodyScroller && extent > 0 && sm > 0) {
+            const target = (bodyScroller.scrollLeft / extent) * sm;
+            if (Math.abs(strip.scrollLeft - target) > 0.5) strip.scrollLeft = target;
+        }
+    };
+    window.addEventListener('scroll', syncCompareStrip, { passive: true });
+    window.addEventListener('resize', syncCompareStrip);
+
+    // Точка 10: изедначување на ширините на колоните на sticky заглавието со телото
+    // (мора да се повика кога табелата е ВИДЛИВА — при скриена view мерењата се 0)
+    const syncCompareHeadWidths = () => {
+        const headEl = compareOverviewView?.querySelector('.compare-table__sticky-head');
+        const bodyScroller = compareOverviewView?.querySelector('.compare-models__table-scroll');
+        if (!headEl || !bodyScroller) return;
+        const headTable = headEl.querySelector('table');
+        const bodyTable = bodyScroller.querySelector('table');
+        if (!headTable || !bodyTable || !bodyTable.rows.length) return;
+        const cells = Array.from(bodyTable.rows[0].cells);
+        cells.forEach((c, i) => {
+            const hc = headTable.rows[0].cells[i];
+            if (hc) {
+                const w = c.getBoundingClientRect().width;
+                hc.style.minWidth = w + 'px';
+                hc.style.width = w + 'px';
+                hc.style.maxWidth = w + 'px';
+            }
+        });
+    };
+
     // Listen for language changes across the app (dropdown-switcher safe)
     if (window.MonetaOnLangChange) {
-        window.MonetaOnLangChange(() => setTimeout(renderSideBySideTable, 50));
+        window.MonetaOnLangChange(() => setTimeout(() => { renderSideBySideTable(); renderOverviewTable(); }, 50));
     }
 
     // Initial render
     renderSideBySideTable();
+    renderOverviewTable();
 })();
 
 // ========================================
@@ -2403,7 +2788,18 @@ console.log('%c Вебсајт во развој 💪', 'color:#6B6B76;font-size
     const getCart = () => {
         try {
             const c = JSON.parse(localStorage.getItem(KEY));
-            return c && typeof c === 'object' ? c : {};
+            if (!c || typeof c !== 'object') return {};
+            // Нормализација: legacy артикли (qty без sizes) → sizes по големина
+            Object.keys(c).forEach((k) => {
+                const it = c[k];
+                if (!it || typeof it !== 'object') { delete c[k]; return; }
+                if (!it.sizes) {
+                    it.sizes = (it.qty || 0) > 0 ? (it.size ? { [it.size]: it.qty } : { '': it.qty }) : {};
+                }
+                it.qty = Object.values(it.sizes).reduce((a, b) => a + (b || 0), 0);
+                if (it.qty === 0) delete c[k];
+            });
+            return c;
         } catch (e) {
             return {};
         }
@@ -2489,18 +2885,102 @@ console.log('%c Вебсајт во развој 💪', 'color:#6B6B76;font-size
     };
 
     // Бројач на модел-страница — само за овој модел
+    // ===== Варијанта 2: Локален избор (pending) на продукт-страница =====
+    // Клиентот поставува големини+количини, па „Додади" ги префрла во кошничката
+    const pending = {}; // { slug: { size: qty } }
+
+    // ===== Историја на пазарење (мали thumbnails во кошничката) =====
+    const HISTORY_KEYS = { viewed: 'moneta_viewed', added: 'moneta_added' };
+    const HISTORY_MAX = 8;
+    const readHistory = (key) => {
+        try {
+            const h = JSON.parse(localStorage.getItem(key));
+            return Array.isArray(h) ? h : [];
+        } catch (e) { return []; }
+    };
+    const pushHistory = (key, slug, name) => {
+        try {
+            const list = readHistory(key).filter((it) => it.slug !== slug);
+            list.unshift({ slug: slug, name: name, ts: Date.now() });
+            localStorage.setItem(key, JSON.stringify(list.slice(0, HISTORY_MAX)));
+        } catch (e) { /* ignore */ }
+    };
+    // Неодамна разгледани — се снима при отворање на модел-страница
+    const trackViewed = () => {
+        if (!/\/modeli\//.test(window.location.pathname)) return;
+        const ctl = document.querySelector('.model-cart[data-model], .size-selector[data-model]');
+        if (!ctl) return;
+        const slug = ctl.getAttribute('data-model');
+        const name = ctl.getAttribute('data-name-mk') || slug;
+        if (slug) pushHistory(HISTORY_KEYS.viewed, slug, name);
+    };
+    trackViewed();
+    // Неодамна додадени — се снима при „Додади"
+    const trackAdded = (slug, name) => {
+        if (slug) pushHistory(HISTORY_KEYS.added, slug, name);
+    };
+    const getViewed = () => readHistory(HISTORY_KEYS.viewed);
+    const getRecentlyAdded = () => readHistory(HISTORY_KEYS.added);
+
     const renderModelQty = () => {
         const cart = getCart();
+        const isModelPage = !!document.querySelector('[data-size-grid]');
         document.querySelectorAll('[data-model]').forEach((ctl) => {
             const slug = ctl.getAttribute('data-model');
-            const qty = (cart[slug] || {}).qty || 0;
+            const item = cart[slug];
             const qtyEl = ctl.querySelector('[data-cart-qty]');
             const minusEl = ctl.querySelector('[data-cart-minus]');
+            const plusEl = ctl.querySelector('[data-cart-plus]');
+            let qty = 0;
+            let showQty = false;
+            if (isModelPage) {
+                // Модел-страница: количината е за ИЗБРАНАТА големина (pending),
+                // почетна вредност 1 — покажува колку ќе се додаде
+                const sz = ctl.getAttribute('data-size');
+                if (sz) {
+                    const p = pending[slug] || {};
+                    qty = (typeof p[sz] === 'number') ? p[sz] : 1;
+                    showQty = true;
+                }
+            } else {
+                // cart.html: вкупна количина (сите големини)
+                qty = (item && item.qty) || 0;
+                showQty = qty > 0;
+            }
             if (qtyEl) {
                 qtyEl.textContent = qty;
-                qtyEl.style.display = qty > 0 ? 'block' : 'none';
+                qtyEl.style.display = showQty ? 'block' : 'none';
             }
-            if (minusEl) minusEl.style.display = qty > 0 ? 'flex' : 'none';
+            // минус се појавува дури на количина >= 2; плус секогаш кога има избрана големина
+            if (minusEl) minusEl.style.display = (showQty && qty >= 2) ? 'flex' : 'none';
+            if (plusEl) plusEl.style.display = showQty ? 'flex' : 'none';
+
+            // Точка 4: цена × количина — клиентот ја гледа вкупната сума за избраната количина
+            if (isModelPage) {
+                const priceEl = ctl.closest('.order-bar__top')?.querySelector('.model-price');
+                if (priceEl) {
+                    const unit = parseInt(ctl.dataset.price, 10) || 0;
+                    if (unit > 0) {
+                        const lang = document.documentElement.lang || 'mk';
+                        const fmt = (n) => n.toLocaleString('mk-MK');
+                        const total = unit * (qty >= 1 ? qty : 1);
+                        let mk, sq, en;
+                        if (qty >= 2) {
+                            mk = 'Цена: ' + fmt(unit) + ' × ' + qty + ' = ' + fmt(total) + ' ден.';
+                            sq = 'Çmimi: ' + fmt(unit) + ' × ' + qty + ' = ' + fmt(total) + ' den.';
+                            en = 'Price: ' + fmt(unit) + ' × ' + qty + ' = ' + fmt(total) + ' MKD';
+                        } else {
+                            mk = 'Цена: ' + fmt(unit) + ' ден.';
+                            sq = 'Çmimi: ' + fmt(unit) + ' den.';
+                            en = 'Price: ' + fmt(unit) + ' MKD';
+                        }
+                        priceEl.setAttribute('data-mk', mk);
+                        priceEl.setAttribute('data-sq', sq);
+                        priceEl.setAttribute('data-en', en);
+                        priceEl.textContent = lang === 'en' ? en : lang === 'sq' ? sq : mk;
+                    }
+                }
+            }
         });
     };
 
@@ -2508,19 +2988,33 @@ console.log('%c Вебсајт во развој 💪', 'color:#6B6B76;font-size
         const slug = ctl.getAttribute('data-model');
         if (!slug) return;
         const cart = getCart();
+        const stripSuffix = (s) => (s || '').replace(/\s*\(.*\)$/, '');
         const item = cart[slug] || {
             slug: slug,
             code: ctl.getAttribute('data-code') || slug,
             price: parseFloat(ctl.getAttribute('data-price')) || 0,
-            nameMk: ctl.getAttribute('data-name-mk') || slug,
-            nameEn: ctl.getAttribute('data-name-en') || slug,
+            nameMk: stripSuffix(ctl.getAttribute('data-name-mk')) || slug,
+            nameEn: stripSuffix(ctl.getAttribute('data-name-en')) || slug,
+            sizes: {},
+            size: '',
             qty: 0
         };
-        const next = Math.max(0, (item.qty || 0) + delta);
+        item.sizes = item.sizes || {};
+        // cart.html нема data-size → користи ја последната активна големина
+        const sizeKey = ctl.getAttribute('data-size') || item.size || '';
+        const cur = item.sizes[sizeKey] || 0;
+        const next = Math.max(0, cur + delta);
         if (next === 0) {
+            delete item.sizes[sizeKey];
+        } else {
+            item.sizes[sizeKey] = next;
+            item.size = sizeKey;
+        }
+        // Вкупна количина (нав-баџ / subtotal / cart.html)
+        item.qty = Object.values(item.sizes).reduce((a, b) => a + (b || 0), 0);
+        if (item.qty === 0) {
             delete cart[slug];
         } else {
-            item.qty = next;
             cart[slug] = item;
         }
         setCart(cart);
@@ -2542,24 +3036,144 @@ console.log('%c Вебсајт во развој 💪', 'color:#6B6B76;font-size
         if (window.MonetaCartOnChange) window.MonetaCartOnChange(cart);
     };
 
-    // Врзување преку делегација — работи и за динамички додадени степери (cart.html)
+    // Варијанта 2: „Додади" — ја префрла целата pending структура во кошничката
+    const addPendingToCart = (ctl) => {
+        const slug = ctl.getAttribute('data-model');
+        if (!slug) return;
+        const p = pending[slug] || {};
+        const toAdd = {};
+        Object.entries(p).forEach(([sz, q]) => { if (q > 0) toAdd[sz] = q; });
+        if (Object.keys(toAdd).length === 0) return;
+        const stripSuffix = (s) => (s || '').replace(/\s*\(.*\)$/, '');
+        const cart = getCart();
+        const item = cart[slug] || {
+            slug: slug,
+            code: ctl.getAttribute('data-code') || slug,
+            price: parseFloat(ctl.getAttribute('data-price')) || 0,
+            nameMk: stripSuffix(ctl.getAttribute('data-name-mk')) || slug,
+            nameEn: stripSuffix(ctl.getAttribute('data-name-en')) || slug,
+            sizes: {},
+            size: '',
+            qty: 0
+        };
+        item.sizes = item.sizes || {};
+        Object.entries(toAdd).forEach(([sz, q]) => {
+            item.sizes[sz] = (item.sizes[sz] || 0) + q;
+            item.size = sz;
+        });
+        item.qty = Object.values(item.sizes).reduce((a, b) => a + (b || 0), 0);
+        if (item.qty === 0) {
+            delete cart[slug];
+        } else {
+            cart[slug] = item;
+        }
+        delete pending[slug];
+        trackAdded(slug, item.nameMk);
+        setCart(cart);
+        renderModelQty();
+        renderNavBadges();
+        renderFreeShip(cart);
+        maybeShowFreeShipPopup(cart);
+        if (window.MonetaCartOnChange) window.MonetaCartOnChange(cart);
+    };
+
+    // Отстрани само една големина од кошничката
+    const removeSize = (slug, size) => {
+        const cart = getCart();
+        const item = cart[slug];
+        if (!item) return;
+        delete item.sizes[size];
+        item.qty = Object.values(item.sizes || {}).reduce((a, b) => a + (b || 0), 0);
+        if (item.qty === 0) {
+            delete cart[slug];
+        } else {
+            cart[slug] = item;
+        }
+        setCart(cart);
+        renderModelQty();
+        renderNavBadges();
+        renderFreeShip(cart);
+        maybeShowFreeShipPopup(cart);
+        if (window.MonetaCartOnChange) window.MonetaCartOnChange(cart);
+    };
+
+    // Врзување преку делегација
+    // Варијанта 2: на модел-страници +/− ја прилагодуваат ЛОКАЛНАТА количина
+    // (pending) за избраната големина; „Додади" ја префрла целата структура во кошничката
     document.addEventListener('click', (e) => {
         const addBtn = e.target.closest('[data-cart-add]');
+        const plusBtn = e.target.closest('[data-cart-plus]');
         const minusBtn = e.target.closest('[data-cart-minus]');
+        const sizeBtn = e.target.closest('.size-btn');
         const removeBtn = e.target.closest('[data-cart-remove]');
         if (removeBtn) {
             const itemEl = removeBtn.closest('[data-cart-item]');
-            if (itemEl) removeItem(itemEl.getAttribute('data-cart-item'));
+            const sz = removeBtn.getAttribute('data-size');
+            if (itemEl) {
+                if (sz) removeSize(itemEl.getAttribute('data-cart-item'), sz);
+                else removeItem(itemEl.getAttribute('data-cart-item'));
+            }
+            return;
+        }
+        // Локален избор на големина (pending) — после inline скриптата (bubble)
+        if (sizeBtn && !sizeBtn.classList.contains('size-btn--disabled')) {
+            const ctl = sizeBtn.closest('[data-model]');
+            // Големината ја читаме од самото копче; „селектирано" значи нов избор
+            const sz = sizeBtn.textContent.trim();
+            if (sizeBtn.classList.contains('size-btn--selected') && ctl && sz) {
+                const slug = ctl.getAttribute('data-model');
+                const p = pending[slug] || (pending[slug] = {});
+                if (typeof p[sz] !== 'number') p[sz] = 1;
+                renderModelQty();
+            }
             return;
         }
         if (addBtn) {
             const ctl = addBtn.closest('[data-model]');
-            if (ctl) updateModel(ctl, 1);
+            if (ctl) addPendingToCart(ctl);
+            return;
+        }
+        if (plusBtn) {
+            const ctl = plusBtn.closest('[data-model]');
+            if (ctl) {
+                const slug = ctl.getAttribute('data-model');
+                const sz = ctl.getAttribute('data-size');
+                if (sz) {
+                    const p = pending[slug] || (pending[slug] = {});
+                    p[sz] = (typeof p[sz] === 'number' ? p[sz] : 1) + 1;
+                    renderModelQty();
+                }
+            }
             return;
         }
         if (minusBtn) {
             const ctl = minusBtn.closest('[data-model]');
-            if (ctl) updateModel(ctl, -1);
+            if (ctl) {
+                const slug = ctl.getAttribute('data-model');
+                const sz = ctl.getAttribute('data-size');
+                if (sz) {
+                    const p = pending[slug] || (pending[slug] = {});
+                    const cur = (typeof p[sz] === 'number') ? p[sz] : 1;
+                    p[sz] = Math.max(0, cur - 1);
+                    renderModelQty();
+                }
+            }
+        }
+    });
+
+    // ===== Точка 3: Синхронизација на бројачите =====
+    // При враќање назад (bfcache) и при промена од друг таб —
+    // бројачите на модел-страниците/кошничката секогаш се освежуваат
+    const refreshCartUI = () => {
+        renderModelQty();
+        renderNavBadges();
+        renderFreeShip(getCart());
+    };
+    window.addEventListener('pageshow', refreshCartUI);
+    window.addEventListener('storage', (e) => {
+        if (e.key === KEY) {
+            refreshCartUI();
+            if (window.MonetaCartOnChange) window.MonetaCartOnChange(getCart());
         }
     });
 
@@ -2569,7 +3183,7 @@ console.log('%c Вебсајт во развој 💪', 'color:#6B6B76;font-size
     maybeShowFreeShipPopup(getCart());
 
     // Јавно API за cart.html
-    window.MonetaCart = { getCart: getCart, setCart: setCart, totalQty: totalQty, subtotal: subtotal, updateModel: updateModel, removeItem: removeItem, renderNavBadges: renderNavBadges, renderFreeShip: renderFreeShip, FREE_SHIP_THRESHOLD: FREE_SHIP_THRESHOLD };
+    window.MonetaCart = { getCart: getCart, setCart: setCart, totalQty: totalQty, subtotal: subtotal, updateModel: updateModel, removeItem: removeItem, removeSize: removeSize, renderModelQty: renderModelQty, renderNavBadges: renderNavBadges, renderFreeShip: renderFreeShip, getViewed: getViewed, getRecentlyAdded: getRecentlyAdded, FREE_SHIP_THRESHOLD: FREE_SHIP_THRESHOLD };
 })();
 
 // ========================================

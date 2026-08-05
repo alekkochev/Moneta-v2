@@ -724,7 +724,7 @@ a {
     overflow: visible;
     border-radius: 22px;
     transform-style: preserve-3d;
-    transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+    transition: background 0.4s ease 0.06s, border-color 0.4s ease 0.06s, box-shadow 0.4s ease 0.06s, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) 0.06s;
 }
 
 .card--sport .card__image,
@@ -743,7 +743,7 @@ a {
     object-fit: cover;
     border-radius: 22px;
     filter: brightness(0.95); /* Sharp, clear card image (no blur) */
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s ease;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.06s, filter 0.4s ease 0.06s;
 }
 
 .card--sport .card__overlay,
@@ -761,7 +761,7 @@ a {
     border-radius: 22px;
     overflow: hidden;
     background: rgba(22, 16, 26, 0.25); /* Unified dark overlay (no blur) */
-    transition: background 0.4s ease;
+    transition: background 0.4s ease 0.06s;
 }
 
 /* Glassmorphism Blur REMOVED / CLEARED on Mobile Scroll Focus & Desktop Hover */
@@ -802,7 +802,7 @@ a {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.4s ease;
+    transition: all 0.4s ease 0.06s;
     z-index: 12;
 }
 
@@ -830,19 +830,20 @@ a {
 
 /* ========================================
    CARD ICON HOVER — icon lights up on hover (desktop) / scroll-focus (mobile)
+   Zoom + move-left stay; no magenta fill — only a pink frame around the perimeter.
    ======================================== */
 @media (hover: hover) and (min-width: 861px) {
     .categories__grid .card:hover .card__icon {
-        background: #EC1752;
-        border-color: #FFFFFF;
+        background: rgba(255, 255, 255, 0.92);
+        border: 2px solid #EC1752;
         box-shadow: 0 0 20px #EC1752, 0 0 35px rgba(236, 23, 82, 0.6);
         transform: translateX(-50%) scale(1.1);
     }
 }
 .categories__grid .card.is-active .card__icon,
 .categories__grid .card.is-scroll-focused .card__icon {
-    background: #EC1752;
-    border-color: #FFFFFF;
+    background: rgba(255, 255, 255, 0.92);
+    border: 2px solid #EC1752;
     box-shadow: 0 0 20px #EC1752, 0 0 35px rgba(236, 23, 82, 0.6);
     transform: translateX(-50%) scale(1.1);
 }
@@ -1336,6 +1337,17 @@ a {
     background: #d4144a;
     transform: translateY(-2px);
     box-shadow: 0 6px 18px rgba(236, 23, 82, 0.35);
+}
+
+/* Точка 6: tracking → директен линк до Карго Експрес */
+.order-tracker__link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    text-decoration: none;
+    margin-top: 4px;
 }
 
 .order-tracker__samples {
@@ -2569,7 +2581,9 @@ a {
     max-width: var(--wrap);
     margin: 0 auto 40px;
     padding: 0 32px;
-    overflow: hidden;
+    /* Точка 10: clip (не hidden!) — hidden создава scroll-контејнер и го крши
+       sticky заглавието/слајдерот; clip клипа без да е scroll-контејнер */
+    overflow: clip;
 }
 
 .compare-models__card {
@@ -2635,15 +2649,43 @@ a {
 }
 
 .compare-models__table-scroll {
+    /* Точка 10: телото на табелата скрола хоризонтално ВО овој контејнер
+       (без лента на самата страница); нативната лента е скриена —
+       контрола е sticky слајдерот долу */
     overflow-x: auto;
-    border-radius: 16px;
+    overflow-y: hidden;
+    border-left: 1px solid rgba(0, 0, 0, 0.06);
+    border-right: 1px solid rgba(0, 0, 0, 0.06);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    scrollbar-width: none;
+}
+.compare-models__table-scroll::-webkit-scrollbar { display: none; }
+
+/* Точка 10: sticky заглавие — посебна табела што се лепи под навигацијата */
+.compare-table__sticky-head {
+    position: sticky;
+    top: 90px;
+    z-index: 5;
+    overflow: hidden;
+    background: #fdfafb;
     border: 1px solid rgba(0, 0, 0, 0.06);
+    border-bottom: none;
+    box-shadow: 0 2px 10px rgba(23, 23, 28, 0.08);
+    scrollbar-width: none;
+}
+.compare-table__sticky-head::-webkit-scrollbar { display: none; }
+.compare-table__sticky-head .compare-table {
+    border: none;
+    margin: 0;
+    table-layout: fixed;
+    background: #fdfafb;
 }
 
 .compare-table {
     width: 100%;
     min-width: 820px;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     background: #ffffff;
     font-size: 14px;
 }
@@ -2685,6 +2727,48 @@ a {
     border-right: 1px solid rgba(0, 0, 0, 0.06);
 }
 
+/* Sticky заглавието е посебна табела (.compare-table__sticky-head) —
+   самите th не треба да се лепат вертикално */
+.compare-table thead th {
+    z-index: 3;
+}
+.compare-table thead th.compare-table__feature-col {
+    z-index: 4;
+}
+
+/* Точка 2: кога е отворен прегледот (табела со 20 модели) — табелата е flush
+   со картата, без заостанатиот padding (заглавието и табовите добиваат свој padding) */
+.compare-models__card.compare--overview { padding: 0; }
+.compare-models__card.compare--overview .compare-models__header,
+.compare-models__card.compare--overview .compare-controls-bar,
+.compare-models__card.compare--overview .compare-interactive-view {
+    padding-left: 32px;
+    padding-right: 32px;
+}
+
+/* Точка 10: sticky хоризонтален слајдер — се лепи на дното на екранот
+   додека е видлива табелата и исчезнува кога се скрола нагоре/надолу од неа */
+.compare-sticky-scroll {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    overflow-x: auto;
+    overflow-y: hidden;
+    height: 14px;
+    background: rgba(248, 246, 247, 0.95);
+    border-top: 1px solid rgba(23, 23, 28, 0.08);
+    border-left: 1px solid rgba(23, 23, 28, 0.06);
+    border-right: 1px solid rgba(23, 23, 28, 0.06);
+    border-bottom: 1px solid rgba(23, 23, 28, 0.1);
+    cursor: grab;
+    scrollbar-width: thin;
+}
+.compare-sticky-scroll__spacer { height: 1px; }
+.compare-sticky-scroll::-webkit-scrollbar { height: 12px; }
+.compare-sticky-scroll::-webkit-scrollbar-track { background: rgba(23, 23, 28, 0.05); }
+.compare-sticky-scroll::-webkit-scrollbar-thumb { background: rgba(236, 23, 82, 0.5); border-radius: 8px; }
+.compare-sticky-scroll::-webkit-scrollbar-thumb:hover { background: rgba(236, 23, 82, 0.75); }
+
 .compare-th-item {
     display: flex;
     flex-direction: column;
@@ -2703,6 +2787,13 @@ a {
 .compare-th-item strong {
     font-size: 15px;
     color: var(--ink);
+}
+
+.compare-th-price {
+    font-size: 12.5px;
+    font-weight: 800;
+    color: var(--pink);
+    white-space: nowrap;
 }
 
 .compare-badge {
@@ -3220,6 +3311,35 @@ a {
         padding-bottom: 6px;
         margin-bottom: 4px;
     }
+}
+
+/* ===== Точка 10: Мобилна оптимизација на табелата „Сите 20 модели" ===== */
+@media (max-width: 860px) {
+    .compare-models-wrapper { padding: 0 12px; }
+    .compare-models__card { padding: 14px; border-radius: 18px; }
+    .compare-models__card.compare--overview .compare-models__header,
+    .compare-models__card.compare--overview .compare-controls-bar,
+    .compare-models__card.compare--overview .compare-interactive-view {
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+    .compare-models__header { flex-wrap: wrap; gap: 12px; margin-bottom: 18px; }
+    .compare-models__title-group h3 { font-size: 18px; }
+    .compare-models__close { width: 34px; height: 34px; }
+    .compare-mode-tabs { flex-wrap: wrap; }
+    .compare-tab-btn { flex: 1 1 auto; padding: 8px 10px; font-size: 12.5px; }
+    .compare-table { min-width: 700px; font-size: 12.5px; }
+    .compare-table th,
+    .compare-table td { padding: 10px 10px; }
+    .compare-table__feature-col { min-width: 110px; font-size: 12.5px; }
+    .compare-table td.compare-table__label { min-width: 110px; font-size: 12.5px; }
+    .compare-th-img { width: 40px; height: 40px; border-radius: 10px; }
+    .compare-th-item { gap: 5px; }
+    .compare-th-item strong { font-size: 12.5px; }
+    .compare-th-price { font-size: 11px; }
+    .compare-stars { font-size: 12px; letter-spacing: 1px; }
+    .compare-badge { font-size: 11.5px; padding: 3px 8px; }
+    /* Мобилно: копчињата „Детали" остануваат икони (заедничкото правило е на крајот на styles.css) */
 }
 
 .faq__modal-link {
@@ -5599,7 +5719,7 @@ textarea {
 .cart__free-ship.is-reached .cart__free-ship__text { color: #1d7a3d; }
 .cart__free-ship.is-reached .cart__free-ship__text svg { color: #2ecc71; }
 .cart__free-ship.is-reached .cart__free-ship__fill {
-    background: linear-gradient(90deg, #27ae60, #2ecc71, #6fda9a);
+    background: linear-gradient(90deg, #27ae60, #2ecc71, #6fda9a) !important;
     animation: freeShipGreenGlow 2s ease-in-out infinite alternate;
 }
 @keyframes freeShipGreenGlow {
@@ -5664,6 +5784,8 @@ textarea {
 .model-cart__add:hover { background: #D4144A; transform: scale(1.06); }
 .model-cart__minus { color: #D4144A; display: none; }
 .model-cart__minus:hover { background: #FDEBF0; }
+.model-cart__plus { color: #D4144A; display: none; }
+.model-cart__plus:hover { background: #FDEBF0; }
 .model-cart__qty {
     min-width: 24px;
     text-align: center;
@@ -6469,7 +6591,7 @@ p { color: var(--ink-700); }
 }
 .hero__content-wrapper { min-height: 760px; align-items: center; padding: 136px 32px 92px; }
 .hero__inner { max-width: 680px; }
-.hero__eyebrow { margin-bottom: var(--space-3); }
+.hero__eyebrow { margin: 24px 0 28px; }
 .hero h1 {
     font-size: clamp(42px, 6vw, 82px);
     line-height: 0.98;
@@ -6842,26 +6964,35 @@ p { color: var(--ink-700); }
     .hero__content-wrapper {
         padding: 108px 20px 48px;
     }
-    .hero__inner { max-width: 100%; }
-    .hero__eyebrow {
+    .hero__inner {
         max-width: 100%;
-        font-size: 10.5px;
-        line-height: 1.25;
-        padding: 7px 11px;
-        margin-bottom: 18px;
+        display: flex;
+        flex-direction: column;
     }
-    .hero h1 {
-        font-size: clamp(36px, 10.8vw, 48px);
-        line-height: 1.02;
-        margin-bottom: 20px;
-    }
+    /* Точка 3: eyebrow-от се поместува ПОД поднасловот (H1 + subtitle) на мобилен */
+    .hero__title-animated { order: 1; }
     .hero__subtitle-dark {
-        margin-bottom: 24px;
+        order: 2;
+        margin-top: 0;
+        margin-bottom: 0;
         padding-left: 16px;
         font-size: 15.5px;
         line-height: 1.55;
     }
-    .hero__cta-group { gap: 10px; }
+    .hero__eyebrow {
+        order: 3;
+        max-width: 100%;
+        font-size: 10.5px;
+        line-height: 1.25;
+        padding: 7px 11px;
+        margin: 20px 0 24px 0;
+    }
+    .hero h1 {
+        font-size: clamp(36px, 10.8vw, 48px);
+        line-height: 1.02;
+        margin-bottom: 12px;
+    }
+    .hero__cta-group { gap: 10px; order: 4; }
     .hero__cta {
         min-height: 50px;
         padding: 14px 18px;
@@ -6871,6 +7002,7 @@ p { color: var(--ink-700); }
         gap: 8px;
         margin-top: 22px;
         max-width: 100%;
+        order: 5;
     }
     .hero__proof-item {
         padding: 12px 10px;
@@ -7277,6 +7409,10 @@ html[lang="sq"] .page-sistem .model-layout .model-cart__add::after { content: 'S
 .page-sistem .model-layout .model-cart__minus:not([style*="display: none"]) {
     display: flex !important;
 }
+.page-sistem .model-layout .model-cart__plus[style*="display: flex"],
+.page-sistem .model-layout .model-cart__plus:not([style*="display: none"]) {
+    display: flex !important;
+}
 @media (max-width: 680px) {
     .page-sistem .model-layout .model-cart__add { min-width: 148px; }
 }
@@ -7329,6 +7465,8 @@ html[lang="sq"] .page-sistem .model-layout .model-cart__add::after { content: 'S
     text-transform: uppercase;
 }
 .cart__frame::before { content: 'Безбедна кошничка'; }
+html[lang="en"] .cart__frame::before { content: 'Secure cart'; }
+html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
 .checkout__frame:first-child::before { content: 'Брза нарачка'; }
 .quiz-card::before { content: 'Персонализирана препорака'; }
 
@@ -7373,6 +7511,12 @@ html[lang="sq"] .page-sistem .model-layout .model-cart__add::after { content: 'S
     font-weight: 750;
     line-height: 1.45;
 }
+.cart__line-qty {
+    color: var(--brand);
+    font-size: 13px;
+    font-weight: 800;
+    margin-top: 6px;
+}
 .cart__item-right {
     display: flex;
     flex-direction: column;
@@ -7384,6 +7528,30 @@ html[lang="sq"] .page-sistem .model-layout .model-cart__add::after { content: 'S
     font-family: var(--font-display);
     font-size: 18px;
     font-weight: 900;
+}
+.cart__item-thumb-col {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+}
+.cart__item-sizes {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.cart__size-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    font-weight: 800;
+    color: var(--brand);
+    background: var(--brand-100);
+    border-radius: 9px;
+    padding: 4px 8px;
+    line-height: 1.2;
 }
 .cart__remove {
     border: 0;
@@ -7707,6 +7875,51 @@ html[lang="sq"] .page-sistem .model-layout .model-cart__add::after { content: 'S
     margin-top: 18px !important;
 }
 .cart__item + .cart__summary { margin-top: 22px !important; }
+
+/* ===== Историја на пазарење (cart.html) ===== */
+.cart__history { margin-top: 4px; }
+.history-group { margin-bottom: 20px; }
+.history-title {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 900;
+    color: var(--ink-950);
+    margin-bottom: 10px;
+}
+.history-strip {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    scrollbar-width: thin;
+}
+.history-chip {
+    flex: 0 0 auto;
+    width: 76px;
+    text-align: center;
+    text-decoration: none;
+}
+.history-chip img {
+    width: 76px;
+    height: 58px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 1px solid rgba(23,23,28,0.08);
+    background: var(--surface-50);
+    display: block;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.history-chip:hover img { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+.history-chip span {
+    display: block;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--ink-700);
+    margin-top: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 .cart__frame { overflow: visible !important; }
 
 /* ========================================
@@ -7778,12 +7991,22 @@ html[lang="sq"] .page-sistem .model-layout .model-cart__add::after { content: 'S
     opacity: 0.55;
 }
 .model-cart--disabled {
-    opacity: 0.45;
     pointer-events: none;
 }
 .model-cart--disabled .model-cart__btn {
     cursor: not-allowed;
-    background: #E8E6E5 !important;
+    background: #fff;
+    color: var(--pink);
+    box-shadow: none;
+}
+/* Без избрана големина: копчето „Додади" е јасно видливо со розова рамка
+   (не е полно розево); станува полно розево откако клиентот ќе избере големина */
+.page-sistem .model-layout .model-cart--disabled .model-cart__add,
+.model-cart--disabled .model-cart__add {
+    background: #fff;
+    border: 2px solid var(--pink);
+    color: var(--pink);
+    box-shadow: 0 4px 14px rgba(236, 23, 82, 0.12);
 }
 .size-selector__hint {
     font-size: 11px;
@@ -7795,4 +8018,72 @@ html[lang="sq"] .page-sistem .model-layout .model-cart__add::after { content: 'S
 .size-selector__hint.success { color: #10B981; }
 @media (max-width: 480px) {
     .size-selector__grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* ========================================
+   КОПЧИЊА „Детали" ВО ТАБЕЛИТЕ → КРУЖНА ИКОНА (→)
+   Важи за ДЕСКТОП и МОБИЛЕН. Стрелката е апсолутно центрирана во кругот.
+   ======================================== */
+.compare-table td .compare-link-btn {
+    position: relative;
+    display: inline-block;
+    min-width: 0;
+    width: 34px;
+    height: 34px;
+    min-height: 0;
+    padding: 0;
+    font-size: 0;                 /* скриен текстот „Види модел →" */
+    border-radius: 50%;
+    font-weight: 400;
+    color: var(--pink);
+    background: rgba(236, 23, 82, 0.08);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+.compare-table td .compare-link-btn::after {
+    content: "→";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 16px;
+    line-height: 1;
+    font-weight: 400;
+}
+.compare-table td .compare-link-btn:hover {
+    background: var(--pink);
+    color: #ffffff;
+}
+@media (max-width: 860px) {
+    .compare-table td .compare-link-btn { width: 30px; height: 30px; }
+    .compare-table td .compare-link-btn::after { font-size: 15px; }
+}
+
+/* ========================================
+   СИТЕ КОПЧИЊА — потенок текст (font-weight 400)
+   Барање на клиентот: „текстот е болдиран, направи го потенок (пример 400)"
+   Важи за ДЕСКТОП и МОБИЛЕН (заедничка содржина).
+   ======================================== */
+.hero__cta,
+.hero__cta--primary,
+.hero__cta--secondary,
+.form__submit,
+.newsletter__submit,
+.order-tracker__submit,
+.size-finder-trigger-btn,
+.compare-models-trigger-btn,
+.compare-link-btn,
+.result-card__cta,
+.reviews__btn,
+.compare-tab-btn,
+.compare-preset-chip,
+.system-quick-btn,
+.quiz-nav__btn,
+.quiz-finder-trigger-btn,
+.quiz-restart,
+.size-btn,
+.lang-dropdown__trigger,
+.freeship-popup__btn,
+.model-cart__add {
+    font-weight: 400 !important;
 }
