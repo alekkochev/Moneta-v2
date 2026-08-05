@@ -3414,7 +3414,7 @@ console.log('%c Вебсајт во развој 💪', 'color:#6B6B76;font-size
         { nameMk: 'МЕДИКА ПРО — Битола', nameEn: 'MEDIKA PRO — Bitola', addrMk: 'бул. 1-ви Мај бр.202/7', addrEn: '202/7 1st May Blvd', tel: ['+389 72 30 37 82', '+389 47 29 21 10'], lat: 41.0297, lng: 21.3332 },
         { nameMk: 'МЕДИКА ПРО — Куманово', nameEn: 'MEDIKA PRO — Kumanovo', addrMk: 'ул. Христијан Тодоровски Карпош бр.7', addrEn: '7 Hristijan Todorovski Karpos St.', tel: ['+389 70 322 611', '+389 31 461 990'], lat: 42.1322, lng: 21.7150 },
         { nameMk: 'МЕДИКА ПРО — Струмица', nameEn: 'MEDIKA PRO — Strumica', addrMk: 'ул. Младинска бр.37', addrEn: '37 Mladinska St.', tel: ['+389 70 223 100', '+389 34 348 256'], lat: 41.3183, lng: 22.6410 },
-        { nameMk: 'МАК-ФИТ (Calivita) — Скопје', nameEn: 'MAK-FIT (Calivita) — Skopje', addrMk: 'ул. св. Кирил и Методиј бр.20', addrEn: '20 Sv. Kiril i Metodij St.', tel: ['+389 76 454 957', '+389 2 323 00 88'], isMain: true, lat: 42.0008, lng: 21.4310 }
+        { nameMk: 'МАК-ФИТ (Calivita) — Скопје', nameEn: 'MAK-FIT (Calivita) — Skopje', addrMk: 'ул. св. Кирил и Методиј бр.20', addrEn: '20 Sv. Kiril i Metodij St.', tel: ['+389 76 454 957', '+389 2 323 00 88'], isMain: true, lat: 41.9907481, lng: 21.4311922 }
     ];
 
     const isEn = () => document.documentElement.lang === 'en';
@@ -3448,7 +3448,7 @@ console.log('%c Вебсајт во развој 💪', 'color:#6B6B76;font-size
         popupAnchor: [0, -34]
     });
 
-    const map = L.map(mapEl, { scrollWheelZoom: false, attributionControl: true }).setView([42.0008, 21.4310], 15);
+    const map = L.map(mapEl, { scrollWheelZoom: false, attributionControl: true }).setView([41.9907481, 21.4311922], 16);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 18,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors'
