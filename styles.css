@@ -8498,3 +8498,34 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
         min-width: 0;
     }
 }
+
+/* ========================================
+   БУРГЕР-МЕНИ — баџ со број на артикли во кошничката (мобилно)
+   Клиентот веднаш гледа дека има артикли во кошничката
+   ======================================== */
+.navbar__toggle {
+    position: relative;
+}
+.navbar__toggle-badge {
+    position: absolute;
+    top: -5px;
+    right: -6px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 10px;
+    background: #D4144A;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(212, 20, 74, 0.4);
+    display: none;
+    z-index: 22;
+    animation: monetaBadgePulse 1.6s ease-in-out infinite;
+    transform-origin: center;
+    will-change: transform;
+    pointer-events: none;
+}

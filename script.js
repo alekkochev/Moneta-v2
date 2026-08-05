@@ -2876,6 +2876,14 @@ console.log('%c Вебсајт во развој 💪', 'color:#6B6B76;font-size
 
     // Нав-бар баџ — вкупен број на сите артикли во кошничката
     const renderNavBadges = () => {
+        // Мобилен: автоматски додади баџ на бургер-копчето (ако недостасува)
+        const toggle = document.querySelector('.navbar__toggle');
+        if (toggle && !toggle.querySelector('[data-cart-badge]')) {
+            const b = document.createElement('span');
+            b.className = 'navbar__toggle-badge';
+            b.setAttribute('data-cart-badge', '0');
+            toggle.appendChild(b);
+        }
         const cart = getCart();
         const total = totalQty(cart);
         document.querySelectorAll('[data-cart-badge]').forEach((badge) => {
