@@ -8506,7 +8506,7 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
 .navbar__toggle {
     position: relative;
 }
-.navbar__toggle-badge {
+.navbar__toggle .navbar__toggle-badge {
     position: absolute;
     top: -5px;
     right: -6px;
