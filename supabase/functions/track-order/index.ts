@@ -45,14 +45,10 @@ serve(async (req) => {
   }
 
   try {
-    const { email, orderNumber } = await req.json().catch(() => ({}));
+    const { email } = await req.json().catch(() => ({}));
 
     if (!email || !EMAIL_RE.test(String(email))) {
       return json({ error: "Invalid email" }, 400);
-    }
-    const order = String(orderNumber || "").trim();
-    if (!order) {
-      return json({ error: "Missing order number" }, 400);
     }
 
     if (!RESEND_API_KEY || !SENDER_EMAIL) {
@@ -60,13 +56,15 @@ serve(async (req) => {
       return json({ error: "Server not configured" }, 500);
     }
 
-    const subject = `📦 Барање за код за следење — нарачка ${order}`;
+    const KARGO_URL = "https://www.kargoekspres.mk/ProverkaPratka.aspx";
+    const subject = "📦 Барање за код за следење на нарачка";
     const text =
       "Испратете ми код за следење на нарачката на мојот мејл.\n\n" +
-      "Број на нарачка: " + order + "\n" +
       "Клиентски мејл: " + email + "\n\n" +
+      "Линк за следење (клиентот го залепува кодот тука): " + KARGO_URL + "\n\n" +
       "Ова барање е испратено преку формуларот „Следете ја вашата нарачка" на moneta-v2-orpin.vercel.app.\n" +
-      "Ве молиме рачно внесете го кодот за следење и испратете му го на клиентскиот мејл.";
+      "Ве молиме рачно внесете го кодот за следење и испратете му го на клиентскиот мејл, " +
+      "заедно со линкот за следење погоре.";
 
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",

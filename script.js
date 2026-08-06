@@ -3562,10 +3562,14 @@ window.addEventListener('resize', syncCardLinkGap, { passive: true });
 // Пример: window.MONETA_SUPABASE_URL = 'https://xxxx.supabase.co';
 // ========================================
 window.MONETA_SUPABASE_URL = '';
+// Е-пошта на продавницата (за mailto fallback) — за тестирање стави nudalsmudals@gmail.com
+window.MONETA_SHOP_EMAIL = '';
+// Е-пошта за НАРАЧКИ (naracka.html mailto) — за тестирање стави nudalsmudals@gmail.com
+window.MONETA_ORDER_EMAIL = '';
 
 // ========================================
 // СЛЕДЕЊЕ НА НАРАЧКА — форма за барање код за следење
-// Клиентот внесува е-пошта + број на нарачка → барањето оди до
+// Клиентот внесува е-пошта → барањето оди до
 // Supabase Edge Function (track-order) → се испраќа мејл до
 // продавницата (info@calivita.mk), а продавачот рачно му го
 // враќа кодот за следење на клиентскиот мејл.
@@ -3575,11 +3579,12 @@ window.MONETA_SUPABASE_URL = '';
     if (!form) return;
 
     const SUPABASE_URL = String(window.MONETA_SUPABASE_URL || '').replace(/\/+$/, '');
+    const SHOP_EMAIL = window.MONETA_SHOP_EMAIL || 'info@calivita.mk';
     const emailInput = document.getElementById('trackEmail');
-    const orderInput = document.getElementById('trackOrderNo');
     const feedback = document.getElementById('orderTrackerFeedback');
 
     const getLang = () => document.documentElement.lang === 'en' ? 'en' : 'mk';
+    const KARGO_URL = 'https://www.kargoekspres.mk/ProverkaPratka.aspx';
 
     const setFeedback = (type, mkText, enText) => {
         if (!feedback) return;
@@ -3590,7 +3595,6 @@ window.MONETA_SUPABASE_URL = '';
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = emailInput.value.trim();
-        const orderNumber = orderInput.value.trim();
         const isEn = getLang() === 'en';
 
         if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
@@ -3600,26 +3604,20 @@ window.MONETA_SUPABASE_URL = '';
             emailInput.focus();
             return;
         }
-        if (!orderNumber) {
-            setFeedback('error',
-                'Ве молиме внесете го бројот на нарачката.',
-                'Please enter your order number.');
-            orderInput.focus();
-            return;
-        }
+
         if (!SUPABASE_URL) {
             // Fallback: отвори го мејл клиентот со готово барање до продавницата
             // (додека Supabase + Resend не се конфигурирани)
-            const subject = encodeURIComponent('Барање за код за следење — нарачка ' + orderNumber);
+            const subject = encodeURIComponent('Барање за код за следење на нарачка');
             const body = encodeURIComponent(
                 'Испратете ми код за следење на нарачката на мојот мејл.\n\n' +
-                'Број на нарачка: ' + orderNumber + '\n' +
-                'Мојата е-пошта: ' + email
+                'Мојата е-пошта: ' + email + '\n\n' +
+                'Линк за следење (залепете го кодот): ' + KARGO_URL
             );
-            window.location.href = 'mailto:info@calivita.mk?subject=' + subject + '&body=' + body;
+            window.location.href = 'mailto:' + SHOP_EMAIL + '?subject=' + subject + '&body=' + body;
             setFeedback('success',
-                'Вашата е-пошта програма се отвори со готово барање до info@calivita.mk.',
-                'Your email app opened with a ready request to info@calivita.mk.');
+                'Вашата е-пошта програма се отвори со готово барање до ' + SHOP_EMAIL + '.',
+                'Your email app opened with a ready request to ' + SHOP_EMAIL + '.');
             return;
         }
 
@@ -3633,13 +3631,15 @@ window.MONETA_SUPABASE_URL = '';
             const res = await fetch(SUPABASE_URL + '/functions/v1/track-order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, orderNumber }),
+                body: JSON.stringify({ email }),
             });
             const data = await res.json().catch(() => ({}));
             if (res.ok && data.ok) {
+                const link = '<a href="' + KARGO_URL + '" target="_blank" rel="noopener" style="color:#7ce38b;text-decoration:underline;font-weight:700;">' +
+                    (isEn ? 'Track on Kargo Express →' : 'Следете ја пратката на Карго Експрес →') + '</a>';
                 setFeedback('success',
-                    'Вашето барање е испратено! Кодот за следење ќе го добиете на вашата е-пошта.',
-                    'Your request has been sent! You will receive the tracking code on your email.');
+                    'Вашето барање е испратено! Кодот за следење ќе го добиете на вашата е-пошта. ' + link,
+                    'Your request has been sent! You will receive the tracking code on your email. ' + link);
                 form.reset();
             } else {
                 setFeedback('error',

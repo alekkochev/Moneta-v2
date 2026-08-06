@@ -1,10 +1,17 @@
 # Поставување: Supabase + Resend за формата „Следете ја вашата нарачка"
 
-Формата (во `index.html` — footer) внесува **е-пошта + број на нарачка** и со копчето **„Испрати"** барањето се испраќа на `info@calivita.mk`. Продавачот потоа **рачно** го внесува кодот за следење и му го враќа на клиентскиот мејл.
+Формата (во `index.html` — footer) внесува **само е-пошта** и со копчето **„Испрати"** барањето се испраќа на мејлот на продавницата. Продавачот потоа **рачно** го внесува кодот за следење и му го враќа на клиентскиот мејл (заедно со линк до Карго Експрес каде клиентот го залепува кодот).
 
-**Додека Supabase не е поставен**, формата работи преку fallback: ја отвора е-пошта програмата со готово барање до `info@calivita.mk` (нема да се изгуби функционалност).
+**Додека Supabase не е поставен**, формата работи преку fallback: ја отвора е-пошта програмата со готово барање (нема да се изгуби функционалност).
 
 ---
+
+## Тестирање: користи свој мејл наместо info@calivita.mk
+Додека тестираме, мејловите (и за нарачки и за следење) може да одат на **nudalsmudals@gmail.com**. По завршено тестирање → назад на `info@calivita.mk`.
+
+- **Следење (Supabase):** `SHOP_EMAIL` secret → `nudalsmudals@gmail.com` (чекор 5)
+- **Следење (mailto fallback):** `window.MONETA_SHOP_EMAIL = 'nudalsmudals@gmail.com'` во `script.js`
+- **Нарачки (naracka.html):** `window.MONETA_ORDER_EMAIL = 'nudalsmudals@gmail.com'` во `script.js`
 
 ## 1. Креирај Supabase проект
 1. Оди на https://supabase.com → Sign in / Sign up
@@ -35,7 +42,7 @@ supabase link --project-ref <project-ref>
 
 supabase secrets set RESEND_API_KEY=re_XXXXXXXX
 supabase secrets set SENDER_EMAIL=on@calivita.mk
-supabase secrets set SHOP_EMAIL=info@calivita.mk
+supabase secrets set SHOP_EMAIL=nudalsmudals@gmail.com   # за тест; подоцна info@calivita.mk
 supabase secrets set ALLOWED_ORIGIN=https://moneta-v2-orpin.vercel.app
 ```
 > `SENDER_EMAIL` мора да е од **верификуван домен** во Resend (или `onboarding@resend.dev` за тест).
@@ -49,24 +56,26 @@ supabase functions deploy track-order
 Во `script.js` (на врвот на крајниот дел):
 ```js
 window.MONETA_SUPABASE_URL = 'https://abcd1234.supabase.co';
+window.MONETA_SHOP_EMAIL = 'nudalsmudals@gmail.com'; // за тест; подоцна избриши (→ info@calivita.mk)
+window.MONETA_ORDER_EMAIL = 'nudalsmudals@gmail.com'; // за тест; подоцна избриши (→ info@calivita.mk)
 ```
 (без `/` на крајот) → комит + деплој на Vercel.
 
 ## 8. Тестирање
 **Локално:**
 ```powershell
-supabase secrets set RESEND_API_KEY=... # ако не е поставено
 supabase functions serve track-order
 # POST http://127.0.0.1:54321/functions/v1/track-order
-# { "email": "test@primer.mk", "orderNumber": "MNT-123" }
+# { "email": "test@primer.mk" }
 ```
 
-**На production:** пополни ја формата на https://moneta-v2-orpin.vercel.app → треба да пристигне мејл на `info@calivita.mk` со „Барање за код за следење — нарачка ...".
+**На production:** пополни ја формата на https://moneta-v2-orpin.vercel.app → треба да пристигне мејл (за тест: nudalsmudals@gmail.com) со „Барање за код за следење на нарачка" и линк до Карго Експрес.
 
 ---
 
 ## Како работи (технички)
-- `index.html` → `#orderTrackerForm` (е-пошта + број на нарачка + „Испрати")
-- `script.js` → `initOrderTrackerForm()` → `POST {SUPABASE_URL}/functions/v1/track-order`
-- `supabase/functions/track-order/index.ts` → преку **Resend API** испраќа мејл до `SHOP_EMAIL`
+- `index.html` → `#orderTrackerForm` (само е-пошта + „Испрати")
+- `script.js` → `initOrderTrackerForm()` → `POST {SUPABASE_URL}/functions/v1/track-order` со `{ email }`
+- `supabase/functions/track-order/index.ts` → преку **Resend API** испраќа мејл до `SHOP_EMAIL` (со клиентскиот мејл + линк до Карго)
 - Долу стои копчето **„Следи ја нарачката"** → линк до Карго Експрес
+- Продавачот рачно му го враќа кодот на клиентскиот мејл (со линкот до Карго)

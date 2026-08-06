@@ -332,7 +332,8 @@
                 body += '\nДостава: ' + (delivery === 0 ? 'БЕСПЛАТНА' : delivery + ' ден.') + '\n';
                 body += 'ВКУПНО: ' + (total + delivery) + ' ден.\n';
 
-                window.location.href = 'mailto:info@calivita.mk?subject=' + encodeURIComponent('Нарачка - МОНЕТА - ' + name) + '&body=' + encodeURIComponent(body);
+                const orderEmail = window.MONETA_ORDER_EMAIL || 'info@calivita.mk';
+                window.location.href = 'mailto:' + orderEmail + '?subject=' + encodeURIComponent('Нарачка - МОНЕТА - ' + name) + '&body=' + encodeURIComponent(body);
 
                 // Потврда
                 const checkoutInner = document.querySelector('.checkout__inner');
