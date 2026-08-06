@@ -232,6 +232,7 @@
     <!-- ===== SCRIPTS ===== -->
     <script src="./vendor/aos.js" defer></script>
     <script src="./script.js" defer></script>
+    <script src="./invoice-pdf.js" defer></script>
     <script>
         // ===== CHECKOUT LOGIC (нарачка) =====
         document.addEventListener('DOMContentLoaded', () => {
@@ -368,6 +369,15 @@
                         }
                         // Автоматски мејл за новата нарачка (Resend edge function order-notify)
                         try {
+                            // Генерирај PDF фактура во прелистувачот (со ДДВ)
+                            let pdfBase64 = '';
+                            if (window.MonetaInvoice) {
+                                const pdf = await window.MonetaInvoice.build(
+                                    { name, phone, email, city, address, items: orderItems, delivery },
+                                    0.18
+                                );
+                                if (pdf) pdfBase64 = pdf.base64;
+                            }
                             await fetch(sbUrl + '/functions/v1/order-notify', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
@@ -377,7 +387,8 @@
                                     items: orderItems,
                                     total: total + delivery,
                                     delivery,
-                                    marketing_consent: marketingChecked
+                                    marketing_consent: marketingChecked,
+                                    pdfBase64
                                 })
                             });
                         } catch (err) { console.warn('Order notify error:', err); }

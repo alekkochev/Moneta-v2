@@ -15,6 +15,7 @@ import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const SENDER_EMAIL = Deno.env.get("SENDER_EMAIL");
 const ALLOWED_ORIGIN = Deno.env.get("ALLOWED_ORIGIN") || "*";
+const VAT_RATE = parseFloat(Deno.env.get("VAT_RATE") || "0.18") || 0.18;
 const ORDER_EMAILS = (Deno.env.get("ORDER_EMAILS") || "nudalsmudals@gmail.com,aposus@gmail.com")
   .split(",")
   .map((e) => e.trim())
@@ -31,6 +32,15 @@ function json(body: unknown, status = 200) {
     status,
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
+}
+
+function makeInvoiceNumber(now: Date): string {
+  return (
+    "INV-" + now.getFullYear() +
+    String(now.getMonth() + 1).padStart(2, "0") +
+    String(now.getDate()).padStart(2, "0") + "-" +
+    String(Math.floor(Math.random() * 9000) + 1000)
+  );
 }
 
 serve(async (req) => {
@@ -68,10 +78,12 @@ serve(async (req) => {
 
     const delivery = Number(body.delivery) || 0;
     const total = Number(body.total) || 0;
+    const invNo = makeInvoiceNumber(new Date());
 
     const text =
       "НОВА НАРАЧКА — МОНЕТА (www.vloski.mk)\n" +
       "========================================\n\n" +
+      "Фактура: " + invNo + "\n" +
       "Име: " + (body.name || "-") + "\n" +
       "Телефон: " + (body.phone || "-") + "\n" +
       "Е-пошта: " + (body.email || "-") + "\n" +
@@ -83,7 +95,21 @@ serve(async (req) => {
       "--- ПРОИЗВОДИ ---\n" +
       (itemLines || "(празна нарачка)") + "\n\n" +
       "Достава: " + (delivery === 0 ? "БЕСПЛАТНА" : delivery + " ден.") + "\n" +
-      "ВКУПНО: " + total + " ден.\n";
+      "ВКУПНО: " + total + " ден.\n\n" +
+      "PDF фактурата е прикачена на овој мејл.";
+
+    // PDF фактурата ја генерира прелистувачот (invoice-pdf.js) и ја праќа како base64
+    const pdfBase64 = String(body.pdfBase64 || "");
+
+    const emailPayload: any = {
+      from: SENDER_EMAIL,
+      to: ORDER_EMAILS,
+      subject: `🛒 Фактура ${invNo} — Нова нарачка — МОНЕТА`,
+      text,
+    };
+    if (pdfBase64) {
+      emailPayload.attachments = [{ filename: invNo + ".pdf", content: pdfBase64 }];
+    }
 
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -91,12 +117,7 @@ serve(async (req) => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        from: SENDER_EMAIL,
-        to: ORDER_EMAILS,
-        subject: `🛒 Нова нарачка — МОНЕТА — ${body.name || ""}`,
-        text,
-      }),
+      body: JSON.stringify(emailPayload),
     });
 
     if (!res.ok) {
@@ -105,7 +126,7 @@ serve(async (req) => {
       return json({ error: "Resend failed", detail: String(detail).slice(0, 500) }, 500);
     }
 
-    return json({ ok: true });
+    return json({ ok: true, invoice: invNo, pdf: !!pdfBase64 });
   } catch (e) {
     return json({ error: String(e) }, 500);
   }
