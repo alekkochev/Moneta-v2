@@ -1,0 +1,9 @@
+# Внатрешни фајлови што НЕ смеат да бидат јавно достапни
+server.js
+scripts/
+supabase/
+content/
+_pgbackup/
+_pginfo/
+metadata.json
+*.md
