@@ -1,7 +1,7 @@
-// Vercel Edge Middleware — лозинка-порта (страницата е во изработка)
+// Vercel Edge Middleware — лозинка-порта (статички проект, без next/server)
 // Лозинката се чита од environment variable SITE_PASSWORD (НЕ е во кодот).
 // Без лозинка → екран „Внесете лозинка" на сите страници.
-import { NextResponse } from 'next/server';
+// Враќање на nothing (undefined) = продолжи кон статичкиот фајл.
 
 const COOKIE = 'moneta_auth';
 const MAX_AGE = 60 * 60 * 24 * 7; // 7 дена
@@ -11,14 +11,14 @@ export default async function middleware(req) {
   const password = process.env.SITE_PASSWORD || '';
 
   // Ако нема поставено лозинка на Vercel → не заштитувај (безбедносна врата)
-  if (!password) return NextResponse.next();
+  if (!password) return;
 
-  const valid = Buffer.from(password).toString('base64url');
+  const valid = btoa(password);
   const cookie = req.headers.get('cookie') || '';
   const authed = cookie.split(';').some((c) => c.trim() === `${COOKIE}=${valid}`);
 
-  // Веќе логиран → пропушти
-  if (authed) return NextResponse.next();
+  // Веќе логиран → продолжи кон страницата
+  if (authed) return;
 
   // Обработи го логин-формуларот (POST)
   if (req.method === 'POST' && url.pathname === '/__login') {
@@ -27,11 +27,16 @@ export default async function middleware(req) {
       const form = await req.formData();
       pass = String(form.get('password') || '');
     } catch (e) { /* ignore */ }
-    const nextPath = (url.searchParams.get('next') || '/').startsWith('/') ? url.searchParams.get('next') : '/';
+    const nextParam = url.searchParams.get('next') || '/';
+    const nextPath = nextParam.startsWith('/') ? nextParam : '/';
     if (pass === password) {
-      const res = NextResponse.redirect(new URL(nextPath, url.origin), 303);
-      res.headers.set('Set-Cookie', `${COOKIE}=${valid}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${MAX_AGE}`);
-      return res;
+      return new Response(null, {
+        status: 303,
+        headers: {
+          Location: nextPath,
+          'Set-Cookie': `${COOKIE}=${valid}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${MAX_AGE}`,
+        },
+      });
     }
     // Погрешна лозинка → повторно логин екран со грешка
     return html(loginPage(true, url.pathname + url.search));
