@@ -4,8 +4,7 @@
   "description": "MONETA — Анатомски вложки",
   "type": "module",
   "scripts": {
-    "dev": "node server.js",
-    "build": "echo 'No build required for static site'"
+    "dev": "node server.js"
   },
   "dependencies": {
     "compression": "^1.8.1",
