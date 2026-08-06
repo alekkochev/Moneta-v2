@@ -3551,3 +3551,107 @@ window.addEventListener('resize', syncCardLinkGap, { passive: true });
     });
 })();
 
+// ========================================
+// МОНЕТА — Supabase конфигурација
+// Пополнете го URL-то на Supabase проектот
+// (Supabase Dashboard → Settings → API → Project URL)
+// Пример: window.MONETA_SUPABASE_URL = 'https://xxxx.supabase.co';
+// ========================================
+window.MONETA_SUPABASE_URL = '';
+
+// ========================================
+// СЛЕДЕЊЕ НА НАРАЧКА — форма за барање код за следење
+// Клиентот внесува е-пошта + број на нарачка → барањето оди до
+// Supabase Edge Function (track-order) → се испраќа мејл до
+// продавницата (info@calivita.mk), а продавачот рачно му го
+// враќа кодот за следење на клиентскиот мејл.
+// ========================================
+(function initOrderTrackerForm() {
+    const form = document.getElementById('orderTrackerForm');
+    if (!form) return;
+
+    const SUPABASE_URL = String(window.MONETA_SUPABASE_URL || '').replace(/\/+$/, '');
+    const emailInput = document.getElementById('trackEmail');
+    const orderInput = document.getElementById('trackOrderNo');
+    const feedback = document.getElementById('orderTrackerFeedback');
+
+    const getLang = () => document.documentElement.lang === 'en' ? 'en' : 'mk';
+
+    const setFeedback = (type, mkText, enText) => {
+        if (!feedback) return;
+        feedback.className = 'order-tracker__feedback is-' + type;
+        feedback.innerHTML = '<span>' + (getLang() === 'en' ? enText : mkText) + '</span>';
+    };
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = emailInput.value.trim();
+        const orderNumber = orderInput.value.trim();
+        const isEn = getLang() === 'en';
+
+        if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+            setFeedback('error',
+                'Ве молиме внесете валидна е-пошта адреса.',
+                'Please enter a valid email address.');
+            emailInput.focus();
+            return;
+        }
+        if (!orderNumber) {
+            setFeedback('error',
+                'Ве молиме внесете го бројот на нарачката.',
+                'Please enter your order number.');
+            orderInput.focus();
+            return;
+        }
+        if (!SUPABASE_URL) {
+            // Fallback: отвори го мејл клиентот со готово барање до продавницата
+            // (додека Supabase + Resend не се конфигурирани)
+            const subject = encodeURIComponent('Барање за код за следење — нарачка ' + orderNumber);
+            const body = encodeURIComponent(
+                'Испратете ми код за следење на нарачката на мојот мејл.\n\n' +
+                'Број на нарачка: ' + orderNumber + '\n' +
+                'Мојата е-пошта: ' + email
+            );
+            window.location.href = 'mailto:info@calivita.mk?subject=' + subject + '&body=' + body;
+            setFeedback('success',
+                'Вашата е-пошта програма се отвори со готово барање до info@calivita.mk.',
+                'Your email app opened with a ready request to info@calivita.mk.');
+            return;
+        }
+
+        const submitBtn = form.querySelector('.order-tracker__form-btn');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = '0.6';
+        }
+
+        try {
+            const res = await fetch(SUPABASE_URL + '/functions/v1/track-order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, orderNumber }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok && data.ok) {
+                setFeedback('success',
+                    'Вашето барање е испратено! Кодот за следење ќе го добиете на вашата е-пошта.',
+                    'Your request has been sent! You will receive the tracking code on your email.');
+                form.reset();
+            } else {
+                setFeedback('error',
+                    'Настана грешка при испраќањето. Ве молиме обидете се повторно.',
+                    'Something went wrong. Please try again.');
+            }
+        } catch (err) {
+            setFeedback('error',
+                'Настана грешка при испраќањето. Ве молиме обидете се повторно.',
+                'Something went wrong. Please try again.');
+        } finally {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '';
+            }
+        }
+    });
+})();
+

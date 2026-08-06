@@ -8529,3 +8529,42 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
     will-change: transform;
     pointer-events: none;
 }
+
+/* ========================================
+   СЛЕДЕЊЕ НА НАРАЧКА — форма за барање код за следење
+   (Supabase Edge Function + Resend)
+   ======================================== */
+.order-tracker__form-btn {
+    flex-shrink: 0;
+    cursor: pointer;
+}
+.order-tracker__feedback {
+    margin-top: 12px;
+    font-size: 13.5px;
+    font-weight: 600;
+    line-height: 1.5;
+    display: none;
+    padding: 10px 14px;
+    border-radius: 10px;
+}
+.order-tracker__feedback.is-success,
+.order-tracker__feedback.is-error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.order-tracker__feedback.is-success {
+    background: rgba(46, 160, 67, 0.15);
+    border: 1px solid rgba(46, 160, 67, 0.4);
+    color: #7ce38b;
+}
+.order-tracker__feedback.is-error {
+    background: rgba(236, 23, 82, 0.15);
+    border: 1px solid rgba(236, 23, 82, 0.4);
+    color: #ff9db6;
+}
+@media (max-width: 520px) {
+    .order-tracker__form-btn {
+        width: 100% !important;
+    }
+}

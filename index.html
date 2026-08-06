@@ -838,12 +838,22 @@
                 <div class="footer__tracker">
                     <div class="order-tracker__header">
                         <div class="order-tracker__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
-                        <div class="order-tracker__titles"><h3 data-mk="Следете ја вашата нарачка" data-sq="Ndiq porosinë tuaj" data-en="Track Your Order">Следете ја вашата нарачка</h3><p data-mk="Побарајте број за следење, истиот ќе ви биде пратен на Вашиот e-mail." data-sq="Kërkoni një numër ndjekjeje, i njëjti do t'ju dërgohet në e-mail-in tuaj." data-en="Request a tracking number, it will be sent to your email.">Побарајте број за следење, истиот ќе ви биде пратен на Вашиот e-mail.</p></div>
+                        <div class="order-tracker__titles"><h3 data-mk="Следете ја вашата нарачка" data-sq="Ndiq porosinë tuaj" data-en="Track Your Order">Следете ја вашата нарачка</h3><p data-mk="Внесете ја вашата е-пошта и бројот на нарачката — ќе Ви го испратиме кодот за следење на Вашиот мејл." data-sq="Shkruani email-in tuaj dhe numrin e porosisë — do t'ju dërgojmë kodin e ndjekjes në email-in tuaj." data-en="Enter your email and order number — we will send the tracking code to your email.">Внесете ја вашата е-пошта и бројот на нарачката — ќе Ви го испратиме кодот за следење на Вашиот мејл.</p></div>
                     </div>
-                    <!-- Точка 6: tracking → директен линк до Карго Експрес (броевите доаѓаат по email) -->
+                    <form class="order-tracker__form" id="orderTrackerForm" novalidate>
+                        <div class="order-tracker__input-group">
+                            <input type="email" id="trackEmail" placeholder="Вашата е-пошта..." data-mk-placeholder="Вашата е-пошта..." data-sq-placeholder="Email-i juaj..." data-en-placeholder="Your email..." required autocomplete="email">
+                            <input type="text" id="trackOrderNo" placeholder="Број на нарачка..." data-mk-placeholder="Број на нарачка..." data-sq-placeholder="Numri i porosisë..." data-en-placeholder="Order number..." required autocomplete="off">
+                            <button type="submit" class="order-tracker__submit order-tracker__form-btn">
+                                <span data-mk="Испрати" data-sq="Dërgo" data-en="Send">Испрати</span>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                            </button>
+                        </div>
+                        <div class="order-tracker__feedback" id="orderTrackerFeedback" aria-live="polite"></div>
+                    </form>
                     <a class="order-tracker__submit order-tracker__link" href="https://www.kargoekspres.mk/ProverkaPratka.aspx" target="_blank" rel="noopener">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                        <span data-mk="Следи пратка во Карго Експрес" data-sq="Ndiq parcelën në Kargo Express" data-en="Track Package with Kargo Express">Следи пратка во Карго Експрес</span>
+                        <span data-mk="Следи ја нарачката" data-sq="Ndiq porosinë" data-en="Track Your Order">Следи ја нарачката</span>
                     </a>
                 </div>
             </div>
