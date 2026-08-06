@@ -15,6 +15,9 @@ _pgbackup/
 _pginfo/
 _design-backup-*/
 
+# Supabase CLI temp/linked files (local only)
+supabase/.temp/
+
 # OS / editor
 .DS_Store
 Thumbs.db
