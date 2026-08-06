@@ -4,7 +4,9 @@
 // Враќање на nothing (undefined) = продолжи кон статичкиот фајл.
 
 const COOKIE = 'moneta_auth';
-const MAX_AGE = 60 * 60 * 24 * 7; // 7 дена
+// Сесиско cookie (без Max-Age): исчезнува при затворање на прелистувачот,
+// а script.js го брише и при секоја навигација/релоад → секогаш бара лозинка.
+// БЕЗ HttpOnly за да може JS (pagehide) да го избрише.
 
 export default async function middleware(req) {
   const url = new URL(req.url);
@@ -34,7 +36,7 @@ export default async function middleware(req) {
         status: 303,
         headers: {
           Location: nextPath,
-          'Set-Cookie': `${COOKIE}=${valid}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${MAX_AGE}`,
+          'Set-Cookie': `${COOKIE}=${valid}; Path=/; SameSite=Lax`,
         },
       });
     }
