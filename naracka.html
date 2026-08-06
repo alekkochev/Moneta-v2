@@ -366,6 +366,21 @@
                                 body: JSON.stringify({ email, name, consent: true, terms_ok: termsChecked })
                             });
                         }
+                        // Автоматски мејл за новата нарачка (Resend edge function order-notify)
+                        try {
+                            await fetch(sbUrl + '/functions/v1/order-notify', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    name, phone, email, city, address, note,
+                                    payment: pay,
+                                    items: orderItems,
+                                    total: total + delivery,
+                                    delivery,
+                                    marketing_consent: marketingChecked
+                                })
+                            });
+                        } catch (err) { console.warn('Order notify error:', err); }
                     } catch (err) { console.warn('Supabase order save error:', err); }
                 }
 
