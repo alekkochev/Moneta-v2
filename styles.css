@@ -8652,3 +8652,191 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
         width: 100% !important;
     }
 }
+
+/* ========================================
+   МАРКЕТИНГ ПОПУПИ (социјален доказ + exit-intent + промо лента)
+   ======================================== */
+.moneta-promo-bar {
+    position: relative;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 9px 42px;
+    background: linear-gradient(90deg, #EC1752, #ff5f89);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+}
+.moneta-promo-bar__close {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: 0;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 2px 8px;
+}
+
+.moneta-sales-toast {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 90;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 340px;
+    background: #fff;
+    border: 1px solid #f0e8e5;
+    border-radius: 16px;
+    padding: 12px 40px 12px 12px;
+    box-shadow: 0 12px 40px rgba(23, 23, 28, 0.16);
+    transform: translateX(-120%);
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    cursor: pointer;
+}
+.moneta-sales-toast.is-visible {
+    transform: translateX(0);
+}
+.moneta-sales-toast__img {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    object-fit: cover;
+    background: #fff;
+    border: 1px solid #f0e8e5;
+}
+.moneta-sales-toast__body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.moneta-sales-toast__title {
+    font-size: 10.5px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: #EC1752;
+    font-weight: 800;
+}
+.moneta-sales-toast__text {
+    font-size: 13px;
+    color: #201F26;
+    line-height: 1.35;
+}
+.moneta-sales-toast__text strong {
+    font-weight: 700;
+}
+.moneta-sales-toast__meta {
+    font-size: 11px;
+    color: #9a9794;
+}
+.moneta-sales-toast__close {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    background: none;
+    border: 0;
+    color: #b5b2b0;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.moneta-exit {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+.moneta-exit__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(20, 18, 24, 0.55);
+    backdrop-filter: blur(3px);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.moneta-exit.is-open .moneta-exit__backdrop {
+    opacity: 1;
+}
+.moneta-exit__card {
+    position: relative;
+    max-width: 400px;
+    width: 100%;
+    background: #fff;
+    border-radius: 24px;
+    padding: 40px 32px 32px;
+    text-align: center;
+    border-top: 4px solid #EC1752;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
+    transform: translateY(24px) scale(0.97);
+    opacity: 0;
+    transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.moneta-exit.is-open .moneta-exit__card {
+    transform: none;
+    opacity: 1;
+}
+.moneta-exit__close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    background: none;
+    border: 0;
+    font-size: 22px;
+    color: #b5b2b0;
+    cursor: pointer;
+}
+.moneta-exit__emoji {
+    font-size: 44px;
+    margin-bottom: 8px;
+}
+.moneta-exit h3 {
+    font-size: 24px;
+    color: #201F26;
+    margin: 0 0 4px;
+}
+.moneta-exit__title {
+    font-size: 18px;
+    font-weight: 800;
+    color: #EC1752;
+    margin: 0 0 8px;
+}
+.moneta-exit__sub {
+    font-size: 14px;
+    color: #6B6B76;
+    margin: 0 0 22px;
+    line-height: 1.5;
+}
+.moneta-exit__btn {
+    display: inline-block;
+    background: #EC1752;
+    color: #fff;
+    font-weight: 700;
+    padding: 14px 26px;
+    border-radius: 999px;
+    text-decoration: none;
+}
+.moneta-exit__btn:hover {
+    background: #d41149;
+}
+@media (max-width: 480px) {
+    .moneta-sales-toast {
+        left: 10px;
+        right: 10px;
+        max-width: none;
+    }
+    .moneta-promo-bar {
+        font-size: 12px;
+        padding: 8px 36px;
+    }
+}

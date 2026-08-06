@@ -3817,3 +3817,153 @@ window.MonetaData = {
     });
 })();
 
+// ========================================
+// МАРКЕТИНГ ИЗВЕСТУВАЊА (попупи) — социјален доказ + exit-intent + промо лента
+// Конфигурација: CONFIG = { sales, exitIntent, promoBar } — true/false
+// ========================================
+(function initMarketingPopups() {
+    const CONFIG = {
+        sales: true,        // 🔔 Sales popup (социјален доказ)
+        exitIntent: true,   // 🚪 Exit-intent popup
+        promoBar: true,     // 🎀 Промо лента горе
+    };
+    const BASE = /\/modeli\//.test(window.location.pathname) ? '../' : './';
+    const isEn = () => document.documentElement.lang === 'en';
+    const isSq = () => document.documentElement.lang === 'sq';
+    const t = (mk, sq, en) => (isEn() ? en : (isSq() ? sq : mk));
+
+    // ---------- 1) Промо лента (горе, отстранлива) ----------
+    function initPromoBar() {
+        if (sessionStorage.getItem('moneta_promo_closed')) return;
+        const bar = document.createElement('div');
+        bar.id = 'monetaPromoBar';
+        bar.className = 'moneta-promo-bar';
+        bar.innerHTML =
+            '<span class="moneta-promo-bar__text">' +
+            t(
+                '🎉 Попусти до −20% на избрани модели · Бесплатна достава над 1.000 ден.',
+                '🎉 Zbritje deri −20% te modelet e zgjedhura · Transport falas mbi 1.000 den.',
+                '🎉 Up to −20% off selected models · Free delivery over 1,000 MKD'
+            ) +
+            '</span>' +
+            '<button type="button" class="moneta-promo-bar__close" aria-label="Затвори">×</button>';
+        document.body.insertBefore(bar, document.body.firstChild);
+        bar.querySelector('.moneta-promo-bar__close').addEventListener('click', () => {
+            sessionStorage.setItem('moneta_promo_closed', '1');
+            bar.remove();
+        });
+    }
+
+    // ---------- 2) Sales popup (социјален доказ) ----------
+    const CITIES = ['Скопје', 'Битола', 'Охрид', 'Тетово', 'Куманово', 'Прилеп', 'Велес', 'Штип', 'Струмица', 'Гостивар'];
+    const NAMES = ['Ана', 'Марија', 'Ивана', 'Елена', 'Горан', 'Никола', 'Стефан', 'Јована', 'Теа', 'Марко'];
+    let salesShown = 0;
+    let salesTimer = null;
+
+    function productPool() {
+        const pool = [];
+        if (window.MonetaData && Object.keys(window.MonetaData.products).length) {
+            Object.values(window.MonetaData.products).forEach((p) => {
+                if (p.active === false) return;
+                pool.push({
+                    name: isEn() ? (p.name_en || p.slug) : (p.name_mk || p.slug),
+                    price: p.price || 0,
+                    slug: p.slug,
+                });
+            });
+        }
+        if (pool.length >= 3) return pool;
+        return [
+            { name: 'Simona', price: 120, slug: 'simona' },
+            { name: 'Carbon', price: 170, slug: 'carbon' },
+            { name: 'Duck', price: 490, slug: 'duck' },
+            { name: 'MEMOSOLE', price: 400, slug: 'memosole' },
+            { name: 'Vital', price: 450, slug: 'vital' },
+        ];
+    }
+
+    function showSalesToast() {
+        if (!CONFIG.sales || salesShown >= 3) return;
+        const pool = productPool();
+        if (!pool.length) return;
+        const prod = pool[Math.floor(Math.random() * pool.length)];
+        const city = CITIES[Math.floor(Math.random() * CITIES.length)];
+        const name = NAMES[Math.floor(Math.random() * NAMES.length)];
+        const mins = 1 + Math.floor(Math.random() * 20);
+
+        const old = document.getElementById('monetaSalesToast');
+        if (old) old.remove();
+        const toast = document.createElement('div');
+        toast.id = 'monetaSalesToast';
+        toast.className = 'moneta-sales-toast';
+        toast.innerHTML =
+            '<img class="moneta-sales-toast__img" src="' + BASE + 'images/cards/' + prod.slug + '.webp" alt="" loading="lazy">' +
+            '<div class="moneta-sales-toast__body">' +
+                '<p class="moneta-sales-toast__title">' + t('🛍️ Штотуку купено', '🛍️ Sapo u blerë', '🛍️ Just purchased') + '</p>' +
+                '<p class="moneta-sales-toast__text"><strong>' + name + '</strong> ' + t('од', 'nga', 'from') + ' ' + city + ' · ' + prod.name + ' · ' + prod.price + ' ' + t('ден.', 'den.', 'MKD') + '</p>' +
+                '<p class="moneta-sales-toast__meta">' + t('пред', 'para', '') + ' ' + mins + ' ' + t('мин', 'min', 'min ago') + '</p>' +
+            '</div>' +
+            '<button type="button" class="moneta-sales-toast__close" aria-label="Затвори">×</button>';
+        document.body.appendChild(toast);
+        requestAnimationFrame(() => toast.classList.add('is-visible'));
+        const close = () => { toast.classList.remove('is-visible'); setTimeout(() => toast.remove(), 400); };
+        toast.querySelector('.moneta-sales-toast__close').addEventListener('click', close);
+        toast.addEventListener('click', (e) => {
+            if (e.target.closest('.moneta-sales-toast__close')) return;
+            window.location.href = BASE + 'modeli/' + prod.slug + '.html';
+        });
+        salesShown++;
+        setTimeout(close, 7000);
+        salesTimer = setTimeout(showSalesToast, 35000 + Math.random() * 15000);
+    }
+
+    // ---------- 3) Exit-intent popup ----------
+    function showExitPopup() {
+        const wrap = document.createElement('div');
+        wrap.id = 'monetaExitPopup';
+        wrap.className = 'moneta-exit';
+        wrap.innerHTML =
+            '<div class="moneta-exit__backdrop"></div>' +
+            '<div class="moneta-exit__card">' +
+                '<button type="button" class="moneta-exit__close" aria-label="Затвори">×</button>' +
+                '<div class="moneta-exit__emoji">🦶</div>' +
+                '<h3>' + t('Чекајте!', 'Prisni!', 'Wait!') + '</h3>' +
+                '<p class="moneta-exit__title">' + t('Бесплатна достава', 'Transport falas', 'Free delivery') + '</p>' +
+                '<p class="moneta-exit__sub">' + t('За нарачки над 1.000 ден. — низ цела Македонија.', 'Për porosi mbi 1.000 den. — në të gjithë Maqedoninë.', 'For orders over 1,000 MKD — across North Macedonia.') + '</p>' +
+                '<a href="' + BASE + 'index.html#kategorii" class="moneta-exit__btn">' + t('Види ги влошките →', 'Shiko tabanat →', 'See the insoles →') + '</a>' +
+            '</div>';
+        document.body.appendChild(wrap);
+        requestAnimationFrame(() => wrap.classList.add('is-open'));
+        const close = () => { wrap.classList.remove('is-open'); setTimeout(() => wrap.remove(), 300); };
+        wrap.querySelector('.moneta-exit__close').addEventListener('click', close);
+        wrap.querySelector('.moneta-exit__backdrop').addEventListener('click', close);
+    }
+
+    function initExitIntent() {
+        let shown = false;
+        document.addEventListener('mouseout', (e) => {
+            if (shown || salesShown > 0) return;
+            if (!e.relatedTarget && e.clientY < 10) {
+                shown = true;
+                showExitPopup();
+            }
+        });
+        // fallback за мобилни: по 60 секунди, ако сè уште не е прикажан
+        setTimeout(() => {
+            if (!shown) { shown = true; showExitPopup(); }
+        }, 60000);
+    }
+
+    // ---------- старт ----------
+    function start() {
+        if (CONFIG.promoBar) initPromoBar();
+        if (CONFIG.sales) setTimeout(showSalesToast, 12000);
+        if (CONFIG.exitIntent) setTimeout(initExitIntent, 5000);
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', start, { once: true });
+    } else {
+        start();
+    }
+})();
+
