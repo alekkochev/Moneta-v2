@@ -160,6 +160,16 @@
                             <span data-mk="💵 Плаќање при преземање (готово)" data-sq="💵 Pagesë në dorëzim (para në dorë)" data-en="💵 Cash on delivery">💵 Плаќање при преземање (готово)</span>
                         </label>
                     </div>
+                    <div class="checkout__consent">
+                        <label class="checkout__consent-item">
+                            <input type="checkbox" id="coMarketing">
+                            <span data-mk="Дали во иднина сакате да добивате известувања од нас?" data-sq="Dëshironi të merrni njoftime nga ne në të ardhmen?" data-en="Would you like to receive notifications from us in the future?">Дали во иднина сакате да добивате известувања од нас?</span>
+                        </label>
+                        <label class="checkout__consent-item checkout__consent-terms">
+                            <input type="checkbox" id="coTerms">
+                            <span data-mk="Ги прифаќам условите за користење и политиката за приватност — се согласувам моите лични податоци да се обработат за реализација на нарачката." data-sq="I pranoj kushtet e përdorimit dhe politikën e privatësisë — pajtohem që të dhënat e mia personale të përpunohen për realizimin e porosisë." data-en="I accept the terms of use and privacy policy — I agree to have my personal data processed for the fulfillment of the order.">Ги прифаќам условите за користење и политиката за приватност — се согласувам моите лични податоци да се обработат за реализација на нарачката.</span>
+                        </label>
+                    </div>
                     <button type="submit" class="hero__cta hero__cta--primary" style="width:100%">
                         <span data-mk="Потврди ја нарачката ✓" data-sq="Konfirmo porosinë ✓" data-en="Confirm order ✓">Потврди ја нарачката ✓</span>
                     </button>
@@ -297,7 +307,7 @@
             });
 
             // Испраќање: mailto кон info@calivita.mk + потврда
-            form.addEventListener('submit', (e) => {
+            form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const name = document.getElementById('coName').value.trim();
                 const phone = document.getElementById('coPhone').value.trim();
@@ -305,8 +315,14 @@
                 const city = document.getElementById('coCity').value.trim();
                 const address = document.getElementById('coAddress').value.trim();
                 const note = document.getElementById('coNote').value.trim();
+                const marketingChecked = !!(document.getElementById('coMarketing') && document.getElementById('coMarketing').checked);
+                const termsChecked = !!(document.getElementById('coTerms') && document.getElementById('coTerms').checked);
                 if (!name || !phone || !city || !address) {
                     alert(isEn() ? 'Please fill in all required fields.' : 'Ве молиме пополнете ги сите задолжителни полиња.');
+                    return;
+                }
+                if (!termsChecked) {
+                    alert(isEn() ? 'Please accept the terms and privacy policy to continue.' : 'Ве молиме означете дека ги прифаќате условите за да продолжите.');
                     return;
                 }
                 const cart = window.MonetaCart.getCart();
@@ -316,6 +332,43 @@
                 const delivery = freeShip ? 0 : 160;
                 const pay = (document.querySelector('input[name="coPay"]:checked') || {}).value || 'Плаќање при преземање';
 
+                // ===== Зачувај нарачка + согласност во Supabase =====
+                const sbUrl = String(window.MONETA_SUPABASE_URL || '').replace(/\/+$/, '');
+                const sbKey = window.MONETA_ANON_KEY || '';
+                if (sbUrl && sbKey) {
+                    const sbHeaders = { apikey: sbKey, Authorization: 'Bearer ' + sbKey, 'Content-Type': 'application/json', Prefer: 'return=minimal' };
+                    try {
+                        const orderItems = items.map((it) => ({
+                            slug: it.slug,
+                            name: isEn() ? it.nameEn : it.nameMk,
+                            code: it.code || '',
+                            sizes: it.sizes || {},
+                            qty: it.qty,
+                            price: it.price || 0
+                        }));
+                        await fetch(sbUrl + '/rest/v1/orders', {
+                            method: 'POST',
+                            headers: sbHeaders,
+                            body: JSON.stringify({
+                                name, phone, email, city, address, note,
+                                payment: pay,
+                                items: orderItems,
+                                total: total + delivery,
+                                delivery,
+                                marketing_consent: marketingChecked,
+                                terms_accepted: termsChecked
+                            })
+                        });
+                        if (marketingChecked && email) {
+                            await fetch(sbUrl + '/rest/v1/news_consents', {
+                                method: 'POST',
+                                headers: sbHeaders,
+                                body: JSON.stringify({ email, name, consent: true, terms_ok: termsChecked })
+                            });
+                        }
+                    } catch (err) { console.warn('Supabase order save error:', err); }
+                }
+
                 let body = 'НОВА НАРАЧКА - МОНЕТА\n========================\n\n';
                 body += 'Име: ' + name + '\n';
                 body += 'Телефон: ' + phone + '\n';
@@ -323,7 +376,9 @@
                 body += 'Град: ' + city + '\n';
                 body += 'Адреса: ' + address + '\n';
                 if (note) body += 'Забелешка: ' + note + '\n';
-                body += 'Плаќање: ' + pay + '\n\n';
+                body += 'Плаќање: ' + pay + '\n';
+                body += 'Маркетинг известувања: ' + (marketingChecked ? 'ДА' : 'НЕ') + '\n';
+                body += 'Услови прифатени: ДА\n\n';
                 body += '--- ПРОИЗВОДИ ---\n';
                 items.forEach((it) => {
                     const bd = sizeBreakdown(it);

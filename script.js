@@ -3565,6 +3565,155 @@ window.MONETA_SUPABASE_URL = 'https://wkpkrnjrtpywuzemirbw.supabase.co';
 window.MONETA_SHOP_EMAIL = '';
 // Е-пошта за НАРАЧКИ (naracka.html mailto) — за тестирање стави nudalsmudals@gmail.com
 window.MONETA_ORDER_EMAIL = '';
+// Анон (јавен) клуч од Supabase — за читање производи/залиха/нарачки
+window.MONETA_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndrcGtybmpydHB5d3V6ZW1pcmJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU5NjkwOTksImV4cCI6MjEwMTU0NTA5OX0.nkeKFm2qQYXEsHY6kkJxqfsOxiSEEQJzLOmnrdMMg8I';
+
+// ========================================
+// МОНЕТА — Supabase податоци (цени, залиха, попусти) — ЖИВО читање
+// Клиентот менува во Supabase Studio → страницата се ажурира сама
+// ========================================
+window.MonetaData = {
+    products: {}, // slug -> product
+    sizes: {},    // slug -> { size: qty }
+    ready: null
+};
+
+(function initMonetaData() {
+    const url = String(window.MONETA_SUPABASE_URL || '').replace(/\/+$/, '');
+    const key = window.MONETA_ANON_KEY || '';
+    if (!url || !key) return;
+    const headers = { apikey: key, Authorization: 'Bearer ' + key };
+
+    const discountOf = (prod) => {
+        const price = Number(prod.price) || 0;
+        const old = prod.old_price ? Number(prod.old_price) : 0;
+        return (old > price && old > 0) ? Math.round((old - price) / old * 100) : 0;
+    };
+
+    const apply = () => {
+        // ---- Модел-страници: цена, стара цена, значка, залиха ----
+        document.querySelectorAll('.size-selector[data-model]').forEach((sel) => {
+            const slug = sel.getAttribute('data-model');
+            const prod = window.MonetaData.products[slug];
+            if (!prod) return;
+            const sizes = window.MonetaData.sizes[slug] || {};
+            const layout = sel.closest('.model-layout') || document;
+            const priceEl = layout.querySelector('.model-price');
+            const cart = layout.querySelector('.model-cart');
+            const price = Number(prod.price) || 0;
+            const old = prod.old_price ? Number(prod.old_price) : 0;
+            const pct = discountOf(prod);
+
+            if (priceEl) {
+                const mk = 'Цена: ' + price + ' ден.';
+                const sq = 'Çmimi: ' + price + ' den.';
+                const en = 'Price: ' + price + ' MKD';
+                priceEl.setAttribute('data-mk', mk);
+                priceEl.setAttribute('data-sq', sq);
+                priceEl.setAttribute('data-en', en);
+                priceEl.textContent = mk;
+
+                // стара цена (прецртана)
+                let oldEl = priceEl.nextElementSibling && priceEl.nextElementSibling.classList.contains('price-old')
+                    ? priceEl.nextElementSibling : null;
+                if (old > price) {
+                    if (!oldEl) {
+                        oldEl = document.createElement('span');
+                        oldEl.className = 'price-old';
+                        priceEl.insertAdjacentElement('afterend', oldEl);
+                    }
+                    const isEn = document.documentElement.lang === 'en';
+                    oldEl.textContent = old + (isEn ? ' MKD' : ' ден.');
+                    oldEl.style.display = '';
+                } else if (oldEl) {
+                    oldEl.style.display = 'none';
+                }
+
+                // значка за попуст
+                let badge = null;
+                if (priceEl.parentElement) {
+                    badge = priceEl.parentElement.querySelector(':scope > .promo-badge');
+                }
+                if (pct > 0) {
+                    if (!badge) {
+                        badge = document.createElement('span');
+                        badge.className = 'promo-badge';
+                        priceEl.insertAdjacentElement('afterend', badge);
+                    }
+                    badge.textContent = '−' + pct + '%';
+                    badge.style.display = '';
+                } else if (badge) {
+                    badge.style.display = 'none';
+                }
+            }
+
+            if (cart) {
+                cart.dataset.price = price;
+                if (prod.code) cart.dataset.code = prod.code;
+            }
+
+            // залиха: оневозможи големини со 0 (само ако има податоци од Supabase)
+            sel.querySelectorAll('.size-btn').forEach((btn) => {
+                const qty = sizes[btn.dataset.size];
+                if (qty === undefined) return;
+                if (qty <= 0) {
+                    btn.classList.add('size-btn--disabled');
+                    btn.setAttribute('aria-disabled', 'true');
+                    btn.tabIndex = -1;
+                } else {
+                    btn.classList.remove('size-btn--disabled');
+                    btn.removeAttribute('aria-disabled');
+                    btn.tabIndex = 0;
+                }
+            });
+        });
+
+        // ---- Картички: значка за попуст ----
+        document.querySelectorAll('.card').forEach((card) => {
+            const link = card.matches('a[href*="modeli/"]') ? card : card.querySelector('a[href*="modeli/"]');
+            if (!link) return;
+            const m = (link.getAttribute('href') || '').match(/modeli\/([^\/]+)\.html/);
+            if (!m) return;
+            const prod = window.MonetaData.products[m[1]];
+            if (!prod) return;
+            const pct = discountOf(prod);
+            const imgWrap = card.querySelector('.card__image') || card;
+            let badge = imgWrap.querySelector('.promo-badge--card');
+            if (pct > 0) {
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.className = 'promo-badge promo-badge--card';
+                    imgWrap.appendChild(badge);
+                }
+                badge.textContent = '−' + pct + '%';
+            } else if (badge) {
+                badge.remove();
+            }
+        });
+    };
+
+    window.MonetaData.ready = (async () => {
+        try {
+            const [prods, sizes] = await Promise.all([
+                fetch(url + '/rest/v1/products?select=*&order=sort_order', { headers }).then(r => r.json()),
+                fetch(url + '/rest/v1/product_sizes?select=product_id,size,qty', { headers }).then(r => r.json())
+            ]);
+            const idToSlug = {};
+            (prods || []).forEach(p => { window.MonetaData.products[p.slug] = p; idToSlug[p.id] = p.slug; });
+            (sizes || []).forEach(s => {
+                const slug = idToSlug[s.product_id];
+                if (slug) (window.MonetaData.sizes[slug] = window.MonetaData.sizes[slug] || {})[s.size] = s.qty;
+            });
+            apply();
+        } catch (e) {
+            console.warn('Supabase data load error', e);
+        }
+    })();
+
+    if (window.MonetaOnLangChange) window.MonetaOnLangChange(() => setTimeout(apply, 60));
+    window.addEventListener('pageshow', () => { if (window.MonetaData.ready) window.MonetaData.ready.then(apply); });
+    window.addEventListener('resize', () => { if (window.MonetaData.ready) window.MonetaData.ready.then(apply); });
+})();
 
 // ========================================
 // СЛЕДЕЊЕ НА НАРАЧКА — форма за барање код за следење
