@@ -3559,9 +3559,8 @@ window.addEventListener('resize', syncCardLinkGap, { passive: true });
 // МОНЕТА — Supabase конфигурација
 // Пополнете го URL-то на Supabase проектот
 // (Supabase Dashboard → Settings → API → Project URL)
-// Пример: window.MONETA_SUPABASE_URL = 'https://xxxx.supabase.co';
 // ========================================
-window.MONETA_SUPABASE_URL = '';
+window.MONETA_SUPABASE_URL = 'https://wkpkrnjrtpywuzemirbw.supabase.co';
 // Е-пошта на продавницата (за mailto fallback) — за тестирање стави nudalsmudals@gmail.com
 window.MONETA_SHOP_EMAIL = '';
 // Е-пошта за НАРАЧКИ (naracka.html mailto) — за тестирање стави nudalsmudals@gmail.com

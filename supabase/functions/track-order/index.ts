@@ -62,7 +62,7 @@ serve(async (req) => {
       "Испратете ми код за следење на нарачката на мојот мејл.\n\n" +
       "Клиентски мејл: " + email + "\n\n" +
       "Линк за следење (клиентот го залепува кодот тука): " + KARGO_URL + "\n\n" +
-      "Ова барање е испратено преку формуларот „Следете ја вашата нарачка" на moneta-v2-orpin.vercel.app.\n" +
+      'Ова барање е испратено преку формуларот „Следете ја вашата нарачка" на moneta-v2-orpin.vercel.app.\n' +
       "Ве молиме рачно внесете го кодот за следење и испратете му го на клиентскиот мејл, " +
       "заедно со линкот за следење погоре.";
 
@@ -83,12 +83,12 @@ serve(async (req) => {
     if (!res.ok) {
       const errText = await res.text();
       console.error("Resend error:", res.status, errText);
-      return json({ error: "Email sending failed" }, 500);
+      return json({ error: "Email sending failed", detail: errText }, 500);
     }
 
     return json({ ok: true });
   } catch (err) {
     console.error("track-order error:", err);
-    return json({ error: "Internal error" }, 500);
+    return json({ error: "Internal error", detail: String(err) }, 500);
   }
 });
