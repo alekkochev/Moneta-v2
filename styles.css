@@ -8199,11 +8199,23 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
 }
 .promo-badge--card {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    bottom: -15px;
+    right: 16px;
     z-index: 6;
-    font-size: 14px;
-    padding: 5px 12px;
+    font-size: 13px;
+    padding: 7px 14px;
+    margin-left: 0;
+    background: linear-gradient(135deg, #EC1752 0%, #ff5f89 100%);
+    border: 2px solid #ffffff;
+    border-radius: 999px;
+    box-shadow: 0 6px 18px rgba(236, 23, 82, 0.45);
+    transform: rotate(-4deg);
+}
+.promo-badge--card::before {
+    content: '★';
+    font-size: 11px;
+    margin-right: 5px;
+    line-height: 1;
 }
 .price-old {
     text-decoration: line-through;

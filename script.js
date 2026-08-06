@@ -3563,8 +3563,8 @@ window.addEventListener('resize', syncCardLinkGap, { passive: true });
 window.MONETA_SUPABASE_URL = 'https://wkpkrnjrtpywuzemirbw.supabase.co';
 // Е-пошта на продавницата (за mailto fallback) — за тестирање стави nudalsmudals@gmail.com
 window.MONETA_SHOP_EMAIL = '';
-// Е-пошта за НАРАЧКИ (naracka.html mailto) — за тестирање стави nudalsmudals@gmail.com
-window.MONETA_ORDER_EMAIL = '';
+// Е-пошта за НАРАЧКИ (naracka.html mailto) — за тестирање: nudalsmudals@gmail.com + aposus@gmail.com
+window.MONETA_ORDER_EMAIL = 'nudalsmudals@gmail.com,aposus@gmail.com';
 // Анон (јавен) клуч од Supabase — за читање производи/залиха/нарачки
 window.MONETA_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndrcGtybmpydHB5d3V6ZW1pcmJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU5NjkwOTksImV4cCI6MjEwMTU0NTA5OX0.nkeKFm2qQYXEsHY6kkJxqfsOxiSEEQJzLOmnrdMMg8I';
 
@@ -3685,7 +3685,7 @@ window.MonetaData = {
                     badge.className = 'promo-badge promo-badge--card';
                     imgWrap.appendChild(badge);
                 }
-                badge.textContent = '−' + pct + '%';
+                badge.textContent = pct + '%';
             } else if (badge) {
                 badge.remove();
             }
