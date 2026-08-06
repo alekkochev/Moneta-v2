@@ -8175,6 +8175,9 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
 @media (max-width: 480px) {
     .size-selector__grid { grid-template-columns: repeat(4, 1fr); }
 }
+/* Копчињата секогаш во ЕДЕН ред — според бројот на големини (опсези) */
+.size-selector__grid--4 { grid-template-columns: repeat(4, 1fr); }
+.size-selector__grid--6 { grid-template-columns: repeat(6, 1fr); }
 
 /* ========================================
    ГЛАВНИ КАТЕГОРИСКИ КАРТИ (index) — нов дизајн (ПОРТРЕТ)
