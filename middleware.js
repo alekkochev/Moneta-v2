@@ -43,10 +43,10 @@ export default async function middleware(req) {
   }
 
   // Не е логиран:
-  //  - HTML навигации → логин екран
-  //  - сите други (css/js/слики) → 401 (заштитени)
-  const accept = req.headers.get('accept') || '';
-  if (req.method === 'GET' && accept.includes('text/html')) {
+  //  - страници (HTML) → логин екран
+  //  - асети (css/js/слики/...) → 401 (заштитени)
+  const ASSET = /\.(css|js|mjs|json|txt|xml|map|png|jpe?g|webp|gif|svg|ico|avif|woff2?|ttf|eot|otf)(\?.*)?$/i;
+  if (req.method === 'GET' && !ASSET.test(url.pathname)) {
     return html(loginPage(false, url.pathname + url.search));
   }
   return new Response('Unauthorized', { status: 401 });
