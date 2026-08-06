@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>МОНЕТА — Преглед на промени (Слајдови)</title>
+<style>
+  :root {
+    --pink: #EC1752;
+    --ink: #1f1f26;
+    --muted: #6b6b76;
+    --bg: #0f1115;
+    --card: #ffffff;
+    --accent-soft: #fff0f4;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .deck { width: 100%; max-width: 960px; height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .slide {
+    display: none;
+    background: var(--card);
+    border-radius: 24px;
+    padding: 48px 52px;
+    width: 100%;
+    max-height: 92vh;
+    overflow-y: auto;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+    position: relative;
+  }
+  .slide.active { display: block; animation: fadeIn .35s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  .slide__num { position: absolute; top: 22px; right: 28px; font-size: 13px; font-weight: 800; color: #c9c9d2; letter-spacing: 1px; }
+  .slide__tag { display: inline-block; background: var(--accent-soft); color: var(--pink); font-size: 12px; font-weight: 800; padding: 5px 14px; border-radius: 999px; letter-spacing: .4px; margin-bottom: 16px; }
+  h1 { font-size: 40px; line-height: 1.15; margin-bottom: 12px; }
+  h2 { font-size: 26px; line-height: 1.2; margin-bottom: 14px; }
+  h3 { font-size: 17px; margin: 18px 0 8px; color: var(--ink); }
+  p { color: var(--muted); font-size: 15.5px; line-height: 1.55; margin-bottom: 10px; }
+  .lead { font-size: 17px; color: var(--ink); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin: 18px 0; }
+  .card-mini { border: 2px solid #eee; border-radius: 14px; padding: 14px 16px; font-size: 13.5px; line-height: 1.45; }
+  .card-mini strong { display: block; margin-bottom: 4px; font-size: 14.5px; color: var(--pink); }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13.5px; }
+  th, td { border: 1px solid #e8e8ec; padding: 9px 12px; text-align: left; }
+  th { background: #fafafa; font-size: 12.5px; text-transform: uppercase; letter-spacing: .4px; color: var(--muted); }
+  td.ok { color: #0e9f6e; font-weight: 700; }
+  .pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 700; margin: 1px 2px; background: #f0f0f2; color: #444; }
+  .pill.pink { background: var(--accent-soft); color: var(--pink); }
+  .pill.uni { background: #eef7ff; color: #0e7490; }
+  .btn {
+    display: inline-block; margin: 6px 6px 6px 0; padding: 11px 20px; border-radius: 12px;
+    background: var(--pink); color: #fff; text-decoration: none; font-weight: 800; font-size: 14px;
+    transition: transform .15s ease, box-shadow .15s ease; border: none; cursor: pointer;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(236,23,82,.35); }
+  .btn.ghost { background: #f0f0f2; color: var(--ink); }
+  .btn.ghost:hover { box-shadow: 0 6px 16px rgba(0,0,0,.12); }
+  .nav { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; align-items: center; background: rgba(15,17,21,.85); backdrop-filter: blur(8px); padding: 10px 18px; border-radius: 999px; z-index: 10; }
+  .nav button { background: #fff; color: var(--ink); border: none; width: 42px; height: 42px; border-radius: 50%; font-size: 18px; font-weight: 800; cursor: pointer; }
+  .nav button:hover { background: var(--pink); color: #fff; }
+  .nav .count { color: #fff; font-size: 13px; font-weight: 700; min-width: 52px; text-align: center; }
+  .check { color: #0e9f6e; font-weight: 800; }
+  ul { margin: 8px 0 12px 20px; color: var(--muted); font-size: 15px; line-height: 1.6; }
+  li { margin-bottom: 6px; }
+  .warn { background: #fff8e6; border: 1px solid #f5d78a; color: #7a5b00; border-radius: 12px; padding: 12px 16px; font-size: 14px; margin-top: 14px; }
+  .note { background: var(--accent-soft); border-radius: 12px; padding: 12px 16px; font-size: 14px; color: #8a1038; margin-top: 14px; }
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- SLIDE 1: Насловна -->
+  <section class="slide active">
+    <span class="slide__num">1 / 10</span>
+    <span class="slide__tag">ПРЕГЛЕД НА ПРОМЕНИ</span>
+    <h1>МОНЕТА — Што е променето</h1>
+    <p class="lead">Преглед на направените корекции по забелешките на клиентот. Се движиш со <b>← / →</b> стрелките или копчињата долу. Секој слајд има линк „Отвори →" за директно да ја видиш страната.</p>
+    <div class="grid">
+      <div class="card-mini"><strong>✅ Точка 1</strong>Големините на сите 20 производи — поправени според постоечката страна (insoles.mk)</div>
+      <div class="card-mini"><strong>✅ Точка 2</strong>Споредбата на модели — сега работи на поединечни модели (20), не на категории</div>
+      <div class="card-mini"><strong>🔧 Дополнително</strong>Поправено кеширањето на stock.json (server.js + vercel.json)</div>
+    </div>
+    <p><b>Активна верзија: MONETA v.2</b> (Vercel: moneta-v2)</p>
+  </section>
+
+  <!-- SLIDE 2: Точка 1 - Големини -->
+  <section class="slide">
+    <span class="slide__num">2 / 10</span>
+    <span class="slide__tag">ТОЧКА 1 · ГОЛЕМИНИ</span>
+    <h2>Големините сега се по модел</h2>
+    <p>Порано: <b>сите 20 модели</b> имаа исти 12 големини (35–46). Сега секој модел ги има точните големини од постоечката страна:</p>
+    <table>
+      <tr><th>Модели</th><th>Големини</th></tr>
+      <tr><td>Memosole, Heel Pad, Heel Pad Fix</td><td class="ok">35–46 (целосно)</td></tr>
+      <tr><td>Hunter CAMO / FLEX / OUTDOOR</td><td class="ok">35–47 (додаден 47)</td></tr>
+      <tr><td>Sport Style, Sportex, X-TREME, Topas, Soft Gel, Vital, Relax, Simona, Thermo Alu</td><td class="ok">35, 37, 38, 39, 41, 42, 43, 45, 46</td></tr>
+      <tr><td>AnatomiX</td><td class="ok">35, 37, 39, 41, 42, 43, 45, 46 (8 бр.)</td></tr>
+      <tr><td>Duck (детски)</td><td class="ok">27, 29, 30, 32, 34, 35</td></tr>
+      <tr><td>Active Gel</td><td class="ok">Женски 35–41 / Машки 42–45</td></tr>
+      <tr><td>Carbon, Heel Pad Grip</td><td class="ok">🔵 Универзална</td></tr>
+    </table>
+    <a class="btn ghost" href="/modeli/anatomiX.html">Отвори AnatomiX →</a>
+    <a class="btn ghost" href="/modeli/topas.html">Отвори Topas →</a>
+    <a class="btn ghost" href="/modeli/memosole.html">Отвори Memosole →</a>
+  </section>
+
+  <!-- SLIDE 3: Точка 1 - Active Gel -->
+  <section class="slide">
+    <span class="slide__num">3 / 10</span>
+    <span class="slide__tag">ТОЧКА 1 · ACTIVE GEL</span>
+    <h2>Active Gel — 2 опции (како на постоечката страна)</h2>
+    <p>Порано имаше 12 копчиња (35–46). Сега има само 2, точно како на insoles.mk:</p>
+    <div class="grid">
+      <div class="card-mini"><strong>👩 Женски 35–41</strong>(се сече по големина)</div>
+      <div class="card-mini"><strong>👨 Машки 42–45</strong>(се сече по големина)</div>
+    </div>
+    <p>При избор, во кошничката се запишува „Active Gel (Женски 35–41)" и се овозможува копчето „Додади".</p>
+    <a class="btn" href="/modeli/active-gel.html">Отвори Active Gel →</a>
+  </section>
+
+  <!-- SLIDE 4: Точка 1 - Универзални -->
+  <section class="slide">
+    <span class="slide__num">4 / 10</span>
+    <span class="slide__tag">ТОЧКА 1 · УНИВЕРЗАЛНИ</span>
+    <h2>Универзални модели — само „Универзална"</h2>
+    <p>Carbon и Heel Pad Grip на постоечката страна немаат избор на големина (се сечат). Кај нас сега имаат <b>едно копче „Универзална"</b>:</p>
+    <div class="grid">
+      <div class="card-mini"><strong>☀️ Carbon</strong><span class="pill uni">Универзална</span> летна влошка, се сече по големина</div>
+      <div class="card-mini"><strong>🦶 Heel Pad Grip</strong><span class="pill uni">Универзална</span> самолеплив grip за пета</div>
+    </div>
+    <a class="btn" href="/modeli/carbon.html">Отвори Carbon →</a>
+    <a class="btn ghost" href="/modeli/heel-pad-grip.html">Отвори Heel Pad Grip →</a>
+  </section>
+
+  <!-- SLIDE 5: Точка 1 - Duck -->
+  <section class="slide">
+    <span class="slide__num">5 / 10</span>
+    <span class="slide__tag">ТОЧКА 1 · ДЕТСКИ</span>
+    <h2>Duck (детски) — детски големини</h2>
+    <p>Порано Duck имаше големини 35–46 (возрасни!). Сега има детски големини, како на постоечката страна:</p>
+    <p><span class="pill pink">27</span><span class="pill pink">29</span><span class="pill pink">30</span><span class="pill pink">32</span><span class="pill pink">34</span><span class="pill pink">35</span></p>
+    <a class="btn" href="/modeli/duck.html">Отвори Duck →</a>
+  </section>
+
+  <!-- SLIDE 6: Точка 1 - Табели -->
+  <section class="slide">
+    <span class="slide__num">6 / 10</span>
+    <span class="slide__tag">ТОЧКА 1 · ТАБЕЛИ ЗА СПОРЕДБА</span>
+    <h2>Поправени табелите за споредба</h2>
+    <p>Табелите на категориските страници прикажуваа „35–46" за сите. Сега ги имаат точните големини:</p>
+    <ul>
+      <li><b>sportski.html</b> — AnatomiX (8 бр.), Sport Style, Sportex, X-TREME (9 бр.)</li>
+      <li><b>kozni.html</b> — Topas, Soft Gel, Vital, Relax (9 бр.)</li>
+      <li><b>outdoor.html</b> — Thermo Alu (9 бр.)</li>
+      <li>detski, heelpad, hunter, letni, zimski веќе беа точни ✓</li>
+    </ul>
+    <a class="btn ghost" href="/sportski.html">Отвори Спортски →</a>
+    <a class="btn ghost" href="/kozni.html">Отвори Кожни →</a>
+    <a class="btn ghost" href="/outdoor.html">Отвори Outdoor →</a>
+  </section>
+
+  <!-- SLIDE 7: Точка 2 - Споредба -->
+  <section class="slide">
+    <span class="slide__num">7 / 10</span>
+    <span class="slide__tag">ТОЧКА 2 · СПОРЕДБА 1:1</span>
+    <h2>„Интерактивна споредба" — сега со поединечни модели</h2>
+    <p>Порано дропдауните изгледаа како да бираат модел, но споредуваа <b>категории</b> (и „популарните комбинации" не работеа). Сега:</p>
+    <ul>
+      <li>Избираш <b>кои било 2 од 20-те модели</b> → споредба со реални спецификации</li>
+      <li>„Популарни комбинации" (Active Gel vs AnatomiX...) <b>работaт</b></li>
+      <li>Секој модел има: материјали, намена, поддршка, апсорпција, дебелина, обувки, грижа, цена</li>
+    </ul>
+    <p class="note">Како да ја најдеш: на почетната скролувај до „Наместо да погодувате..." → кликни <b>„Спореди ги сите модели"</b></p>
+    <a class="btn" href="/index.html">Отвори Почетна →</a>
+  </section>
+
+  <!-- SLIDE 8: Точка 2 - Табела 20 -->
+  <section class="slide">
+    <span class="slide__num">8 / 10</span>
+    <span class="slide__tag">ТОЧКА 2 · СИТЕ 20 МОДЕЛИ</span>
+    <h2>Таб „📊 Сите 20 модели (Табела)"</h2>
+    <p>Табелата порано покажуваше 6 <b>категории</b> (иако пишуваше „6 модели"). Сега се рендерира динамички со <b>сите 20 модели</b> — слика, име, цена и спецификации, со хоризонтален скрол:</p>
+    <ul>
+      <li>Отвори го табот „Сите 20 модели (Табела)" во споредувачот</li>
+      <li>Скролувај лево-десно за да ги видиш сите модели</li>
+    </ul>
+    <p class="note">Цените во табелата се <b>од постоечката страна</b> (insoles.mk).</p>
+    <a class="btn" href="/index.html">Отвори Почетна →</a>
+  </section>
+
+  <!-- SLIDE 9: Податоци -->
+  <section class="slide">
+    <span class="slide__num">9 / 10</span>
+    <span class="slide__tag">ПОДАТОЦИ</span>
+    <h2>Од каде се податоците</h2>
+    <ul>
+      <li><b>Големини</b> — од постоечката страна (insoles.mk) — потврден извор на вистина</li>
+      <li><b>Текст/спецификации</b> — од содржинските документи (content/*.md) + постоечката страна</li>
+      <li><b>Цени (во споредувачот)</b> — од постоечката страна</li>
+      <li><b>stock.json</b> — само големините се ажурирани; <b>цените таму се уште стари</b> (тоа е Точка 9)</li>
+    </ul>
+    <div class="warn">⚠️ Забелешка: на продукт-страниците цената доаѓа од stock.json (пр. AnatomiX 890), додека во споредувачот е точната (430). Ќе се изедначи со Точка 9 — синхронизација на цени.</div>
+  </section>
+
+  <!-- SLIDE 10: Резиме -->
+  <section class="slide">
+    <span class="slide__num">10 / 10</span>
+    <span class="slide__tag">РЕЗИМЕ</span>
+    <h2>Што е готово и што следи</h2>
+    <div class="grid">
+      <div class="card-mini"><strong>✅ Точка 1</strong>Големини по модел — готово и тестирано</div>
+      <div class="card-mini"><strong>✅ Точка 2</strong>Споредба на поединечни модели — имплементирано (визуелно тестирање на тебе)</div>
+      <div class="card-mini"><strong>🔜 Точка 3</strong>Отстранување од кошничката — следна</div>
+      <div class="card-mini"><strong>📌 На ред</strong>Точки 4, 5, 6, 7, 8, 9, 10, 11, 12</div>
+    </div>
+    <p class="lead">Ако сè изгледа добро, продолжуваме со <b>Точка 3</b> — отстранување од кошничката.</p>
+  </section>
+
+</div>
+
+<div class="nav">
+  <button id="prevBtn" aria-label="Претходен">←</button>
+  <span class="count" id="count">1 / 10</span>
+  <button id="nextBtn" aria-label="Следен">→</button>
+</div>
+
+<script>
+(function () {
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  let cur = 0;
+  const count = document.getElementById('count');
+
+  function show(i) {
+    cur = (i + slides.length) % slides.length;
+    slides.forEach((s, idx) => s.classList.toggle('active', idx === cur));
+    count.textContent = (cur + 1) + ' / ' + slides.length;
+  }
+  document.getElementById('prevBtn').addEventListener('click', () => show(cur - 1));
+  document.getElementById('nextBtn').addEventListener('click', () => show(cur + 1));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') show(cur + 1);
+    if (e.key === 'ArrowLeft') show(cur - 1);
+  });
+})();
+</script>
+</body>
+</html>
