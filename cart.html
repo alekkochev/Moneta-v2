@@ -200,7 +200,7 @@
                 const lines = [];
                 Object.values(cart).filter((it) => it.qty > 0).forEach((it) => {
                     Object.entries(it.sizes || {}).filter(([, q]) => q > 0).forEach(([sz, q]) => {
-                        lines.push({ slug: it.slug, code: it.code, price: it.price, nameMk: it.nameMk, nameEn: it.nameEn, size: sz, qty: q });
+                        lines.push({ slug: it.slug, code: it.code || '—', price: it.price, nameMk: it.nameMk || it.titleMk || it.slug, nameEn: it.nameEn || it.titleEn || it.slug, size: sz, qty: q });
                     });
                 });
                 const active = lines.filter((l) => !isInactive(l.slug, l.size));
@@ -230,7 +230,7 @@
                         </button>
                         <div class="cart__thumb-wrap">
                             <a href="./modeli/${l.slug}.html" class="cart__item-thumb" aria-label="${isEn() ? l.nameEn : l.nameMk}">
-                                <img src="./images/cards/${l.slug}.webp" alt="${isEn() ? l.nameEn : l.nameMk}" loading="lazy">
+                                <img src="./images/cards/${l.slug}.webp" alt="${isEn() ? l.nameEn : l.nameMk}" loading="lazy" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=%27http://www.w3.org/2000/svg%27 width=%27120%27 height=%27120%27><rect width=%27120%27 height=%27120%27 fill=%27%23f1eef0%27/><text x=%2760%27 y=%2768%27 font-size=%2734%27 text-anchor=%27middle%27>👟</text></svg>'">
                             </a>
                             <button type="button" class="cart__thumb-remove" data-cart-remove data-size="${l.size}" aria-label="${isEn() ? 'Remove' : 'Отстрани'}" title="${isEn() ? 'Remove' : 'Отстрани'}"${inact ? ' disabled' : ''}>✕</button>
                         </div>

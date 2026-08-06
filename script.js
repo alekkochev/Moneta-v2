@@ -2796,6 +2796,10 @@ console.log('%c Вебсајт во развој 💪', 'color:#6B6B76;font-size
                 if (!it.sizes) {
                     it.sizes = (it.qty || 0) > 0 ? (it.size ? { [it.size]: it.qty } : { '': it.qty }) : {};
                 }
+                // Нормализација на име/код — никогаш да не се прикажува „undefined"
+                if (!it.nameMk) it.nameMk = it.titleMk || k;
+                if (!it.nameEn) it.nameEn = it.titleEn || it.nameMk;
+                if (!it.code) it.code = '';
                 it.qty = Object.values(it.sizes).reduce((a, b) => a + (b || 0), 0);
                 if (it.qty === 0) delete c[k];
             });
