@@ -56,15 +56,12 @@ serve(async (req) => {
       return json({ error: "Server not configured" }, 500);
     }
 
-    const KARGO_URL = "https://www.kargoekspres.mk/ProverkaPratka.aspx";
     const subject = "📦 Барање за код за следење на нарачка";
     const text =
       "Испратете ми код за следење на нарачката на мојот мејл.\n\n" +
       "Клиентски мејл: " + email + "\n\n" +
-      "Линк за следење (клиентот го залепува кодот тука): " + KARGO_URL + "\n\n" +
-      'Ова барање е испратено преку формуларот „Следете ја вашата нарачка" на moneta-v2-orpin.vercel.app.\n' +
-      "Ве молиме рачно внесете го кодот за следење и испратете му го на клиентскиот мејл, " +
-      "заедно со линкот за следење погоре.";
+      "Ова барање е испратено од новата страница www.vloski.mk.\n" +
+      "Ве молиме рачно внесете го кодот за следење и испратете му го на клиентскиот мејл.";
 
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
