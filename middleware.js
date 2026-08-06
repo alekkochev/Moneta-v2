@@ -4,9 +4,12 @@
 // Враќање на nothing (undefined) = продолжи кон статичкиот фајл.
 
 const COOKIE = 'moneta_auth';
-// Сесиско cookie (без Max-Age): исчезнува при затворање на прелистувачот,
-// а script.js го брише и при секоја навигација/релоад → секогаш бара лозинка.
+// Лозинката важи САМО 60 секунди (серверски, без разлика на browser-от).
+// Дури и ако прелистувачот го задржи cookie-то по затворање (сесија во позадина,
+// VS Code preview, итн.), по 60 сек middleware-от пак бара лозинка.
+// Покрај тоа script.js го брише cookie-то при секоја навигација (pagehide).
 // БЕЗ HttpOnly за да може JS (pagehide) да го избрише.
+const TOKEN_TTL_MS = 60 * 1000;
 
 export default async function middleware(req) {
   const url = new URL(req.url);
@@ -16,8 +19,24 @@ export default async function middleware(req) {
   if (!password) return;
 
   const valid = btoa(password);
-  const cookie = req.headers.get('cookie') || '';
-  const authed = cookie.split(';').some((c) => c.trim() === `${COOKIE}=${valid}`);
+
+  // Провери: cookie мора да е `btoa(лозинка).<epoch на истекување>` и да не е истечен
+  let authed = false;
+  {
+    const cookie = req.headers.get('cookie') || '';
+    const pair = cookie.split(';').map((c) => c.trim()).find((c) => c.startsWith(COOKIE + '='));
+    if (pair) {
+      const token = pair.slice(COOKIE.length + 1);
+      const dot = token.lastIndexOf('.');
+      if (dot > 0) {
+        const val = token.slice(0, dot);
+        const exp = Number(token.slice(dot + 1));
+        if (val === valid && Number.isFinite(exp) && exp > Date.now()) {
+          authed = true;
+        }
+      }
+    }
+  }
 
   // Веќе логиран → продолжи кон страницата
   if (authed) return;
@@ -32,11 +51,12 @@ export default async function middleware(req) {
     const nextParam = url.searchParams.get('next') || '/';
     const nextPath = nextParam.startsWith('/') ? nextParam : '/';
     if (pass === password) {
+      const token = valid + '.' + (Date.now() + TOKEN_TTL_MS);
       return new Response(null, {
         status: 303,
         headers: {
           Location: nextPath,
-          'Set-Cookie': `${COOKIE}=${valid}; Path=/; SameSite=Lax`,
+          'Set-Cookie': `${COOKIE}=${token}; Path=/; SameSite=Lax`,
         },
       });
     }
