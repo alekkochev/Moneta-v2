@@ -3677,7 +3677,8 @@ window.MonetaData = {
             const prod = window.MonetaData.products[m[1]];
             if (!prod) return;
             const pct = discountOf(prod);
-            const imgWrap = card.querySelector('.card__image') || card;
+            // ВАЖНО: значката мора на .card (overflow:visible), НЕ на .card__image (overflow:hidden) — инаку долниот дел што виси надвор е отсечен
+            const imgWrap = card;
             let badge = imgWrap.querySelector('.promo-badge--card');
             if (pct > 0) {
                 if (!badge) {
