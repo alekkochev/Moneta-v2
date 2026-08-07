@@ -3824,7 +3824,7 @@ window.MonetaData = {
 (function initMarketingPopups() {
     const CONFIG = {
         sales: true,        // 🔔 Sales popup (социјален доказ)
-        exitIntent: true,   // 🚪 Exit-intent popup
+        exitIntent: false,  // 🚪 Exit-intent popup (ТРГНАТ - барање на клиентот)
         promoBar: true,     // 🎀 Промо лента горе
     };
     const BASE = /\/modeli\//.test(window.location.pathname) ? '../' : './';
