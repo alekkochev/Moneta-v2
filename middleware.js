@@ -9,11 +9,8 @@ const COOKIE = 'moneta_auth';
 // HttpOnly = JS не може да го чита/менува (посигурно).
 
 export default async function middleware(req) {
-  const url = new URL(req.url);
-  const password = process.env.SITE_PASSWORD || 'moneta2026';
-
-  // Ако нема поставено лозинка (ниту во env ниту fallback) → не заштитувај
-  if (!password) return;
+  // Password protection disabled — site is public
+  return;
 
   const valid = btoa(password);
   const cookie = req.headers.get('cookie') || '';
