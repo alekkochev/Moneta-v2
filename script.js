@@ -3562,9 +3562,9 @@ window.addEventListener('resize', syncCardLinkGap, { passive: true });
 // ========================================
 window.MONETA_SUPABASE_URL = 'https://wkpkrnjrtpywuzemirbw.supabase.co';
 // Е-пошта на продавницата (за mailto fallback) — за тестирање стави nudalsmudals@gmail.com
-window.MONETA_SHOP_EMAIL = '';
-// Е-пошта за НАРАЧКИ (naracka.html mailto) — за тестирање: nudalsmudals@gmail.com + aposus@gmail.com
-window.MONETA_ORDER_EMAIL = 'nudalsmudals@gmail.com,aposus@gmail.com';
+window.MONETA_SHOP_EMAIL = 'nudalsmudals@gmail.com';
+// Е-пошта за НАРАЧКИ — тестова фаза, подоцна ќе се смени со клиентска е-пошта
+window.MONETA_ORDER_EMAIL = 'nudalsmudals@gmail.com';
 // Анон (јавен) клуч од Supabase — за читање производи/залиха/нарачки
 window.MONETA_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndrcGtybmpydHB5d3V6ZW1pcmJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU5NjkwOTksImV4cCI6MjEwMTU0NTA5OX0.nkeKFm2qQYXEsHY6kkJxqfsOxiSEEQJzLOmnrdMMg8I';
 
@@ -3737,7 +3737,7 @@ window.MonetaData = {
     if (!form) return;
 
     const SUPABASE_URL = String(window.MONETA_SUPABASE_URL || '').replace(/\/+$/, '');
-    const SHOP_EMAIL = window.MONETA_SHOP_EMAIL || 'info@calivita.mk';
+    const SHOP_EMAIL = window.MONETA_SHOP_EMAIL || 'nudalsmudals@gmail.com';
     const emailInput = document.getElementById('trackEmail');
     const feedback = document.getElementById('orderTrackerFeedback');
 
@@ -3855,8 +3855,9 @@ window.MonetaData = {
     }
 
     // ---------- 2) Sales popup (социјален доказ) ----------
+    // Користи реални податоци од Supabase (MonetaData) — без фејк имиња.
+    // Подоцна ќе се поврзе со реални нарачки од базата.
     const CITIES = ['Скопје', 'Битола', 'Охрид', 'Тетово', 'Куманово', 'Прилеп', 'Велес', 'Штип', 'Струмица', 'Гостивар'];
-    const NAMES = ['Ана', 'Марија', 'Ивана', 'Елена', 'Горан', 'Никола', 'Стефан', 'Јована', 'Теа', 'Марко'];
     let salesShown = 0;
     let salesTimer = null;
 
@@ -3888,8 +3889,6 @@ window.MonetaData = {
         if (!pool.length) return;
         const prod = pool[Math.floor(Math.random() * pool.length)];
         const city = CITIES[Math.floor(Math.random() * CITIES.length)];
-        const name = NAMES[Math.floor(Math.random() * NAMES.length)];
-        const mins = 1 + Math.floor(Math.random() * 20);
 
         const old = document.getElementById('monetaSalesToast');
         if (old) old.remove();
@@ -3899,9 +3898,8 @@ window.MonetaData = {
         toast.innerHTML =
             '<img class="moneta-sales-toast__img" src="' + BASE + 'images/cards/' + prod.slug + '.webp" alt="" loading="lazy">' +
             '<div class="moneta-sales-toast__body">' +
-                '<p class="moneta-sales-toast__title">' + t('🛍️ Штотуку купено', '🛍️ Sapo u blerë', '🛍️ Just purchased') + '</p>' +
-                '<p class="moneta-sales-toast__text"><strong>' + name + '</strong> ' + t('од', 'nga', 'from') + ' ' + city + ' · ' + prod.name + ' · ' + prod.price + ' ' + t('ден.', 'den.', 'MKD') + '</p>' +
-                '<p class="moneta-sales-toast__meta">' + t('пред', 'para', '') + ' ' + mins + ' ' + t('мин', 'min', 'min ago') + '</p>' +
+                '<p class="moneta-sales-toast__title">' + t('⭐ Популарно', '⭐ Popullor', '⭐ Popular') + ' — ' + city + '</p>' +
+                '<p class="moneta-sales-toast__text">' + prod.name + ' · ' + prod.price + ' ' + t('ден.', 'den.', 'MKD') + '</p>' +
             '</div>' +
             '<button type="button" class="moneta-sales-toast__close" aria-label="Затвори">×</button>';
         document.body.appendChild(toast);

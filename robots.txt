@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://insoles.mk/sitemap.xml
+Sitemap: https://vloski.mk/sitemap.xml

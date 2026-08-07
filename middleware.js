@@ -10,9 +10,9 @@ const COOKIE = 'moneta_auth';
 
 export default async function middleware(req) {
   const url = new URL(req.url);
-  const password = process.env.SITE_PASSWORD || '';
+  const password = process.env.SITE_PASSWORD || 'moneta2026';
 
-  // Ако нема поставено лозинка на Vercel → не заштитувај (безбедносна врата)
+  // Ако нема поставено лозинка (ниту во env ниту fallback) → не заштитувај
   if (!password) return;
 
   const valid = btoa(password);

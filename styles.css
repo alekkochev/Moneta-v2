@@ -81,7 +81,6 @@ body {
     background: var(--bg);
     color: var(--ink);
     overflow-x: hidden;
-    animation: fadeIn 0.8s ease forwards;
     font-size: 15px;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
@@ -121,6 +120,23 @@ a {
 :focus-visible {
     outline: 3px solid var(--pink);
     outline-offset: 3px;
+}
+
+.skip-link {
+    position: absolute;
+    top: -100%;
+    left: 16px;
+    z-index: 9999;
+    padding: 12px 20px;
+    background: var(--pink);
+    color: #fff;
+    font-weight: 700;
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    text-decoration: none;
+    transition: top 0.2s;
+}
+.skip-link:focus {
+    top: 0;
 }
 
 /* ========================================
@@ -556,7 +572,7 @@ a {
 .hero__subtitle-dark {
     font-family: 'Montserrat', sans-serif;
     font-size: clamp(17px, 1.8vw, 22px);
-    font-weight: 300;
+    font-weight: 400;
     color: rgba(30, 32, 41, 0.92);
     max-width: 580px;
     margin: 54px 0 0 0;
@@ -2400,7 +2416,7 @@ a {
 .faq__answer-content p {
     padding: 0 24px 22px;
     font-family: 'Montserrat', sans-serif;
-    font-weight: 300;
+    font-weight: 400;
     font-size: 15px;
     line-height: 1.65;
     color: var(--muted);
