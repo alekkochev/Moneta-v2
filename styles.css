@@ -809,14 +809,13 @@ a {
 
 /* ========================================
    CARD ICON HOVER — icon lights up on hover (desktop) / scroll-focus (mobile)
-   Zoom + move-left stay; no magenta fill — only a pink frame around the perimeter.
+   Pink frame around the perimeter (без скок налево).
    ======================================== */
 @media (hover: hover) and (min-width: 861px) {
     .categories__grid .card:hover .card__icon {
         background: rgba(255, 255, 255, 0.92);
         border: 2px solid #EC1752;
         box-shadow: 0 0 20px #EC1752, 0 0 35px rgba(236, 23, 82, 0.6);
-        transform: translateX(-50%) scale(1.1);
     }
 }
 .categories__grid .card.is-active .card__icon,
@@ -824,7 +823,6 @@ a {
     background: rgba(255, 255, 255, 0.92);
     border: 2px solid #EC1752;
     box-shadow: 0 0 20px #EC1752, 0 0 35px rgba(236, 23, 82, 0.6);
-    transform: translateX(-50%) scale(1.1);
 }
 
 @keyframes traceLaserBeamCircuit {
