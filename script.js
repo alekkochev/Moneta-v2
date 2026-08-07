@@ -3825,7 +3825,7 @@ window.MonetaData = {
     const CONFIG = {
         sales: true,        // 🔔 Sales popup (социјален доказ)
         exitIntent: false,  // 🚪 Exit-intent popup (ТРГНАТ - барање на клиентот)
-        promoBar: true,     // 🎀 Промо лента горе
+        promoBar: false,    // 🎀 Промо лента горе (ТРГНАТА - барање на клиентот)
     };
     const BASE = /\/modeli\//.test(window.location.pathname) ? '../' : './';
     const isEn = () => document.documentElement.lang === 'en';
