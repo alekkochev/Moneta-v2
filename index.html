@@ -49,7 +49,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://wkpkrnjrtpywuzemirbw.supabase.co" crossorigin />
     <link rel="preload" href="./images/hero-foot-insole.webp" as="image" fetchpriority="high" />
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
+    <!-- Fonts: async (non-render-blocking) + preload на критичните кирилични фајлови (македонски текст) -->
+    <link rel="preload" href="https://fonts.gstatic.com/s/manrope/v20/xn7gYHE41ni1AdIRggOxSuXd.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="https://fonts.gstatic.com/s/montserrat/v31/JTUSjIg1_i6t8kCHKm459W1hyzbi.woff2" as="font" type="font/woff2" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Manrope:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Manrope:wght@400;700&display=swap" rel="stylesheet" /></noscript>
     <link href="./vendor/aos.css" rel="stylesheet" media="print" onload="this.media='all'" />
     <noscript><link rel="stylesheet" href="./vendor/aos.css" /></noscript>
     <link rel="icon" type="image/svg+xml" href="./images/favicon/favicon.svg" />
