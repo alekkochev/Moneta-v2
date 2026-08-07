@@ -1525,9 +1525,6 @@ a {
     .navbar__search-btn:hover {
         background: rgba(236, 23, 82, 0.1);
     }
-    .search-btn__label {
-        display: none;
-    }
     .navbar__toggle {
         order: 3;
     }
@@ -4580,8 +4577,7 @@ a {
 .form__group input,
 .form__group textarea,
 .size-finder__input,
-.search-modal__input,
-.compare-select-dropdown {
+.search-modal__input {
     font-family: var(--font-body) !important;
 }
 
