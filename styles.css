@@ -260,19 +260,6 @@ a {
     transform: scale(1.1);
 }
 
-.search-btn__shortcut {
-    display: inline-block;
-    padding: 2px 6px;
-    font-size: 10.5px;
-    font-weight: 700;
-    font-family: system-ui, -apple-system, sans-serif;
-    background: rgba(255, 255, 255, 0.85);
-    border: 1px solid rgba(0, 0, 0, 0.12);
-    border-radius: 6px;
-    color: rgba(0, 0, 0, 0.45);
-    letter-spacing: -0.02em;
-}
-
 @media (max-width: 768px) {
     .navbar__search-btn {
         padding: 8px;
@@ -283,8 +270,7 @@ a {
     .navbar__search-btn:hover {
         background: rgba(236, 23, 82, 0.08);
     }
-    .search-btn__label,
-    .search-btn__shortcut {
+    .search-btn__label {
         display: none;
     }
 }
@@ -389,13 +375,6 @@ a {
     box-shadow: var(--shadow-pink);
 }
 
-.navbar--sistem .search-btn__shortcut,
-.page-sistem .search-btn__shortcut {
-    background: rgba(236, 23, 82, 0.12);
-    border-color: rgba(236, 23, 82, 0.35);
-    color: var(--pink);
-}
-
 .navbar--sistem .lang-switcher,
 .page-sistem .lang-switcher {
     background: rgba(255, 255, 255, 0.7);
@@ -467,22 +446,6 @@ a {
     flex-direction: column;
     justify-content: flex-start;
     overflow: hidden;
-}
-
-.hero__bg-container {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-    pointer-events: none;
-    overflow: hidden;
-}
-
-.hero__bg-container picture {
-    display: block;
-    width: 100%;
-    height: 100%;
 }
 
 .hero__bg-img {
@@ -1355,204 +1318,6 @@ a {
     box-shadow: 0 6px 18px rgba(236, 23, 82, 0.35);
 }
 
-/* Точка 6: tracking → директен линк до Карго Експрес */
-.order-tracker__link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    width: 100%;
-    text-decoration: none;
-    margin-top: 4px;
-}
-
-.order-tracker__samples {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    font-size: 13px;
-}
-
-.samples-label {
-    color: rgba(255, 255, 255, 0.5);
-    font-weight: 600;
-}
-
-.order-sample-chip {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    color: rgba(255, 255, 255, 0.85);
-    padding: 4px 12px;
-    border-radius: 14px;
-    font-size: 12.5px;
-    font-family: monospace;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.order-sample-chip:hover {
-    background: rgba(236, 23, 82, 0.2);
-    border-color: var(--pink);
-    color: #ffffff;
-}
-
-/* TRACKER RESULT DISPLAY */
-.order-tracker__result {
-    display: none;
-    margin-top: 10px;
-    padding: 22px;
-    background: rgba(0, 0, 0, 0.35);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 16px;
-    animation: fadeInResult 0.35s ease forwards;
-}
-
-@keyframes fadeInResult {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.order-result__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    margin-bottom: 20px;
-}
-
-.order-result__id {
-    font-size: 16px;
-    font-weight: 800;
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.order-result__badge {
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.3px;
-}
-
-.order-result__badge--delivering {
-    background: rgba(236, 23, 82, 0.2);
-    color: #ff6584;
-    border: 1px solid rgba(236, 23, 82, 0.4);
-}
-
-.order-result__badge--shipped {
-    background: rgba(59, 130, 246, 0.2);
-    color: #60a5fa;
-    border: 1px solid rgba(59, 130, 246, 0.4);
-}
-
-.order-result__badge--delivered {
-    background: rgba(16, 185, 129, 0.2);
-    color: #34d399;
-    border: 1px solid rgba(16, 185, 129, 0.4);
-}
-
-.order-result__badge--processing {
-    background: rgba(245, 158, 11, 0.2);
-    color: #fbbf24;
-    border: 1px solid rgba(245, 158, 11, 0.4);
-}
-
-/* TIMELINE STEPS */
-.order-result__timeline {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    position: relative;
-    margin-bottom: 20px;
-}
-
-.timeline-step {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 8px;
-    position: relative;
-    z-index: 2;
-}
-
-.timeline-step__dot {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.15);
-    color: rgba(255, 255, 255, 0.4);
-    font-size: 12px;
-    font-weight: 800;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid transparent;
-    transition: all 0.3s ease;
-}
-
-.timeline-step.is-done .timeline-step__dot {
-    background: var(--pink);
-    color: #ffffff;
-    box-shadow: 0 0 12px rgba(236, 23, 82, 0.5);
-}
-
-.timeline-step.is-active .timeline-step__dot {
-    background: #ffffff;
-    color: var(--pink);
-    border-color: var(--pink);
-    box-shadow: 0 0 16px rgba(255, 255, 255, 0.6);
-}
-
-.timeline-step__label {
-    font-size: 12.5px;
-    font-weight: 700;
-    color: rgba(255, 255, 255, 0.5);
-}
-
-.timeline-step.is-done .timeline-step__label,
-.timeline-step.is-active .timeline-step__label {
-    color: #ffffff;
-}
-
-.order-result__details {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
-    padding-top: 16px;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    font-size: 13px;
-}
-
-.order-detail-item {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.order-detail-item span {
-    color: rgba(255, 255, 255, 0.5);
-}
-
-.order-detail-item strong {
-    color: #ffffff;
-    font-weight: 700;
-}
-
 .footer__inner {
     padding-top: 24px;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
@@ -1677,13 +1442,6 @@ a {
         justify-content: center;
         width: 100%;
     }
-    .order-result__timeline {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 16px;
-    }
-    .order-result__details {
-        grid-template-columns: 1fr;
-    }
     .footer__inner {
         flex-direction: column;
         align-items: center;
@@ -1767,8 +1525,7 @@ a {
     .navbar__search-btn:hover {
         background: rgba(236, 23, 82, 0.1);
     }
-    .search-btn__label,
-    .search-btn__shortcut {
+    .search-btn__label {
         display: none;
     }
     .navbar__toggle {
@@ -2511,11 +2268,6 @@ a {
     gap: 16px;
     flex-wrap: wrap;
     padding: 0 20px;
-}
-
-.categories__size-banner {
-    margin: 0;
-    text-align: center;
 }
 
 .size-finder-trigger-btn {
@@ -3739,21 +3491,6 @@ a {
     border-radius: 6px;
 }
 
-.result-card__cta {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: 6px;
-    color: var(--pink);
-    font-weight: 700;
-    font-size: 13.5px;
-    transition: transform 0.2s ease;
-}
-
-.result-card__cta:hover {
-    transform: translateX(4px);
-}
-
 .modal__footer {
     padding: 16px 28px;
     background: var(--bg);
@@ -4961,8 +4698,6 @@ textarea {
 .form__submit,
 .newsletter__submit,
 .order-tracker__submit,
-.quiz-result__cta-btn,
-.result-card__cta,
 .size-finder-trigger-btn,
 .compare-models-trigger-btn {
     display: inline-flex;
@@ -4990,8 +4725,6 @@ textarea {
 .form__submit:hover,
 .newsletter__submit:hover,
 .order-tracker__submit:hover,
-.quiz-result__cta-btn:hover,
-.result-card__cta:hover,
 .size-finder-trigger-btn:hover,
 .compare-models-trigger-btn:hover {
     background: var(--pink-dark);
@@ -5018,8 +4751,7 @@ textarea {
 .feature-card,
 .review-card,
 .system-card,
-.system-finder-card,
-.quiz-box {
+.system-finder-card {
     border-radius: var(--radius-xl);
 }
 .card {
@@ -5750,8 +5482,6 @@ textarea {
     font-size: 12px;
     color: #a47082;
 }
-.cart__free-ship__48h { font-weight: 700; color: #D4144A; }
-.cart__free-ship.is-reached .cart__free-ship__48h { color: #2ecc71; }
 /* Лента „Бесплатна достава + 48ч" (index.html и категории) */
 .freeship-ribbon {
     display: flex;
@@ -5768,7 +5498,6 @@ textarea {
 }
 .freeship-ribbon__item { display: inline-flex; align-items: center; gap: 7px; }
 .freeship-ribbon__item svg { flex-shrink: 0; }
-.freeship-ribbon__item--48h { font-weight: 800; }
 /* Модел степер за кошничка (+/-) */
 .model-cart {
     display: inline-flex;
@@ -5958,35 +5687,6 @@ textarea {
     max-width: 860px;
     margin: 0 auto;
 }
-.quiz-section__header {
-    text-align: center;
-    margin-bottom: 28px;
-}
-.quiz-section__badge {
-    display: inline-block;
-    font-size: 12.5px;
-    font-weight: 800;
-    letter-spacing: 0.4px;
-    text-transform: uppercase;
-    color: var(--pink);
-    background: rgba(236, 23, 82, 0.08);
-    padding: 6px 16px;
-    border-radius: 50px;
-    margin-bottom: 12px;
-}
-.quiz-section__header h2 {
-    font-family: Manrope, 'Plus Jakarta Sans', sans-serif;
-    font-size: clamp(22px, 3.4vw, 32px);
-    color: var(--ink);
-    margin: 0 0 10px;
-}
-.quiz-section__header p {
-    color: #666;
-    font-size: 14.5px;
-    line-height: 1.6;
-    margin: 0 auto;
-    max-width: 560px;
-}
 .quiz-card {
     background: #fff;
     border: 1px solid #f0e6ea;
@@ -6153,27 +5853,6 @@ textarea {
 /* ========================================
    CTA „Најди го твојот совршен пар“ (квиз)
    ======================================== */
-.quiz-finder-trigger-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    background: var(--pink);
-    border: 1.5px solid var(--pink);
-    padding: 12px 24px;
-    border-radius: 30px;
-    font-size: 14.5px;
-    font-weight: 600;
-    color: #fff;
-    cursor: pointer;
-    text-decoration: none;
-    box-shadow: 0 8px 24px rgba(236, 23, 82, 0.3);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.quiz-finder-trigger-btn:hover {
-    background: #c01240;
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(236, 23, 82, 0.4);
-}
 
 /* „MONETA водич за влошки" во нав-барот = обичен линк (како останатите) */
 
@@ -6632,8 +6311,7 @@ p { color: var(--ink-700); }
 .order-tracker__submit,
 .size-finder-trigger-btn,
 .compare-models-trigger-btn,
-.compare-link-btn,
-.result-card__cta {
+.compare-link-btn {
     min-height: 52px;
     border-radius: var(--radius-pill);
     font-family: var(--font-display);
@@ -7545,42 +7223,6 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
     font-size: 18px;
     font-weight: 900;
 }
-.cart__item-thumb-col {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    align-items: stretch;
-}
-.cart__item-sizes {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-.cart__size-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 6px;
-    font-size: 11.5px;
-    font-weight: 800;
-    color: var(--brand);
-    background: var(--brand-100);
-    border-radius: 9px;
-    padding: 4px 8px;
-    line-height: 1.2;
-}
-.cart__remove {
-    border: 0;
-    background: transparent;
-    color: var(--ink-500);
-    font-family: var(--font-body);
-    font-size: 12px;
-    font-weight: 850;
-    cursor: pointer;
-    text-decoration: underline;
-    text-underline-offset: 3px;
-}
-.cart__remove:hover { color: var(--brand); }
 .cart__summary {
     position: sticky;
     bottom: 18px;
@@ -8392,13 +8034,11 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
 .size-finder-trigger-btn,
 .compare-models-trigger-btn,
 .compare-link-btn,
-.result-card__cta,
 .reviews__btn,
 .compare-tab-btn,
 .compare-preset-chip,
 .system-quick-btn,
 .quiz-nav__btn,
-.quiz-finder-trigger-btn,
 .quiz-restart,
 .size-btn,
 .lang-dropdown__trigger,
@@ -8748,10 +8388,6 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
 }
 .moneta-sales-toast__text strong {
     font-weight: 700;
-}
-.moneta-sales-toast__meta {
-    font-size: 11px;
-    color: #9a9794;
 }
 .moneta-sales-toast__close {
     position: absolute;
