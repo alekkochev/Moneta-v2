@@ -7,6 +7,29 @@
   var VFS_URL = 'https://cdn.jsdelivr.net/npm/pdfmake@0.2.10/build/vfs_fonts.js';
 
   var libPromise = null;
+  var MONETA_LOGO = null;
+
+  function loadLogo() {
+    if (MONETA_LOGO) return Promise.resolve(MONETA_LOGO);
+    return fetch('images/moneta-logo.png')
+      .then(function (r) {
+        if (!r.ok) throw new Error('лого не е достапно');
+        return r.blob();
+      })
+      .then(function (blob) {
+        return new Promise(function (resolve, reject) {
+          var fr = new FileReader();
+          fr.onload = function () { MONETA_LOGO = fr.result; resolve(fr.result); };
+          fr.onerror = reject;
+          fr.readAsDataURL(blob);
+        });
+      })
+      .catch(function () {
+        // Fallback: текстуално лого ако сликата не е достапна
+        MONETA_LOGO = null;
+        return null;
+      });
+  }
 
   function loadScript(src) {
     return new Promise(function (resolve, reject) {
@@ -67,16 +90,21 @@
           columns: [
             {
               width: '*',
-              stack: [
-                { text: 'МОНЕТА', fontSize: 26, bold: true, color: '#EC1752' },
-                { text: 'Анатомски влошки', fontSize: 11, color: '#808080' },
-              ],
+              stack: MONETA_LOGO
+                ? [
+                    { image: MONETA_LOGO, width: 170, alignment: 'left' },
+                    { text: 'Анатомски влошки', fontSize: 11, color: '#808080', margin: [2, 4, 0, 0] },
+                  ]
+                : [
+                    { text: 'МОНЕТА', fontSize: 26, bold: true, color: '#EC1752' },
+                    { text: 'Анатомски влошки', fontSize: 11, color: '#808080' },
+                  ],
             },
             {
               width: 'auto',
               alignment: 'right',
               stack: [
-                { text: 'ФАКТУРА', fontSize: 24, bold: true, color: '#212124' },
+                { text: 'Испратница-Фактура', fontSize: 24, bold: true, color: '#212124' },
                 { text: 'Број: ' + invNo, fontSize: 10, color: '#808080' },
                 { text: 'Датум: ' + dateStr, fontSize: 10, color: '#808080' },
               ],
@@ -182,6 +210,7 @@
           + String(now.getDate()).padStart(2, '0') + '-'
           + String(Math.floor(Math.random() * 9000) + 1000);
         var dateStr = now.toLocaleDateString('mk-MK');
+        await loadLogo();
         var docDef = buildDocDef(order, invNo, vatRate || 0.18, dateStr);
         var b64 = await new Promise(function (resolve, reject) {
           window.pdfMake.createPdf(docDef).getBase64(function (result) {

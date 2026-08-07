@@ -1,6 +1,32 @@
 ﻿<!DOCTYPE html>
 <html lang="mk">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YEDJMPTEZG"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-YEDJMPTEZG');
+</script>
+
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '3399617573559080');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>МОНЕТА® — Анатомски влошки | Ортопедска удобност за секојдневен комфор</title>
@@ -150,16 +176,12 @@
                     </div>
                 </li>
                     <li><a href="./sistem.html" data-mk="МОНЕТА систем" data-sq="Sistemi MONETA" data-en="MONETA System">МОНЕТА систем</a></li>
-                                        <li class="navbar__guide-item">
-                        <a href="./kviz.html" class="navbar__guide-btn">
-                            <span data-mk="МОНЕТА водич за влошки" data-sq="Udhëzuesi MONETA për tabana" data-en="MONETA insole guide">МОНЕТА водич за влошки</span>
-                        </a>
-                    </li>
                     <li><a href="./index.html#kontakt" data-mk="Контакт" data-sq="Kontakt" data-en="Contact">Контакт</a></li>
                                         <li class="navbar__coupon-item">
-                        <button type="button" class="navbar__coupon" id="promoTrigger" aria-label="Промокод" title="Промокод" data-mk-aria="Промокод" data-sq-aria="Kodi promocional" data-en-aria="Promo Code" data-mk-title="Промокод" data-en-title="Promo Code">
-                            <img src="./images/icons/coupon.webp" alt="Промокод" width="33" height="33" class="navbar__coupon-icon" loading="lazy" decoding="async">
-                        </button>
+                        <!-- TODO: линк кон Supabase (акциска страница) -->
+                        <a href="#" class="navbar__akcija" aria-label="Акција" title="Акција" data-mk-aria="Акција" data-sq-aria="Aksion" data-en-aria="Sale" data-mk-title="Акција" data-sq-title="Aksion" data-en-title="Sale">
+                            <span data-mk="Акција" data-sq="Aksion" data-en="SALE">Акција</span>
+                        </a>
                     </li>
                     <li>
                         <a href="./cart.html" class="navbar__cart" aria-label="Кошница" title="Кошница" data-mk-aria="Кошница" data-sq-aria="Shporta" data-en-aria="Cart" data-mk-title="Кошница" data-en-title="Cart">
@@ -200,7 +222,7 @@
                 </p>
                 <div class="hero__eyebrow" data-mk="Анатомски влошки за секојдневен комфор" data-sq="Tabana anatomikë për rehati të përditshme" data-en="Anatomical insoles for everyday comfort">Анатомски влошки за секојдневен комфор</div>
                 <div class="hero__cta-group" aria-label="Главни акции">
-                    <a class="hero__cta hero__cta--primary" href="./kviz.html" data-mk="Пронајди ја твојата влошка" data-sq="Gjej tabanin tënd" data-en="Find your insole">Пронајди ја твојата влошка</a>
+                    <a class="hero__cta hero__cta--primary" href="./vodic.html" data-mk="МОНЕТА водич за влошки" data-sq="Udhëzuesi MONETA për tabana" data-en="MONETA insole guide">МОНЕТА водич за влошки</a>
                     <a class="hero__cta hero__cta--secondary" href="#kategorii" data-mk="Види ги моделите" data-sq="Shiko modelet" data-en="Browse models">Види ги моделите</a>
                 </div>
                 <div class="hero__proof-grid" aria-label="Докази за доверба">
@@ -266,38 +288,12 @@
     <section class="categories-section" id="kategorii">
         <div class="hero__trust" data-aos="fade-up" data-aos-delay="200">
             <span class="hero__trust-item" data-mk="✓ Анатомска поддршка" data-sq="✓ Mbështetje anatomike" data-en="✓ Anatomical Support">✓ Анатомска поддршка</span>
-            <span class="hero__trust-item" data-mk="✓ Произведено во Словачка" data-sq="✓ Prodhuar në Sllovaki" data-en="✓ Made in Slovakia">✓ Произведено во Словачка</span>
+            <span class="hero__trust-item" data-mk="✓ Скроено за вашето стапало" data-sq="✓ Përshtatur për këmbën tuaj" data-en="✓ Tailored to your foot">✓ Скроено за вашето стапало</span>
             <span class="hero__trust-item" data-mk="✓ За секојдневна удобност" data-sq="✓ Për rehati të përditshme" data-en="✓ Everyday Comfort">✓ За секојдневна удобност</span>
         </div>
 
         <div class="section-kicker categories__header" data-aos="fade-up">
-            <span data-mk="Изберете според вашето движење" data-sq="Zgjidhni sipas lëvizjes suaj" data-en="Choose by how you move">Изберете според вашето движење</span>
-            <h2 data-mk="20 специјализирани модели за различни обувки, сезони и активности" data-sq="20 modele të specializuara për këpucë, sezone dhe aktivitete të ndryshme" data-en="20 specialized models for different shoes, seasons and activities">20 специјализирани модели за различни обувки, сезони и активности</h2>
-            <p data-mk="Наместо да погодувате, започнете со водичот или споредете ги сите 20 модели." data-sq="Në vend që të hamendësoni, filloni me udhëzuesin ose krahasoni të 20 modelet." data-en="Instead of guessing, start with the guide or compare all 20 models.">Наместо да погодувате, започнете со водичот или споредете ги сите 20 модели.</p>
-        </div>
-
-        <div class="categories__actions-banner" data-aos="fade-up">
-            <button type="button" class="size-finder-trigger-btn" data-open-size-modal>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.4 2.4 0 0 1 0-3.4l2.6-2.6a2.4 2.4 0 0 1 3.4 0l12.6 12.6z"/>
-                    <path d="m14.5 12.5 2-2"/>
-                    <path d="m11.5 9.5 2-2"/>
-                    <path d="m8.5 6.5 2-2"/>
-                    <path d="m17.5 15.5 2-2"/>
-                </svg>
-                <span data-mk="<strong>Отворете го Водичот за големини →</strong>" data-sq="<strong>Hapni Udhëzuesin e madhësive →</strong>" data-en="<strong>Open the Size Guide →</strong>" data-lang-html><strong>Отворете го Водичот за големини →</strong></span>
-            </button>
-            <button type="button" class="compare-models-trigger-btn" id="compareToggleBtn" aria-expanded="false" aria-controls="compareModelsSection">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="18" y1="20" x2="18" y2="10"/>
-                    <line x1="12" y1="20" x2="12" y2="4"/>
-                    <line x1="6" y1="20" x2="6" y2="14"/>
-                </svg>
-                <span data-mk="Спореди ги сите модели" data-sq="Krahasoji të gjitha modelet" data-en="Compare All Models">Спореди ги сите модели</span>
-                <svg class="compare-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="6 9 12 15 18 9"/>
-                </svg>
-            </button>
+            <h2 data-mk="Изберете категорија според обувките, сезоната или активноста." data-sq="Zgjidhni kategorinë sipas këpucëve, sezonit ose aktivitetit." data-en="Choose a category by shoes, season or activity.">Изберете категорија според обувките, сезоната или активноста.</h2>
         </div>
 
         <!-- EXPANDABLE COMPARE MODELS SECTION -->
@@ -1017,7 +1013,7 @@
                 </div>
             </div>
             <div class="modal__footer">
-                <p class="modal__tip"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg><span><strong data-mk="Совет:" data-sq="Këshillë:" data-en="Tip:">Совет:</strong> <span data-mk="Поткастрување со ножици е можно кај: Active Gel, MEMOSOLE, Sportex, Carbon, Simona, Thermo Alu и сите HUNTER модели. Кожните влошки и останатите модели имаат фиксни големини." data-sq="Shkurtimi me gërshërë është i mundur te: Active Gel, MEMOSOLE, Sportex, Carbon, Simona, Thermo Alu dhe të gjitha modelet HUNTER. Tabanat lëkure dhe modelet e tjera kanë madhësi fikse." data-en="Trimming with scissors is available for: Active Gel, MEMOSOLE, Sportex, Carbon, Simona, Thermo Alu and all HUNTER models. Leather insoles and other models come in fixed sizes.">Поткастрување со ножици е можно кај: Active Gel, MEMOSOLE, Sportex, Carbon, Simona, Thermo Alu и сите HUNTER модели. Кожните влошки и останатите модели имаат фиксни големини.</span></span></p>
+                <p class="modal__tip"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg><span><strong data-mk="Совет:" data-sq="Këshillë:" data-en="Tip:">Совет:</strong> <span data-mk="Поткастрување со ножици е можно кај: Active Gel и Carbon. Кожните влошки и останатите модели имаат фиксни големини." data-sq="Shkurtimi me gërshërë është i mundur te: Active Gel dhe Carbon. Tabanat lëkure dhe modelet e tjera kanë madhësi fikse." data-en="Trimming with scissors is available for: Active Gel and Carbon. Leather insoles and other models come in fixed sizes.">Поткастрување со ножици е можно кај: Active Gel и Carbon. Кожните влошки и останатите модели имаат фиксни големини.</span></span></p>
             </div>
         </div>
     </div>

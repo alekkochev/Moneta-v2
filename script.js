@@ -3420,7 +3420,7 @@ console.log('%c Вебсајт во развој 💪', 'color:#6B6B76;font-size
     if (!mapEl) return;
 
     const DEALERS = [
-        { nameMk: 'МЕДИКА ПРО — Скопје', nameEn: 'MEDIKA PRO — Skopje', addrMk: 'бул. Кочо Рацин бр.75, Центар', addrEn: '75 Koco Racin Blvd, Centar', tel: ['+389 72 225 505', '+389 2 3111 404'], lat: 41.9963, lng: 21.4258 },
+        { nameMk: 'МЕДИКА ПРО — Скопје', nameEn: 'MEDIKA PRO — Skopje', addrMk: 'бул. Кочо Рацин бр.75, Центар', addrEn: '75 Koco Racin Blvd, Centar', tel: ['+389 72 225 505', '+389 2 3111 404'], lat: 41.99133928123531, lng: 21.436732260905845 },
         { nameMk: 'МЕДИКА ПРО — Прилеп', nameEn: 'MEDIKA PRO — Prilep', addrMk: 'ул. Мице Козар бр.10', addrEn: '10 Mice Kozar St.', tel: ['+389 70 22 55 99', '+389 48 450 231'], lat: 41.3458, lng: 21.5565 },
         { nameMk: 'МЕДИКА ПРО — Тетово', nameEn: 'MEDIKA PRO — Tetovo', addrMk: 'ул. Маршал Тито бр.36', addrEn: '36 Marshal Tito St.', tel: ['+389 71 26 20 48', '+389 44 349 050'], lat: 42.0086, lng: 20.9710 },
         { nameMk: 'МЕДИКА ПРО — Битола', nameEn: 'MEDIKA PRO — Bitola', addrMk: 'бул. 1-ви Мај бр.202/7', addrEn: '202/7 1st May Blvd', tel: ['+389 72 30 37 82', '+389 47 29 21 10'], lat: 41.0297, lng: 21.3332 },
