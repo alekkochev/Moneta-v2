@@ -5206,8 +5206,8 @@ textarea {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 .model-icons__item img {
-    width: 30px;
-    height: 30px;
+    width: 95px;
+    height: 95px;
     object-fit: contain;
 }
 /* Мотивациски popup за бесплатна достава */
@@ -6774,8 +6774,8 @@ p { color: var(--ink-700); }
     overflow-wrap: anywhere;
 }
 .model-icons__item img {
-    width: 38px;
-    height: 38px;
+    width: 95px;
+    height: 95px;
     filter: none;
 }
 .model-icons__item span {
