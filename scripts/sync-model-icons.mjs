@@ -29,13 +29,14 @@ const IC = {
   univerzalen: ['univerzalen%20broj.webp', 'Универзален', 'Universal', 'Universal'],
   antibakteriska: ['antibakteriska.svg', 'Антибактеријaлна', 'Antibakteriale', 'Antibacterial'],
   komfort: ['komfort.svg', 'Комфорт', 'Komfort', 'Comfort'],
+  perduv: ['perduv.webp', 'Комфорт', 'Komfort', 'Comfort'],
   memorska: ['memorska.svg', 'Мемориска', 'Memorike', 'Memory'],
   izolacija: ['izolacija.svg', 'Изолација', 'Izolim', 'Insulation']
 };
 
 // Финален редослед по модел — како на амбалажата (ревизија 2026-08-07)
 const MODEL_ICONS = {
-  'memosole': ['pritisok', 'mirisi', 'komfort', 'memorska', 'univerzalen'],
+  'memosole': ['pritisok', 'mirisi', 'perduv', 'memorska'],
   'active-gel': ['anatomska', 'pritisok', 'apsorpcija', 'mirisi', 'antibakteriska'],
   'anatomiX': ['anatomska', 'apsorpcija', 'antibakteriska', 'perenje'],
   'carbon': ['apsorpcija', 'mirisi', 'univerzalen', 'antibakteriska'],
