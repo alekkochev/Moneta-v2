@@ -30,7 +30,7 @@ const IC = {
   antibakteriska: ['antibakteriska.svg', 'Антибактеријaлна', 'Antibakteriale', 'Antibacterial'],
   komfort: ['komfort.svg', 'Комфорт', 'Komfort', 'Comfort'],
   perduv: ['perduv.webp', 'Комфорт', 'Komfort', 'Comfort'],
-  memorska: ['memorska.svg', 'Мемориска', 'Memorike', 'Memory'],
+  memorska: ['memorska.webp', 'Мемориска', 'Memorike', 'Memory'],
   izolacija: ['izolacija.svg', 'Изолација', 'Izolim', 'Insulation']
 };
 

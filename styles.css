@@ -6779,9 +6779,7 @@ p { color: var(--ink-700); }
     filter: none;
 }
 .model-icons__item span {
-    max-width: 88px;
-    overflow-wrap: anywhere;
-    word-break: break-word;
+    display: none;
 }
 .model-layout__info { min-width: 0; }
 .model-info-frame {
