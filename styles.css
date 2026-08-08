@@ -6803,7 +6803,7 @@ p { color: var(--ink-700); }
 .model-info-frame > * { position: relative; z-index: 1; }
 .model-info-frame .system-hero__badge { margin-bottom: var(--space-2); }
 .model-info-frame .system-hero__title {
-    font-size: clamp(44px, 6vw, 84px);
+    font-size: clamp(38px, 5vw, 64px);
     line-height: 0.94;
     letter-spacing: -0.06em;
     margin-bottom: var(--space-2);
