@@ -3685,7 +3685,33 @@ window.MonetaData = {
 
         // ---- JSON-LD Product schema (динамично од MonetaData) ----
         injectProductLD();
+
+        // ---- Неонски ефект на „Акција" копче (ако има попусти) ----
+        updateAkcijaBadge();
     };
+
+    function updateAkcijaBadge() {
+        var akcijaBtn = document.getElementById('navAkcija');
+        if (!akcijaBtn) akcijaBtn = document.querySelector('.navbar__akcija');
+        if (!akcijaBtn) return;
+        var prods = window.MonetaData.products || {};
+        var hasDiscount = false;
+        for (var slug in prods) {
+            var p = prods[slug];
+            var price = Number(p.price) || 0;
+            var oldPrice = Number(p.old_price) || 0;
+            var discCol = Number(p.discount) || 0;
+            if ((oldPrice > price && oldPrice > 0) || discCol > 0) { hasDiscount = true; break; }
+        }
+        if (hasDiscount) {
+            akcijaBtn.classList.add('navbar__akcija--active');
+            if (!akcijaBtn.getAttribute('href') || akcijaBtn.getAttribute('href') === '#') {
+                akcijaBtn.setAttribute('href', './akcija.html');
+            }
+        } else {
+            akcijaBtn.classList.remove('navbar__akcija--active');
+        }
+    }
 
     function injectProductLD() {
         const sel = document.querySelector('.size-selector[data-model]');
