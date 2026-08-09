@@ -8239,6 +8239,33 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
 }
 
 /* ========================================
+   БУРГЕР-МЕНИ (мобилно) — „Влошки" копчето (button) и подкатегориите
+   да бидат видливи на темната позадина на менито
+   ======================================== */
+@media (max-width: 860px) {
+    .navbar__links .navbar__dd-trigger {
+        color: #ffffff;
+        font-weight: 700 !important;
+    }
+    .navbar__links .navbar__dd-trigger:hover,
+    .navbar__links .navbar__dd-trigger.is-active {
+        color: var(--pink);
+    }
+    .navbar__dd-menu {
+        background: #ffffff !important;
+        border: 1px solid #efe9e6 !important;
+    }
+    /* Повисока специфичност од .navbar__links.is-open a (#fff !important) */
+    .navbar__links.is-open .navbar__dd-menu a {
+        color: var(--ink-900) !important;
+    }
+    .navbar__links.is-open .navbar__dd-menu a:hover {
+        color: #EC1752 !important;
+        background: rgba(236, 23, 82, 0.08) !important;
+    }
+}
+
+/* ========================================
    БУРГЕР-МЕНИ — баџ со број на артикли во кошничката (мобилно)
    Клиентот веднаш гледа дека има артикли во кошничката
    ======================================== */
