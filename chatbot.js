@@ -414,6 +414,71 @@
     }
   ];
 
+  // ============================================================
+  // БАЗА НА ПРОИЗВОДИ — структурирани атрибути за Recommendation Engine
+  // (acts / problems / shoes = кодови; support/cushion/comfort = 1-3)
+  // ============================================================
+  const PRODUCT_ATTRS = {
+    'active-gel': { acts: ['sports', 'running', 'standing', 'daily'], problems: ['fatigue', 'joint'], shoes: ['sport_shoe', 'everyday_shoe'], support: 2, cushion: 3, comfort: 3, materials: 'активен гел', tech: 'гел амортизација' },
+    'anatomiX': { acts: ['running', 'hiking', 'sports'], problems: ['fatigue', 'joint'], shoes: ['sport_shoe'], support: 3, cushion: 3, comfort: 2, materials: 'рециклирана антибактериска пена', tech: 'RUN & HIKING' },
+    'carbon': { acts: ['summer', 'daily'], problems: ['odor', 'sweat'], shoes: ['summer_shoe', 'everyday_shoe'], support: 1, cushion: 1, comfort: 2, materials: 'латекс + активен јаглен', tech: 'анти-габична' },
+    'duck': { acts: ['kids', 'daily'], problems: ['flat'], shoes: ['kids'], support: 2, cushion: 2, comfort: 2, materials: '100% памук', tech: 'карбосан калап' },
+    'heel-pad': { acts: ['walking', 'daily'], problems: ['heel'], shoes: ['everyday_shoe', 'work_shoe', 'elegant_shoe'], support: 1, cushion: 2, comfort: 2, materials: 'кожа + карбосан перниче', tech: 'самолеплив слој' },
+    'heel-pad-fix': { acts: ['walking', 'daily'], problems: ['heel'], shoes: ['everyday_shoe', 'work_shoe'], support: 2, cushion: 2, comfort: 2, materials: 'кожа + карбосан перниче', tech: 'зајакнат самолеплив' },
+    'heel-pad-grip': { acts: ['walking', 'daily'], problems: ['friction', 'heel'], shoes: ['everyday_shoe'], support: 1, cushion: 1, comfort: 1, materials: 'мека кожа + карбосан пена', tech: 'самолеплив grip' },
+    'hunter-camo': { acts: ['hiking', 'sports'], problems: ['odor', 'sweat', 'fatigue'], shoes: [], support: 3, cushion: 3, comfort: 2, materials: 'PES ткаенина + латекс', tech: 'активен јаглен' },
+    'hunter-flex': { acts: ['hiking', 'winter'], problems: ['cold'], shoes: ['winter_shoe'], support: 3, cushion: 2, comfort: 2, materials: 'Cambrella + алуминиум + филц', tech: 'термо изолација' },
+    'hunter-outdoor': { acts: ['hiking'], problems: ['fatigue', 'cold'], shoes: [], support: 3, cushion: 3, comfort: 3, materials: 'Viscolat мемориска пена', tech: 'PES филц + алуминиум' },
+    'memosole': { acts: ['daily', 'standing', 'walking'], problems: ['fatigue', 'arch'], shoes: ['everyday_shoe', 'work_shoe'], support: 2, cushion: 3, comfort: 3, materials: 'мемориска пена + латекс', tech: 'прилагодување на стапалото' },
+    'relax': { acts: ['daily', 'standing', 'walking', 'work'], problems: ['fatigue', 'heel', 'odor'], shoes: ['work_shoe', 'everyday_shoe', 'elegant_shoe'], support: 2, cushion: 2, comfort: 3, materials: 'јагнешка кожа + латекс', tech: 'пластичен носач' },
+    'simona': { acts: ['summer', 'daily'], problems: ['odor', 'sweat'], shoes: ['summer_shoe', 'everyday_shoe'], support: 1, cushion: 1, comfort: 2, materials: '100% памук', tech: 'ароматична пена' },
+    'soft-gel': { acts: ['daily', 'standing', 'walking', 'work'], problems: ['fatigue', 'heel', 'arch', 'joint'], shoes: ['work_shoe', 'everyday_shoe', 'elegant_shoe'], support: 3, cushion: 3, comfort: 3, materials: 'јагнешка кожа + гел', tech: 'гел перничиња' },
+    'sport-style': { acts: ['sports', 'daily'], problems: ['fatigue'], shoes: ['sport_shoe', 'everyday_shoe'], support: 2, cushion: 2, comfort: 2, materials: 'памучен фротир + латекс', tech: 'пластичен носач' },
+    'sportex': { acts: ['sports', 'running'], problems: ['fatigue', 'heel', 'joint'], shoes: ['sport_shoe'], support: 2, cushion: 3, comfort: 2, materials: 'антибактериски материјали', tech: 'воздушно перниче + алое вера' },
+    'thermo-alu': { acts: ['winter', 'daily'], problems: ['cold'], shoes: ['winter_shoe'], support: 2, cushion: 2, comfort: 2, materials: '100% волна + латекс', tech: 'алуминиумска изолација' },
+    'topas': { acts: ['daily', 'standing', 'work'], problems: ['fatigue', 'arch'], shoes: ['elegant_shoe'], support: 2, cushion: 1, comfort: 2, materials: 'перфорирана јагнешка кожа', tech: '3/4 анатомски носач' },
+    'vital': { acts: ['daily', 'standing', 'work'], problems: ['heel', 'fatigue', 'odor'], shoes: ['work_shoe', 'everyday_shoe', 'elegant_shoe'], support: 2, cushion: 2, comfort: 2, materials: 'перфорирана кожа + латекс', tech: 'карбосан перниче' },
+    'x-treme': { acts: ['sports', 'running', 'hiking'], problems: ['fatigue', 'joint'], shoes: ['sport_shoe'], support: 3, cushion: 3, comfort: 2, materials: 'WAP 4-слојна', tech: 'амортизирачка зона' }
+  };
+
+  // Етикети за човечки приказ на сигналите (за објаснувањето „зошто")
+  const SIGNAL_LABELS = {
+    sports: 'спорт', running: 'трчање', standing: 'долго стоење', walking: 'одење', hiking: 'планинарење', kids: 'деца', daily: 'секојдневно носење', winter: 'зима/студ', summer: 'лето/топло',
+    fatigue: 'замор на стапала', heel: 'болка во пета', arch: 'потпора на свод', odor: 'мирис', sweat: 'потење', cold: 'ладни стапала', joint: 'оптоварување на зглобови', friction: 'лизгање/жулење', flat: 'рамни стапала',
+    sport_shoe: 'спортски обувки', work_shoe: 'работни обувки', elegant_shoe: 'елегантни чевли', winter_shoe: 'зимски обувки', summer_shoe: 'летни обувки', everyday_shoe: 'секојдневни обувки',
+    comfort: 'удобност', support: 'поддршка'
+  };
+
+  // Мапирање текст → сигнали (што корисникот ги бара)
+  const SIGNAL_MAP = {
+    running: ['трча', 'run', 'vrap'],
+    sports: ['спорт', 'фитнес', 'тренинг', 'вежба', 'sport', 'training', 'fitness'],
+    standing: ['стое', 'стојам', 'стоиш', 'стој', 'standing', 'qëndro'],
+    walking: ['одам', 'одењ', 'хода', 'walk', 'ecje'],
+    hiking: ['планинаре', 'лов', 'hiking', 'hunt', 'outdoor', 'mount'],
+    kids: ['деца', 'детск', 'дете', 'kids', 'fëmij'],
+    daily: ['секојднев', 'дневн', 'daily'],
+    winter: ['зима', 'зимск', 'ладн', 'winter', 'cold', 'ftoht'],
+    summer: ['лето', 'летн', 'summer', 'verë'],
+    fatigue: ['умор', 'замор', 'морн', 'tired', 'fatigue', 'lodh'],
+    heel: ['пета', 'петиц', 'heel', 'thembr'],
+    arch: ['свод', 'рамни', 'flat', 'hark'],
+    odor: ['мирис', 'мириз', 'odor', 'smell'],
+    sweat: ['пот', 'зно', 'sweat', 'djers'],
+    cold: ['ладн', 'студ', 'cold', 'ftoht'],
+    joint: ['колен', 'зглоб', 'рбет', 'knee', 'joint'],
+    friction: ['лизга', 'жули', 'friction', 'rrëshqit'],
+    sport_shoe: ['спортски', 'патики', 'sport', 'atlete'],
+    work_shoe: ['работн', 'work', 'pune'],
+    elegant_shoe: ['елегант', 'деловн', 'балетанки', 'штикли', 'elegant', 'business'],
+    winter_shoe: ['чизма', 'зимски', 'boots', 'çizme'],
+    summer_shoe: ['летни', 'sandal', 'verore'],
+    everyday_shoe: ['секојдневн', 'everyday']
+  };
+
+  // Медицински термини → не даваме дијагноза (спецификација #10)
+  const MEDICAL_KW = ['дијабет', 'артрит', 'невропат', 'циркулаци', 'тромб', 'херни', 'тумор', 'операц', 'рана', 'отиц', 'воспалени', 'ревма', 'остеопороз', 'диабет', 'arthritis', 'diabetes', 'neuropath', 'circulation', 'swelling', 'infection', 'reuma'];
+
   // Разговорна состојба — памти ако треба дообјаснување пред препорака (#4 од спецификацијата)
   let clarifyState = null;
 
@@ -429,25 +494,68 @@
     });
   }
 
-  function buildRec(rec) {
+  // ============================================================
+  // RECOMMENDATION ENGINE — оценува производи по сигнали, врвни 3 со %
+  // ============================================================
+  function extractSignals(n) {
+    const signals = [];
+    Object.keys(SIGNAL_MAP).forEach(function (sig) {
+      SIGNAL_MAP[sig].forEach(function (kw) {
+        if (kwScore(n.words, kw) > 0) signals.push(sig);
+      });
+    });
+    return Array.from(new Set(signals));
+  }
+
+  function scoreProduct(slug, signals) {
+    const a = PRODUCT_ATTRS[slug];
+    if (!a) return 0;
+    let s = 0;
+    signals.forEach(function (sig) {
+      if (a.acts.indexOf(sig) !== -1) s += 2;
+      if (a.problems.indexOf(sig) !== -1) s += 2;
+      if (a.shoes.indexOf(sig) !== -1) s += 2;
+      if (sig === 'comfort' && a.comfort >= 2) s += 2;
+      if (sig === 'support' && a.support >= 2) s += 2;
+    });
+    return s;
+  }
+
+  function recExplain(ranked, signals) {
+    const top = ranked[0];
+    const m = modelData(top.slug);
+    const a = PRODUCT_ATTRS[top.slug] || {};
+    const sigHuman = (signals || []).map(function (s) { return SIGNAL_LABELS[s]; }).filter(Boolean).join(', ');
+    const pct = top.pct != null ? top.pct : 100;
+    const benefits = (Array.isArray(m.specs) && m.specs.length ? m.specs.slice(0, 3).join(', ') : (a.tech || '')).replace(/\.$/, '');
+    const reason = (m.desc || '').replace(/\.$/, '');
+    return t(
+      'Според тоа што ми кажавте — ' + (sigHuman || 'вашите потреби') + ' — најмногу би ви ја препорачал ' + m.name + ' (' + pct + '% совпаѓање). Причина: ' + reason + '. За вас особено се важни: ' + benefits + '.',
+      'Sipas asaj që më thatë — ' + (sigHuman || 'nevojat tuaja') + ' — më shumë do t\'ju rekomandoja ' + m.name + ' (' + pct + '% përputhje). Arsyeja: ' + reason + '. Për ju veçanërisht: ' + benefits + '.',
+      'Based on what you told me — ' + (sigHuman || 'your needs') + ' — I would most recommend ' + m.name + ' (' + pct + '% match). Reason: ' + reason + '. Especially important for you: ' + benefits + '.'
+    );
+  }
+
+  function recResult(title, text, ranked) {
     const IS_MODELI = /\/modeli\//.test(window.location.pathname);
     const base = IS_MODELI ? '../' : './';
     let thumbs = '<div class="b-thumbs">';
     const chips = [];
-    rec.models.forEach(function (slug) {
-      const m = modelData(slug);
-      thumbs += '<div class="b-thumb" data-model="' + esc(slug) + '">'
-        + '<div class="b-thumb__img"><img src="' + base + 'images/cards/' + slug + '.webp" alt="' + esc(m.name) + '" loading="lazy" data-zoom="' + esc(slug) + '"></div>'
+    ranked.forEach(function (r) {
+      const m = modelData(r.slug);
+      const pct = r.pct != null ? '<div class="b-thumb__match">' + r.pct + '%</div>' : '';
+      thumbs += '<div class="b-thumb" data-model="' + esc(r.slug) + '">'
+        + '<div class="b-thumb__img"><img src="' + base + 'images/cards/' + r.slug + '.webp" alt="' + esc(m.name) + '" loading="lazy" data-zoom="' + esc(r.slug) + '">' + pct + '</div>'
         + '<div class="b-thumb__name">' + esc(m.name) + '</div>'
         + '<div class="b-thumb__price">' + (m.price ? m.price.toLocaleString('mk-MK') + ' ден.' : '') + '</div>'
         + '</div>';
-      chips.push({ label: m.name, q: slug });
+      chips.push({ label: m.name, q: r.slug });
     });
     thumbs += '</div>';
     return {
       html: '<div class="b-rec">'
-        + '<div class="b-rec__title">' + esc(rec.title) + '</div>'
-        + '<div class="b-rec__text">' + esc(rec.text) + '</div>'
+        + '<div class="b-rec__title">' + esc(title) + '</div>'
+        + '<div class="b-rec__text">' + esc(text) + '</div>'
         + thumbs
         + '<div class="b-rec__hint">' + esc(t('Кликни на сликичка за детали, додавање во кошничка или зголемување.', 'Kliko foton për detaje, shtim në shportë ose zmadhim.', 'Click a thumbnail for details, adding to cart or zoom.')) + '</div>'
         + '</div>',
@@ -455,8 +563,185 @@
     };
   }
 
+  function buildRec(rec, n) {
+    const signals = extractSignals(n);
+    const scored = rec.models.map(function (slug) { return { slug: slug, score: scoreProduct(slug, signals) }; });
+    scored.sort(function (a, b) { return b.score - a.score; });
+    const top = scored.slice(0, 3);
+    const maxS = Math.max(1, scored[0].score);
+    top.forEach(function (r) { r.pct = Math.round(r.score / maxS * 100); });
+    return recResult(rec.title, rec.text + '\n\n' + recExplain(top, signals), top);
+  }
+
+  // ============================================================
+  // ПРОДАЖЕН FUNNEL — „сакам влошки" → 2-4 прашања → препорака
+  // ============================================================
+  const FUNNEL_STEPS = {
+    shoe: {
+      q: t('Секако! За да ви ја препорачам најсоодветната влошка — за какви обувки ќе ги користите?', 'Sigurisht! Për t\'ju rekomanduar tabanin më të përshtatshëm — për çfarë këpucësh do t\'i përdorni?', 'Of course! To recommend the best insole — what type of shoes will you use them with?'),
+      chips: [
+        { label: t('🏃 Спортски', '🏃 Sportive', '🏃 Sports'), q: 'Спортски' },
+        { label: t('👞 Работни/кожни', '👞 Pune/lëkure', '👞 Work/leather'), q: 'Работни' },
+        { label: t('👠 Елегантни', '👠 Elegante', '👠 Elegant'), q: 'Елегантни' },
+        { label: t('🥾 Зимски', '🥾 Dimërore', '🥾 Winter'), q: 'Зимски' },
+        { label: t('☀️ Летни', '☀️ Verore', '☀️ Summer'), q: 'Летни' },
+        { label: t('👶 Детски', '👶 Për fëmijë', '👶 Kids'), q: 'Детски' }
+      ]
+    },
+    activity: {
+      q: t('Дали најмногу стоите, одите или комбинирате?', 'A qëndroni më shumë, ecni apo kombinoni?', 'Do you mostly stand, walk or combine?'),
+      chips: [
+        { label: t('🕐 Стојам', '🕐 Qëndroj', '🕐 I stand'), q: 'Стојам' },
+        { label: t('🚶 Одам', '🚶 Eci', '🚶 I walk'), q: 'Одам' },
+        { label: t('⚖️ Комбинирам', '⚖️ Kombinoj', '⚖️ I combine'), q: 'Комбинирам' }
+      ]
+    },
+    priority: {
+      q: t('Дали барате пред сè удобност и амортизација, или повеќе поддршка и стабилност?', 'Kërkoni mbi të gjitha rehati dhe amortizim, apo më shumë mbështetje dhe stabilitet?', 'Do you want comfort and cushioning above all, or more support and stability?'),
+      chips: [
+        { label: t('☁️ Удобност', '☁️ Rehati', '☁️ Comfort'), q: 'Удобност' },
+        { label: t('🦶 Поддршка', '🦶 Mbështetje', '🦶 Support'), q: 'Поддршка' },
+        { label: t('⭐ И двете', '⭐ Të dyja', '⭐ Both'), q: 'И двете' }
+      ]
+    }
+  };
+  const GENERIC_KW = ['сакам влошк', 'барам влошк', 'ми треба влошк', 'што да земам', 'препорачај ми', 'препорачај влошк', 'сакам нешто за стапал', 'која влошка', 'која да ја земам', 'koja vloska', 'sakam vloska', 'preporacaj mi', 'which insole', 'what insole', 'i need insole', 'i want insole', 'koji taban', 'me duhet taban'];
+  let funnel = null;
+
+  function isGenericShopping(n) {
+    return GENERIC_KW.some(function (k) {
+      const kf = forms(k);
+      for (let i = 0; i < kf.length; i++) {
+        if (n.raw.indexOf(kf[i]) !== -1 || n.cyr.indexOf(kf[i]) !== -1) return true;
+      }
+      return false;
+    });
+  }
+
+  function detectShoe(n) {
+    const w = n.raw + ' ' + n.cyr;
+    if (/(спортск|патик|sport|atlete|trча|run|vrap)/.test(w)) return 'sport';
+    if (/(работн|work|pune|кожн|lëkur)/.test(w)) return 'work';
+    if (/(елегант|деловн|балетанк|штикли|elegant|business|thekë)/.test(w)) return 'elegant';
+    if (/(зимск|чизм|winter|dimër|boots)/.test(w)) return 'winter';
+    if (/(летн|sandal|summer|verore|лето)/.test(w)) return 'summer';
+    if (/(детск|деца|kids|fëmij)/.test(w)) return 'kids';
+    if (/(секојдневн|everyday|daily|обичн)/.test(w)) return 'everyday';
+    return null;
+  }
+  function detectActivity(n) {
+    const w = n.raw + ' ' + n.cyr;
+    if (/(стое|стојам|стоиш|стој|standing|qëndro)/.test(w)) return 'stand';
+    if (/(одам|одењ|хода|walk|ecje|ec)/.test(w)) return 'walk';
+    if (/(комбинир|двете|both|mix|të dyja)/.test(w)) return 'mix';
+    return null;
+  }
+  function detectPriority(n) {
+    const w = n.raw + ' ' + n.cyr;
+    if (/(удобност|comfort|rehat)/.test(w)) return 'comfort';
+    if (/(поддршк|стабилн|support|stabilit)/.test(w)) return 'support';
+    if (/(двете|both|të dyja)/.test(w)) return 'both';
+    return null;
+  }
+
+  function funnelAnswersToSignals(answers) {
+    const signals = [];
+    const add = function (s) { signals.push(s); };
+    if (answers.shoe === 'sport') { add('sports'); add('sport_shoe'); }
+    if (answers.shoe === 'work') { add('work_shoe'); add('standing'); }
+    if (answers.shoe === 'elegant') { add('elegant_shoe'); }
+    if (answers.shoe === 'winter') { add('winter'); add('winter_shoe'); }
+    if (answers.shoe === 'summer') { add('summer'); add('summer_shoe'); }
+    if (answers.shoe === 'kids') { add('kids'); }
+    if (answers.shoe === 'everyday') { add('daily'); add('everyday_shoe'); }
+    if (answers.activity === 'stand') { add('standing'); }
+    if (answers.activity === 'walk') { add('walking'); }
+    if (answers.activity === 'mix') { add('standing'); add('walking'); }
+    if (answers.priority === 'comfort') { add('comfort'); }
+    if (answers.priority === 'support') { add('support'); }
+    if (answers.priority === 'both') { add('comfort'); add('support'); }
+    return Array.from(new Set(signals));
+  }
+
+  function processFunnel(n) {
+    const step = funnel.step;
+    let ans = null;
+    if (step === 'shoe') ans = detectShoe(n);
+    else if (step === 'activity') ans = detectActivity(n);
+    else if (step === 'priority') ans = detectPriority(n);
+    if (!ans) return null;
+    funnel.answers[step] = ans;
+    if (step === 'shoe') {
+      funnel.step = 'activity';
+      return { text: FUNNEL_STEPS.activity.q, chips: FUNNEL_STEPS.activity.chips };
+    }
+    if (step === 'activity') {
+      funnel.step = 'priority';
+      return { text: FUNNEL_STEPS.priority.q, chips: FUNNEL_STEPS.priority.chips };
+    }
+    if (step === 'priority') {
+      const signals = funnelAnswersToSignals(funnel.answers);
+      const scored = Object.keys(PRODUCT_ATTRS).map(function (slug) { return { slug: slug, score: scoreProduct(slug, signals) }; });
+      scored.sort(function (a, b) { return b.score - a.score; });
+      const top = scored.slice(0, 3);
+      const maxS = Math.max(1, top[0].score);
+      top.forEach(function (r) { r.pct = Math.round(r.score / maxS * 100); });
+      funnel = null; clarifyState = null;
+      return recResult(t('🎯 Препорака за вас', '🎯 Rekomandim për ju', '🎯 Recommendation for you'), recExplain(top, signals), top);
+    }
+    return null;
+  }
+
+  function hasStrongOtherIntent(n) {
+    for (let i = 0; i < FAQ.length; i++) {
+      let s = 0;
+      FAQ[i].kw.forEach(function (k) { s += kwScore(n.words, k); });
+      if (s >= 5) return true;
+    }
+    const strongIds = { delivery: 1, payment: 1, sizes: 1, care: 1, contact: 1, guide: 1 };
+    for (let j = 0; j < INTENTS.length; j++) {
+      const int = INTENTS[j];
+      if (!strongIds[int.id]) continue;
+      let s = 0;
+      int.kw.forEach(function (k) { s += kwScore(n.words, k); });
+      if (s >= 5) return true;
+    }
+    return false;
+  }
+
+  function matchAnyInWords(n, kw) {
+    const all = (n.raw + ' ' + n.cyr).split(/\s+/).filter(Boolean);
+    for (let i = 0; i < all.length; i++) {
+      if (matchAny(all[i], kw)) return true;
+    }
+    return false;
+  }
+
   function answer(text) {
     const n = normalize(text);
+    // 0) Медицински теми → НЕ даваме дијагноза (спецификација #10)
+    const medHit = MEDICAL_KW.some(function (k) { return matchAnyInWords(n, k); });
+    if (medHit) {
+      funnel = null; clarifyState = null;
+      return {
+        text: t(
+          'Не можам да поставам медицинска дијагноза. 😊 Оваа влошка е наменета за поддршка/амортизација според карактеристиките наведени за производот. За сериозна, постојана или влошувачка болка препорачуваме консултација со лекар.',
+          'Nuk mund të bëj diagnozë mjekësore. 😊 Ky taban është i destinuar për mbështetje/amortizim sipas karakteristikave të produktit. Për dhimbje serioze, të vazhdueshme ose në përkeqësim rekomandojmë konsultim me mjekun.',
+          'I cannot make a medical diagnosis. 😊 This insole is designed for support/cushioning per the product characteristics. For serious, persistent or worsening pain we recommend consulting a doctor.'),
+        chips: [{ label: t('📞 Контакт', '📞 Kontakt', '📞 Contact'), q: 'контакт' }]
+      };
+    }
+    // 0.5) Активен funnel → обработи го одговорот на клиентот
+    if (funnel) {
+      const fr = processFunnel(n);
+      if (fr) return fr;
+      if (hasStrongOtherIntent(n) || findModel(n)) {
+        funnel = null;
+      } else {
+        const st = FUNNEL_STEPS[funnel.step];
+        return { text: t('Не те разбрав точно. ', 'Nuk të kuptova saktësisht. ', 'I did not understand exactly. ') + st.q, chips: st.chips };
+      }
+    }
     // 1) Прво — FAQ (поконкретни прашања од сајтот)
     let bestFaq = null, bestFaqScore = 0;
     FAQ.forEach(function (f) {
@@ -467,6 +752,12 @@
     if (bestFaq && bestFaqScore > 0) {
       clarifyState = null;
       return { text: bestFaq.q + '\n' + bestFaq.a };
+    }
+    // 1.2) Генеричко „сакам влошки" → започни продажен funnel (2-4 прашања)
+    if (isGenericShopping(n)) {
+      funnel = { step: 'shoe', answers: {} };
+      clarifyState = null;
+      return { text: FUNNEL_STEPS.shoe.q, chips: FUNNEL_STEPS.shoe.chips };
     }
     // 1.5) Препораки — врз основа на потребата (умор, болка, спорт, сезона...)
     let bestRec = null, bestRecScore = 0;
@@ -485,7 +776,7 @@
         return { text: bestRec.clarify || bestRec.text, chips: [] };
       }
       clarifyState = null;
-      return buildRec(bestRec);
+      return buildRec(bestRec, n);
     }
     clarifyState = null;
     // 2) Потоа — општи намери
@@ -551,8 +842,9 @@
     '.b-thumbs{display:flex;flex-wrap:wrap;gap:10px;margin:4px 0;}',
     '.b-thumb{width:calc(50% - 5px);min-width:120px;background:#fff;border:1px solid #efe9e6;border-radius:12px;overflow:hidden;cursor:pointer;transition:transform .14s ease,box-shadow .14s ease;}',
     '.b-thumb:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.08);}',
-    '.b-thumb__img{aspect-ratio:4/3;overflow:hidden;}',
+    '.b-thumb__img{aspect-ratio:4/3;overflow:hidden;position:relative;}',
     '.b-thumb__img img{display:block;width:100%;height:100%;object-fit:cover;}',
+    '.b-thumb__match{position:absolute;top:6px;right:6px;background:#EC1752;color:#fff;font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:999px;box-shadow:0 2px 8px rgba(236,23,82,.4);}',
     '.b-thumb__name{font-size:11.5px;font-weight:700;padding:6px 8px 0;line-height:1.2;}',
     '.b-thumb__price{font-size:11.5px;font-weight:800;padding:2px 8px 8px;color:#17171c;}',
     '.b-rec__hint{font-size:11px;color:#9a918b;margin-top:8px;}',
