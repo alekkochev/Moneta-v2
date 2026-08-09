@@ -30,27 +30,9 @@
 <link rel="icon" type="image/svg+xml" href="./images/favicon/favicon.svg"/>
 <link rel="stylesheet" href="./styles.css?v=20260813"/>
 <style>
-/* Неонски пулсирачки наслов за акциската страна */
-.akcija-hero__title {
-  text-align: center;
-  font-size: clamp(28px,5vw,48px);
-  font-weight:800;
-  padding: 40px 16px 8px;
-  color: #EC1752;
-  animation: akcijaNeonPulse 1.8s ease-in-out infinite;
-}
-@keyframes akcijaNeonPulse {
-  0%,100%{text-shadow:0 0 7px rgba(236,23,82,.4),0 0 14px rgba(236,23,82,.2);}
-  50%{text-shadow:0 0 14px rgba(236,23,82,.7),0 0 28px rgba(236,23,82,.4),0 0 42px rgba(236,23,82,.15);}
-}
-.akcija-hero__sub {
-  text-align:center;
-  font-size:15px;
-  color:#5a5552;
-  padding:0 16px 24px;
-  max-width:600px;
-  margin:0 auto;
-}
+.akcija-hero__title{text-align:center;font-size:clamp(28px,5vw,48px);font-weight:800;padding:40px 16px 8px;color:#EC1752;animation:akcijaNeonPulse 1.8s ease-in-out infinite;}
+@keyframes akcijaNeonPulse{0%,100%{text-shadow:0 0 7px rgba(236,23,82,.4),0 0 14px rgba(236,23,82,.2);}50%{text-shadow:0 0 14px rgba(236,23,82,.7),0 0 28px rgba(236,23,82,.4),0 0 42px rgba(236,23,82,.15);}}
+.akcija-hero__sub{text-align:center;font-size:15px;color:#5a5552;padding:0 16px 24px;max-width:600px;margin:0 auto;}
 .akcija-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;padding:16px 24px 48px;max-width:1200px;margin:0 auto;}
 .akcija-card{background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.08);transition:transform .2s,box-shadow .2s;position:relative;}
 .akcija-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.14);}
@@ -111,77 +93,49 @@
     <div class="footer__col"><strong>Контакт:</strong><p>Скопје, ул. св. Кирил и Методиј бр. 20</p><p><a href="tel:+38976454957">+389 76 454 957</a> / <a href="tel:+38923230088">+389 2 323 00 88</a></p><p><a href="mailto:info@calivita.mk">info@calivita.mk</a></p><p>МАК-ФИТ ДООЕЛ (Calivita)</p></div>
     <div class="footer__col"><img src="./images/moneta-logo.svg" alt="MONETA" width="100"><p>© 2026 МОНЕТА. Сите права задржани.</p><p>Секој чекор заслужува удобност.</p></div>
     <div class="footer__col"><a href="./index.html#prednosti">За нас</a> · <a href="./index.html#kontakt">Контакт</a> · <a href="./dostava.html">Достава и плаќање</a><br><a href="./uslovi.html">Услови</a> · <a href="./uslovi.html#privatnost">Приватност</a></div>
-    <div class="footer__social"><a href="https://www.facebook.com/insoles.mk" target="_blank" rel="noopener noreferrer nofollow" class="social__link social__link--facebook">FB</a><a href="https://www.instagram.com/moneta_makedonija/" target="_blank" rel="noopener noreferrer nofollow" class="social__link social__link--instagram">IG</a></div>
+    <div class="footer__social"><a href="https://www.facebook.com/insoles.mk" target="_blank" rel="noopener noreferrer nofollow">FB</a> <a href="https://www.instagram.com/moneta_makedonija/" target="_blank" rel="noopener noreferrer nofollow">IG</a></div>
   </div>
 </footer>
 
 <script src="./script.js" defer></script>
 <script src="./chatbot.js?v=14" defer></script>
 <script>
-// Динамично полнење на акциски производи од Supabase (MonetaData)
 (function(){
-  function renderGrid() {
-    var grid = document.getElementById('akcijaGrid');
-    if (!grid) return;
-    var prods = (window.MonetaData && window.MonetaData.products) || {};
-    var discounted = [];
+  function renderGrid(){
+    var grid=document.getElementById('akcijaGrid');
+    if(!grid)return;
+    var prods=(window.MonetaData&&window.MonetaData.products)||{};
+    var discounted=[];
     Object.keys(prods).forEach(function(slug){
-      var p = prods[slug];
-      var price = Number(p.price) || 0;
-      var oldPrice = Number(p.old_price) || 0;
-      var discCol = Number(p.discount) || 0;
-      var discPct = 0;
-      if (oldPrice > price && oldPrice > 0) {
-        discPct = Math.round((1 - price / oldPrice) * 100);
-      } else if (discCol > 0) {
-        discPct = discCol < 100 ? discCol : Math.round(discCol / price * 100);
-        oldPrice = discPct > 0 ? Math.round(price / (1 - discPct / 100)) : 0;
-      }
-      if (discPct > 0) {
-        discounted.push({
-          slug: slug,
-          name: p.name_mk || slug,
-          price: price,
-          oldPrice: oldPrice,
-          discPct: discPct,
-          image: p.image || ('./images/cards/' + slug + '.webp')
-        });
-      }
+      var p=prods[slug];
+      var price=Number(p.price)||0;
+      var oldPrice=Number(p.old_price)||0;
+      var discCol=Number(p.discount)||0;
+      var discPct=0;
+      if(oldPrice>price&&oldPrice>0){discPct=Math.round((1-price/oldPrice)*100);}
+      else if(discCol>0){discPct=discCol<100?discCol:Math.round(discCol/price*100);oldPrice=discPct>0?Math.round(price/(1-discPct/100)):0;}
+      if(discPct>0){discounted.push({slug:slug,name:p.name_mk||slug,price:price,oldPrice:oldPrice,discPct:discPct,image:p.image||('./images/cards/'+slug+'.webp')});}
     });
-    discounted.sort(function(a,b){ return b.discPct - a.discPct; });
-
-    if (!discounted.length) {
-      grid.innerHTML = '<div class="akcija-empty">🎯 Моментално нема активни попусти. Проверете повторно наскоро!</div>';
-      return;
-    }
-    var html = '';
+    discounted.sort(function(a,b){return b.discPct-a.discPct;});
+    if(!discounted.length){grid.innerHTML='<div class="akcija-empty">🎯 Моментално нема активни попусти. Проверете повторно наскоро!</div>';return;}
+    var html='';
     discounted.forEach(function(d){
-      html += '<div class="akcija-card">'
-        + '<a href="./modeli/' + d.slug + '.html"><img class="akcija-card__img" src="' + d.image + '" alt="' + d.name + '" loading="lazy"></a>'
-        + '<div class="akcija-card__discount">-' + d.discPct + '%</div>'
-        + '<div class="akcija-card__body">'
-        + '<div class="akcija-card__name">' + d.name + '</div>'
-        + '<div class="akcija-card__prices">'
-        + (d.oldPrice ? '<span class="akcija-card__old">' + d.oldPrice.toLocaleString('mk-MK') + ' ден.</span>' : '')
-        + '<span class="akcija-card__price">' + d.price.toLocaleString('mk-MK') + ' ден.</span>'
-        + '</div>'
-        + '<a class="akcija-card__btn" href="./modeli/' + d.slug + '.html">Види повеќе →</a>'
-        + '</div></div>';
+      html+='<div class="akcija-card">'
+        +'<a href="./modeli/'+d.slug+'.html"><img class="akcija-card__img" src="'+d.image+'" alt="'+d.name+'" loading="lazy"></a>'
+        +'<div class="akcija-card__discount">-'+d.discPct+'%</div>'
+        +'<div class="akcija-card__body">'
+        +'<div class="akcija-card__name">'+d.name+'</div>'
+        +'<div class="akcija-card__prices">'
+        +(d.oldPrice?'<span class="akcija-card__old">'+d.oldPrice.toLocaleString('mk-MK')+' ден.</span>':'')
+        +'<span class="akcija-card__price">'+d.price.toLocaleString('mk-MK')+' ден.</span>'
+        +'</div>'
+        +'<a class="akcija-card__btn" href="./modeli/'+d.slug+'.html">Види повеќе →</a>'
+        +'</div></div>';
     });
-    grid.innerHTML = html;
+    grid.innerHTML=html;
   }
-
-  if (window.MonetaData && window.MonetaData.ready) {
-    window.MonetaData.ready.then(renderGrid);
-  } else {
-    var iv = setInterval(function(){
-      if (window.MonetaData && Object.keys(window.MonetaData.products||{}).length) {
-        clearInterval(iv);
-        renderGrid();
-      }
-    }, 300);
-    setTimeout(function(){ clearInterval(iv); renderGrid(); }, 5000);
-  }
+  if(window.MonetaData&&window.MonetaData.ready){window.MonetaData.ready.then(renderGrid);}
+  else{var iv=setInterval(function(){if(window.MonetaData&&Object.keys(window.MonetaData.products||{}).length){clearInterval(iv);renderGrid();}},300);setTimeout(function(){clearInterval(iv);renderGrid();},5000);}
 })();
 </script>
 </body>
