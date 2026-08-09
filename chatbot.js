@@ -526,11 +526,11 @@
     const m = modelData(top.slug);
     const a = PRODUCT_ATTRS[top.slug] || {};
     const sigHuman = (signals || []).map(function (s) { return SIGNAL_LABELS[s]; }).filter(Boolean).join(', ');
-    const pct = top.pct != null ? top.pct : 100;
+    const pct = '';
     const benefits = (Array.isArray(m.specs) && m.specs.length ? m.specs.slice(0, 3).join(', ') : (a.tech || '')).replace(/\.$/, '');
     const reason = (m.desc || '').replace(/\.$/, '');
     return t(
-      'Според тоа што ми кажавте — ' + (sigHuman || 'вашите потреби') + ' — најмногу би ви ја препорачал ' + m.name + ' (' + pct + '% совпаѓање). Причина: ' + reason + '. За вас особено се важни: ' + benefits + '.',
+      'Според тоа што ми кажавте — ' + (sigHuman || 'вашите потреби') + ' — најмногу би ви ја препорачал ' + m.name + '. Причина: ' + reason + '. За вас особено се важни: ' + benefits + '.',
       'Sipas asaj që më thatë — ' + (sigHuman || 'nevojat tuaja') + ' — më shumë do t\'ju rekomandoja ' + m.name + ' (' + pct + '% përputhje). Arsyeja: ' + reason + '. Për ju veçanërisht: ' + benefits + '.',
       'Based on what you told me — ' + (sigHuman || 'your needs') + ' — I would most recommend ' + m.name + ' (' + pct + '% match). Reason: ' + reason + '. Especially important for you: ' + benefits + '.'
     );
@@ -543,16 +543,14 @@
     const chips = [];
     ranked.forEach(function (r) {
       const m = modelData(r.slug);
-      const pct = r.pct != null ? '<div class="b-thumb__match">' + r.pct + '%</div>' : '';
       thumbs += '<div class="b-thumb" data-model="' + esc(r.slug) + '">'
-        + '<div class="b-thumb__img"><img src="' + base + 'images/cards/' + r.slug + '.webp" alt="' + esc(m.name) + '" loading="lazy" data-zoom="' + esc(r.slug) + '">' + pct + '</div>'
+        + '<div class="b-thumb__img"><img src="' + base + 'images/cards/' + r.slug + '.webp" alt="' + esc(m.name) + '" loading="lazy" data-zoom="' + esc(r.slug) + '"></div>'
         + '<div class="b-thumb__info">'
         + '<div class="b-thumb__name">' + esc(m.name) + '</div>'
         + '<div class="b-thumb__price">' + (m.price ? m.price.toLocaleString('mk-MK') + ' ден.' : '') + '</div>'
         + '<div class="b-thumb__desc">' + esc((m.desc || '').slice(0, 55)) + '</div>'
         + '</div>'
         + '</div>';
-      chips.push({ label: m.name, q: r.slug });
     });
     thumbs += '</div>';
     return {
@@ -560,9 +558,9 @@
         + '<div class="b-rec__title">' + esc(title) + '</div>'
         + '<div class="b-rec__text">' + esc(text) + '</div>'
         + thumbs
-        + '<div class="b-rec__hint">' + esc(t('Кликни на сликичка за детали, додавање во кошничка или зголемување.', 'Kliko foton për detaje, shtim në shportë ose zmadhim.', 'Click a thumbnail for details, adding to cart or zoom.')) + '</div>'
+        + '<div class="b-rec__hint">' + esc(t('Кликни на сликичка за детали и додавање во кошничка.', 'Kliko foton për detaje dhe shtim në shportë.', 'Click a thumbnail for details and adding to cart.')) + '</div>'
         + '</div>',
-      chips: chips
+      chips: []
     };
   }
 
@@ -824,11 +822,13 @@
     '#monetaBotWin.is-open{display:flex;animation:botIn .22s ease;}',
     '@keyframes botIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}',
     '#monetaBotHead{background:linear-gradient(135deg,#EC1752,#C4123F);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;}',
-    '#monetaBotHead .b-avatar{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:17px;}',
+    '#monetaBotHead .b-m-logo{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff;animation:mPulse 2s ease-in-out infinite;}',
+    '@keyframes mPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}',
+    '#monetaBotHead .b-avatar{display:none;}',
     '#monetaBotHead .b-title{font-weight:800;font-size:15px;line-height:1.2;}',
     '#monetaBotHead .b-sub{font-size:11px;opacity:.85;}',
     '#monetaBotHead .b-close{margin-left:auto;background:none;border:none;color:#fff;font-size:20px;cursor:pointer;line-height:1;}',
-    '#monetaBotBody{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;background:#faf7f6;}',
+    '#monetaBotBody{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:14px;display:flex;flex-direction:column;gap:10px;background:#faf7f6;}',
     '.b-msg{max-width:82%;padding:10px 13px;border-radius:16px;font-size:13.5px;line-height:1.45;white-space:pre-line;}',
     '.b-msg.b-bot{background:#fff;border:1px solid #efe9e6;border-bottom-left-radius:5px;align-self:flex-start;}',
     '.b-msg.b-user{background:linear-gradient(135deg,#EC1752,#C4123F);color:#fff;border-bottom-right-radius:5px;align-self:flex-end;}',
@@ -847,7 +847,7 @@
     '.b-thumb:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.07);}',
     '.b-thumb__img{width:64px;height:64px;flex-shrink:0;border-radius:10px;overflow:hidden;position:relative;}',
     '.b-thumb__img img{display:block;width:100%;height:100%;object-fit:cover;}',
-    '.b-thumb__match{position:absolute;top:3px;right:3px;background:#EC1752;color:#fff;font-size:10px;font-weight:600;padding:2px 6px;border-radius:999px;box-shadow:0 2px 6px rgba(236,23,82,.35);}',
+    '.b-thumb__match{display:none;}',
     '.b-thumb__info{flex:1;min-width:0;}',
     '.b-thumb__name{font-size:12.5px;font-weight:600;line-height:1.2;}',
     '.b-thumb__price{font-size:12px;font-weight:600;color:#17171c;margin-top:2px;}',
@@ -895,11 +895,13 @@
   }
 
   const TPL = [
+    '<div id="monetaBotBackdrop" style="display:none;position:fixed;inset:0;z-index:9989;"></div>',
     '<button id="monetaBotBtn" aria-label="МОНЕТА асистент" title="МОНЕТА асистент">',
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
     '</button>',
     '<div id="monetaBotWin" role="dialog" aria-label="МОНЕТА асистент">',
     '<div id="monetaBotHead">',
+    '<span class="b-m-logo">M</span>',
     '<span class="b-avatar">🤖</span>',
     '<div><div class="b-title" data-b="title">МОНЕТА асистент</div><div class="b-sub" data-b="sub">Одговара веднаш · 24/7</div></div>',
     '<button class="b-close" id="monetaBotClose" aria-label="Затвори">×</button>',
@@ -975,9 +977,10 @@
     }
 
     function open() {
-      document.body.style.overflow = 'hidden';
       win.classList.add('is-open');
       btn.classList.add('is-open');
+      const bd = document.getElementById('monetaBotBackdrop');
+      if (bd) bd.style.display = 'block';
       if (first) {
         first = false;
         typing(function () {
@@ -990,9 +993,10 @@
       input.focus();
     }
     function closeWin() {
-      document.body.style.overflow = '';
       win.classList.remove('is-open');
       btn.classList.remove('is-open');
+      const bd = document.getElementById('monetaBotBackdrop');
+      if (bd) bd.style.display = 'none';
     }
     function ask(text) {
       const q = String(text || '').trim();
@@ -1137,6 +1141,8 @@
     btn.addEventListener('click', function () {
       if (win.classList.contains('is-open')) closeWin(); else open();
     });
+    const backdrop = document.getElementById('monetaBotBackdrop');
+    if (backdrop) backdrop.addEventListener('click', closeWin);
     close.addEventListener('click', closeWin);
     send.addEventListener('click', function () { ask(input.value); });
     input.addEventListener('keydown', function (e) { if (e.key === 'Enter') ask(input.value); });
