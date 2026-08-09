@@ -619,6 +619,19 @@
     });
   }
 
+  const SIZE_QUERY_KW = ['mm', 'cm', 'милиметр', 'сантиметр', 'должина', 'измер', 'мерењ', 'стопал', 'големина на ног', 'големина на стапал', 'број од', 'бројка', 'долж', 'measure', 'foot size', 'shoe size', 'size chart', 'sizing', 'за noga', 'kolku mm', 'santimetr', 'madhës'];
+  const SIZE_GUIDE_MSG = t(
+    '📏 За да ја одредите вистинската големина, измерете ја должината на стапалото во милиметри (од пета до најдолгиот прст). Потоа проверете ја табелата во МОНЕТА водичот за големини — таму се мапирани должините со европските броеви (35-46).\n🔗 vodic.html#golemini',
+    '📏 Për të përcaktuar madhësinë e duhur, matni gjatësinë e këmbës në milimetra (nga thembra te gishti më i gjatë). Më pas kontrolloni tabelën në udhëzuesin MONETA për madhësi — aty janë të mapuara gjatësitë me numrat evropianë (35-46).\n🔗 vodic.html#golemini',
+    '📏 To determine the right size, measure your foot length in millimeters (from heel to longest toe). Then check the table in the MONETA size guide — lengths are mapped to European sizes (35-46).\n🔗 vodic.html#golemini');
+
+  function isSizeQuery(n) {
+    const haystack = n.raw + ' ' + n.cyr;
+    return SIZE_QUERY_KW.some(function (k) {
+      return haystack.indexOf(k) !== -1;
+    });
+  }
+
   function detectShoe(n) {
     const w = n.raw + ' ' + n.cyr;
     if (/(спортск|патик|sport|atlete|trча|run|vrap)/.test(w)) return 'sport';
@@ -742,6 +755,11 @@
         const st = FUNNEL_STEPS[funnel.step];
         return { text: t('Не те разбрав точно. ', 'Nuk të kuptova saktësisht. ', 'I did not understand exactly. ') + st.q, chips: st.chips };
       }
+    }
+    // 0.7) Прашање за големина/мерење → директно до водичот за големини
+    if (isSizeQuery(n)) {
+      clarifyState = null; funnel = null;
+      return { text: SIZE_GUIDE_MSG, chips: [] };
     }
     // 1) Прво — FAQ (поконкретни прашања од сајтот)
     let bestFaq = null, bestFaqScore = 0;

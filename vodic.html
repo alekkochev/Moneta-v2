@@ -576,7 +576,7 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
 
     <!-- ===== SCRIPTS ===== -->
     <script src="./vendor/aos.js" defer></script>
-    <script src="./chatbot.js?v=8" defer></script>
+    <script src="./chatbot.js?v=9" defer></script>
     <script src="./script.js?v=20260812" defer></script>
     <!-- Водич — логика на табови -->
     <script>
@@ -604,6 +604,128 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
             var hash = (location.hash || '').replace('#', '');
             if (VALID.indexOf(hash) === -1) hash = 'vodic';
             activate(hash);
+        })();
+
+        // ======== КАЛКУЛАТОР ЗА ГОЛЕМИНИ (реално време) ========
+        (function () {
+            var sizeInput = document.getElementById('customSizeInput');
+            var lenInput = document.getElementById('customLenInput');
+            var badge = document.getElementById('customSizeBadge');
+            var unitToggle = document.getElementById('lenUnitToggle');
+            var sizePills = document.getElementById('sizePills');
+            var currentUnit = 'mm';
+
+            // Табела: EU големина → должина на стапало (мм)
+            var SIZE_TABLE = [
+                { eu: 28, mm: 170 }, { eu: 29, mm: 177 }, { eu: 30, mm: 183 },
+                { eu: 31, mm: 190 }, { eu: 32, mm: 197 }, { eu: 33, mm: 203 },
+                { eu: 34, mm: 210 },
+                { eu: 35, mm: 225 }, { eu: 36, mm: 232 }, { eu: 37, mm: 240 },
+                { eu: 38, mm: 247 }, { eu: 39, mm: 255 }, { eu: 40, mm: 260 },
+                { eu: 41, mm: 267 }, { eu: 42, mm: 274 }, { eu: 43, mm: 280 },
+                { eu: 44, mm: 287 }, { eu: 45, mm: 295 }, { eu: 46, mm: 302 }
+            ];
+
+            function mmToEU(mm) {
+                var closest = SIZE_TABLE[0];
+                var minDiff = Math.abs(mm - closest.mm);
+                for (var i = 1; i < SIZE_TABLE.length; i++) {
+                    var diff = Math.abs(mm - SIZE_TABLE[i].mm);
+                    if (diff < minDiff) { minDiff = diff; closest = SIZE_TABLE[i]; }
+                }
+                return closest;
+            }
+
+            function euToMM(eu) {
+                for (var i = 0; i < SIZE_TABLE.length; i++) {
+                    if (SIZE_TABLE[i].eu >= eu) return SIZE_TABLE[i];
+                }
+                return SIZE_TABLE[SIZE_TABLE.length - 1];
+            }
+
+            function selectSizePill(eu) {
+                if (!sizePills) return;
+                var pills = sizePills.querySelectorAll('.size-pill');
+                pills.forEach(function (p) { p.classList.remove('is-active'); });
+                var rangeMap = {
+                    '28-34': [28, 34], '35-36': [35, 36], '37-38': [37, 38],
+                    '39-40': [39, 40], '41-42': [41, 42], '43-44': [43, 44],
+                    '45-46': [45, 46]
+                };
+                pills.forEach(function (p) {
+                    var r = rangeMap[p.dataset.size];
+                    if (r && eu >= r[0] && eu <= r[1]) p.classList.add('is-active');
+                });
+            }
+
+            // Внес на EU големина → конвертирај во mm
+            if (sizeInput) {
+                sizeInput.addEventListener('input', function () {
+                    var eu = parseFloat(this.value);
+                    if (isNaN(eu) || eu < 20 || eu > 48) { if(badge) badge.textContent = ''; return; }
+                    var info = euToMM(eu);
+                    lenInput.value = info.mm;
+                    if(badge) badge.textContent = 'EU ' + info.eu + ' \u00A0|\u00A0 \u2248 ' + (info.mm / 10).toFixed(1) + ' cm (' + info.mm + ' mm)';
+                    selectSizePill(info.eu);
+                });
+            }
+
+            // Внес на должина (mm/cm) → конвертирај во EU
+            if (lenInput) {
+                lenInput.addEventListener('input', function () {
+                    var val = parseFloat(this.value);
+                    if (isNaN(val) || val < 100) { if(badge) badge.textContent = ''; return; }
+                    var mm = currentUnit === 'cm' ? Math.round(val * 10) : Math.round(val);
+                    var info = mmToEU(mm);
+                    sizeInput.value = info.eu;
+                    if(badge) badge.textContent = 'EU ' + info.eu + ' \u00A0|\u00A0 \u2248 ' + (info.mm / 10).toFixed(1) + ' cm (' + info.mm + ' mm)';
+                    selectSizePill(info.eu);
+                });
+            }
+
+            // Toggle mm ↔ cm
+            if (unitToggle) {
+                unitToggle.addEventListener('click', function (e) {
+                    var btn = e.target.closest('.size-finder__unit');
+                    if (!btn) return;
+                    var newUnit = btn.dataset.unit;
+                    if (newUnit === currentUnit) return;
+                    currentUnit = newUnit;
+                    var btns = unitToggle.querySelectorAll('.size-finder__unit');
+                    btns.forEach(function (b) { b.classList.toggle('is-active', b.dataset.unit === currentUnit); });
+                    // Конвертирај ја моменталната вредност
+                    var curVal = parseFloat(lenInput.value);
+                    if (!isNaN(curVal) && curVal > 0) {
+                        if (currentUnit === 'cm') {
+                            lenInput.value = (curVal / 10).toFixed(1);
+                            lenInput.step = '0.1';
+                        } else {
+                            lenInput.value = Math.round(curVal * 10);
+                            lenInput.step = '1';
+                        }
+                    } else {
+                        lenInput.placeholder = currentUnit === 'cm' ? '25.5' : '255';
+                        lenInput.step = currentUnit === 'cm' ? '0.1' : '1';
+                    }
+                    lenInput.focus();
+                });
+            }
+
+            // EU size pills
+            if (sizePills) {
+                sizePills.addEventListener('click', function (e) {
+                    var pill = e.target.closest('.size-pill');
+                    if (!pill) return;
+                    var range = pill.dataset.size.split('-');
+                    var mid = (parseInt(range[0]) + parseInt(range[1])) / 2;
+                    var info = euToMM(mid);
+                    sizeInput.value = info.eu;
+                    lenInput.value = info.mm;
+                    updateBadge(info, info.mm);
+                    sizePills.querySelectorAll('.size-pill').forEach(function (p) { p.classList.remove('is-active'); });
+                    pill.classList.add('is-active');
+                });
+            }
         })();
     </script>
 </body>
