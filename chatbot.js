@@ -356,10 +356,13 @@
   }
 
   function imgPath(slug) {
-    // Ако има thumbnail во MonetaData (од Supabase) → користи го
+    // Ако има thumbnail или image во MonetaData (од Supabase) → користи го
     const prods = (window.MonetaData && window.MonetaData.products) || {};
     const db = prods[slug];
-    if (db && db.thumbnail) return db.thumbnail;
+    if (db) {
+      if (db.image) return db.image; // постоечка колона во Supabase (точна патека)
+      if (db.thumbnail) return db.thumbnail; // нова колона
+    }
     // Инаку fallback на стандардната патека
     return (/\/modeli\//.test(window.location.pathname) ? '../' : './') + 'images/cards/' + slug + '.webp';
   }
