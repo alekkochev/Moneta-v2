@@ -197,7 +197,7 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
 
     <!-- ===== SCRIPTS ===== -->
     <script src="./vendor/aos.js" defer></script>
-    <script src="./script.js?v=20260810" defer></script>
+    <script src="./script.js?v=20260811" defer></script>
     <script>
         // ===== CART PAGE RENDER (prototype) =====
         document.addEventListener('DOMContentLoaded', () => {
@@ -257,7 +257,7 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
                             <button type="button" class="cart__thumb-remove" data-cart-remove data-size="${l.size}" aria-label="${isEn() ? 'Remove' : 'Отстрани'}" title="${isEn() ? 'Remove' : 'Отстрани'}"${inact ? ' disabled' : ''}>✕</button>
                         </div>
                         <div>
-                            <a href="./modeli/${l.slug}.html" class="cart__item-name">${isEn() ? l.nameEn : l.nameMk} — ${isEn() ? 'Size' : 'Број'} ${l.size || (isEn() ? 'Universal' : 'Универзална')}</a>
+                            <a href="./modeli/${l.slug}.html" class="cart__item-name">${isEn() ? l.nameEn : l.nameMk} — ${isEn() ? 'Size' : 'Бр.'} ${l.size || (isEn() ? 'Universal' : 'Универзална')}</a>
                             <div class="cart__item-code">${isEn() ? 'Code' : 'Код'}: ${l.code}</div>
                             <div class="cart__item-price">${fmt(l.price)} / ${isEn() ? 'pair' : 'пар'}</div>
                             <div class="cart__line-qty">${isEn() ? 'Quantity' : 'Количина'}: ${l.qty}</div>

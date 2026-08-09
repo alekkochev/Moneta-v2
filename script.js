@@ -335,28 +335,8 @@ if (typeof requestIdleCallback === 'function') {
 }
 
 // ========================================
-// KONTAKT FORMA HANDLER (LAZY EMAILJS)
+// KONTAKT FORMA HANDLER (RESEND преку Supabase edge function)
 // ========================================
-let emailjsPromise = null;
-function loadEmailJS() {
-    if (window.emailjs) return Promise.resolve(window.emailjs);
-    if (emailjsPromise) return emailjsPromise;
-    emailjsPromise = new Promise((resolve) => {
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
-        script.async = true;
-        script.onload = () => {
-            try {
-                if (window.emailjs) window.emailjs.init("KTMO1pZn_2I0wSyZf");
-            } catch (err) {}
-            resolve(window.emailjs || null);
-        };
-        script.onerror = () => resolve(null);
-        document.head.appendChild(script);
-    });
-    return emailjsPromise;
-}
-
 const kontaktForm = document.getElementById('kontaktForm');
 const kontaktFeedback = document.getElementById('kontaktFeedback');
 
@@ -404,28 +384,28 @@ if (kontaktForm) {
             kontaktForm.reset();
         };
 
-        const emailjsInstance = await loadEmailJS();
-        if (emailjsInstance) {
-            emailjsInstance.send(
-                "service_4ymilao",
-                "template_r5ysad8",
-                {
-                    name: name,
-                    email: email,
-                    phone: phone,
-                    message: message,
-                    title: "Контакт од веб"
-                }
-            )
-            .then(function() {
-                showSuccess();
-            })
-            .catch(function(error) {
-                console.warn('EmailJS sending error:', error);
-                showSuccess();
+        // Испраќање преку Resend (Supabase edge function contact-notify)
+        const sbUrl = String(window.MONETA_SUPABASE_URL || '').replace(/\/+$/, '');
+        try {
+            const res = await fetch(sbUrl + '/functions/v1/contact-notify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: name, email: email, phone: phone, message: message })
             });
-        } else {
-            showSuccess();
+            if (res.ok) {
+                showSuccess();
+            } else {
+                throw new Error('contact-notify status ' + res.status);
+            }
+        } catch (err) {
+            console.warn('Contact notify error:', err);
+            if (kontaktFeedback) {
+                kontaktFeedback.className = 'form__feedback is-error';
+                kontaktFeedback.innerHTML = `
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    <span>Настана грешка при испраќањето на пораката. Ве молиме обидете се повторно.</span>
+                `;
+            }
         }
     });
 }

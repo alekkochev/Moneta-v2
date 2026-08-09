@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF Test — Испратница-Фактура</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 0; padding: 16px; background: #f4f4f4; }
+  h1 { font-size: 18px; }
+  #status { font-size: 14px; margin: 8px 0; color: #333; }
+  #pdf { width: 100%; height: 92vh; border: 1px solid #ccc; background: #fff; }
+</style>
+</head>
+<body>
+<h1>PDF Test — Испратница-Фактура (лого)</h1>
+<div id="status">Генерирање...</div>
+<iframe id="pdf"></iframe>
+<script src="./invoice-pdf.js?v=4" defer></script>
+<script>
+  window.addEventListener('load', async () => {
+    const sample = {
+      name: 'Тест Купувач',
+      phone: '+389 70 123 456',
+      email: 'test@example.com',
+      city: 'Скопје',
+      address: 'ул. Македонија 10',
+      items: [
+        // РЕАЛНИ цени (синхронизирани со Supabase/HTML): MEMOSOLE=400, Active Gel=620
+        { name: 'MEMOSOLE — Мемориска влошка', sizes: { '41': 1, '42': 1 }, qty: 2, price: 400 },
+        { name: 'Active Gel — Гел влошка', sizes: { '40': 1 }, qty: 1, price: 620 }
+      ],
+      delivery: 0
+    };
+    try {
+      const res = await window.MonetaInvoice.build(sample, 0.18);
+      if (!res) throw new Error('build врати null');
+      const bin = atob(res.base64);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      const blob = new Blob([bytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      document.getElementById('pdf').src = url;
+      document.getElementById('status').textContent = 'OK — ' + res.invNo;
+    } catch (e) {
+      document.getElementById('status').textContent = 'ГРЕШКА: ' + e.message;
+    }
+  });
+</script>
+</body>
+</html>

@@ -193,9 +193,8 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
                         </label>
                     </div>
                     <button type="submit" class="hero__cta hero__cta--primary" style="width:100%">
-                        <span data-mk="Потврди ја нарачката ✓" data-sq="Konfirmo porosinë ✓" data-en="Confirm order ✓">Потврди ја нарачката ✓</span>
+                        <span data-mk="Потврди ја нарачката" data-sq="Konfirmo porosinë" data-en="Confirm order">Потврди ја нарачката</span>
                     </button>
-                    <p class="checkout__note" data-mk="Со кликнување на „Потврди ја нарачката" data-sq="Duke klikuar „Konfirmo porosinë" ја испраќате нарачката на info@calivita.mk." data-en="By clicking 'Confirm order' you send the order to info@calivita.mk.">Со кликнување на „Потврди ја нарачката" ја испраќате нарачката на info@calivita.mk.</p>
                 </form>
             </div>
 
@@ -251,9 +250,19 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
         </div>
     </footer>
 
+    <style>
+        /* Ознака на непополнети полиња (потврда на нарачка) */
+        .checkout__field input.is-invalid,
+        .checkout__field textarea.is-invalid {
+            border-color: rgba(236, 23, 82, 0.55) !important;
+            background-color: rgba(236, 23, 82, 0.07) !important;
+            box-shadow: 0 0 0 3px rgba(236, 23, 82, 0.12) !important;
+        }
+    </style>
+
     <!-- ===== SCRIPTS ===== -->
     <script src="./vendor/aos.js" defer></script>
-    <script src="./script.js?v=20260810" defer></script>
+    <script src="./script.js?v=20260811" defer></script>
     <script src="./invoice-pdf.js?v=20260809" defer></script>
     <script>
         // ===== CHECKOUT LOGIC (нарачка) =====
@@ -269,7 +278,7 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
                 const sizes = (it && it.sizes) || {};
                 return Object.entries(sizes)
                     .filter(([, q]) => q > 0)
-                    .map(([sz, q]) => `${isEn() ? 'Size' : 'Број'} ${sz || (isEn() ? 'Universal' : 'Универзална')} × ${q}`)
+                    .map(([sz, q]) => `${isEn() ? 'Size' : 'Бр.'} ${sz || (isEn() ? 'Universal' : 'Универзална')}${q > 1 ? ' × ' + q : ''}`)
                     .join(', ');
             };
 
@@ -305,9 +314,10 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
                 const grand = total + delivery;
 
                 summaryEl.innerHTML = rows.map((r) => {
+                    const qtyTxt = r.qty > 1 ? ` × ${r.qty}` : '';
                     const sizeTxt = r.size === null
-                        ? ` × ${r.qty}`
-                        : ` — ${isEn() ? 'Size' : 'Број'} ${r.size || (isEn() ? 'Universal' : 'Универзална')} × ${r.qty}`;
+                        ? qtyTxt
+                        : ` — ${isEn() ? 'Size' : 'Бр.'} ${r.size || (isEn() ? 'Universal' : 'Универзална')}${qtyTxt}`;
                     return `
                     <div class="checkout__summary-item">
                         <span class="n">${r.name}${sizeTxt}</span>
@@ -345,6 +355,12 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
                 });
             });
 
+            // Отстрани ја magenta ознаката штом корисникот почне да пишува
+            ['coName', 'coPhone', 'coCity', 'coAddress'].forEach((id) => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('input', () => el.classList.remove('is-invalid'));
+            });
+
             // Испраќање: mailto кон info@calivita.mk + потврда
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -356,8 +372,24 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
                 const note = document.getElementById('coNote').value.trim();
                 const marketingChecked = !!(document.getElementById('coMarketing') && document.getElementById('coMarketing').checked);
                 const termsChecked = !!(document.getElementById('coTerms') && document.getElementById('coTerms').checked);
-                if (!name || !phone || !city || !address) {
+                // Означи ги непополнетите полиња со бледа magenta боја
+                const requiredFields = [
+                    ['coName', name],
+                    ['coPhone', phone],
+                    ['coCity', city],
+                    ['coAddress', address]
+                ];
+                const missingFields = [];
+                requiredFields.forEach(([id, val]) => {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+                    if (val) { el.classList.remove('is-invalid'); }
+                    else { el.classList.add('is-invalid'); missingFields.push(el); }
+                });
+                if (missingFields.length > 0) {
                     alert(isEn() ? 'Please fill in all required fields.' : 'Ве молиме пополнете ги сите задолжителни полиња.');
+                    missingFields[0].focus();
+                    missingFields[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
                     return;
                 }
                 if (!termsChecked) {
