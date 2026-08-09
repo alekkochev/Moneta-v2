@@ -24,7 +24,7 @@
     if (window.MonetaData && window.MonetaData.products && Object.keys(window.MonetaData.products).length) return;
     var SUPABASE_URL = 'https://wkpkrnjrtpywuzemirbw.supabase.co';
     var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndrcHBybmpydHB5d3V6ZW1pcmJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQyMjYzNjgsImV4cCI6MjA1OTgwMjM2OH0.fGkOnLxqcoyBxfhTsFAVmf0Fw4Gq0Z7QyVWomxWvkVg'; // анонимен public key — безбедно за front-end
-    fetch(SUPABASE_URL + '/rest/v1/products?select=slug,name_mk,name_en,code,price,old_price,discount', {
+    fetch(SUPABASE_URL + '/rest/v1/products?select=slug,name_mk,name_en,code,price,old_price,discount,thumbnail', {
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
     })
     .then(function (r) { return r.json(); })
@@ -334,6 +334,7 @@
       price: price,
       oldPrice: oldPrice,
       discountPct: discPct,
+      thumbnail: (db && db.thumbnail) || null,
       cat: d.cat,
       tag: d.tag[li] || '',
       desc: d.desc[li] || '',
@@ -355,6 +356,11 @@
   }
 
   function imgPath(slug) {
+    // Ако има thumbnail во MonetaData (од Supabase) → користи го
+    const prods = (window.MonetaData && window.MonetaData.products) || {};
+    const db = prods[slug];
+    if (db && db.thumbnail) return db.thumbnail;
+    // Инаку fallback на стандардната патека
     return (/\/modeli\//.test(window.location.pathname) ? '../' : './') + 'images/cards/' + slug + '.webp';
   }
 
@@ -640,7 +646,7 @@
           + m.price.toLocaleString('mk-MK') + ' ден.';
       }
       thumbs += '<div class="b-thumb" data-model="' + esc(r.slug) + '">'
-        + '<div class="b-thumb__img"><img src="' + base + 'images/cards/' + r.slug + '.webp" alt="' + esc(m.name) + '" loading="lazy" data-zoom="' + esc(r.slug) + '">' + discBadge + '</div>'
+        + '<div class="b-thumb__img"><img src="' + imgPath(r.slug) + '" alt="' + esc(m.name) + '" loading="lazy" data-zoom="' + esc(r.slug) + '">' + discBadge + '</div>'
         + '<div class="b-thumb__info">'
         + '<div class="b-thumb__name">' + esc(m.name) + '</div>'
         + '<div class="b-thumb__price">' + priceHtml + '</div>'
