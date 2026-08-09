@@ -119,29 +119,50 @@
     { id: 'heelpad', link: './heelpad.html' }
   ];
 
-  // Кратки описи на модели (дополнително на живите цени од Supabase)
-  const MODEL_HIGHLIGHTS = {
-    'active-gel': 'Активен гел за амортизација; се сече по големина.',
-    'anatomiX': 'Премиум RUN & HIKING; перење до 30°C.',
-    'memosole': 'Мемориска пена што се прилагодува на стапалото.',
-    'sport-style': 'Памучен фротир + пластичен носач за стабилност.',
-    'sportex': 'Воздушно перниче во петата + алое вера.',
-    'x-treme': '4-слојна конструкција со WAP амортизирачка зона.',
-    'topas': '3/4 дизајн за елегантни чевли со ограничен простор.',
-    'vital': 'Карбосан перниче за дополнителен комфор на петата.',
-    'relax': 'Перфорирана кожа + пластичен носач.',
-    'soft-gel': 'Кожа + гел перничиња во зоните на најголем контакт.',
-    'heel-pad': 'Самолепливо перниче за амортизација на петата.',
-    'heel-pad-fix': 'Формирачко перниче за стабилно позиционирање на петата.',
-    'heel-pad-grip': 'Универзален самолеплив grip против лизгање.',
-    'carbon': 'Активен јаглен; универзална — се сече по големина.',
-    'simona': '100% памук + ароматична пена.',
-    'thermo-alu': 'Волна + алуминиумска изолација од ладен под.',
-    'hunter-camo': 'Камуфлажен дизајн + латекс со активен јаглен.',
-    'hunter-flex': '3-слојна: Cambrella + алуминиум + филц (топлина).',
-    'hunter-outdoor': '4-слојна со Viscolat мемориска пена.',
-    'duck': '100% памучен фротир; ароматизирана латекс пена.'
+  // ============================================================
+  // ДЕТАЛНИ ОПИСИ НА МОДЕЛИ (полна содржина од страниците)
+  // ============================================================
+  const MODEL_DETAILS = {
+    'active-gel': { cat: 'sportski', tag: ['🏃 Спортска — гел амортизација', '🏃 Sportive — amortizim xhel', '🏃 Sports — gel cushioning'], desc: ['Спортска влошка од активен гел што ја апсорбира силата на удар при секој чекор и значително го намалува заморот во нозете.', 'Taban sportiv me xhel aktiv që thith forcën e goditjes në çdo hap dhe redukton ndjeshëm lodhjen e këmbëve.', 'Sports insole with active gel that absorbs impact force with every step and significantly reduces leg fatigue.'], target: ['Идеална за трчање, фитнес и секојдневен тренинг — за спортисти и активни луѓе кои сакаат мека амортизација.', 'Ideale për vrapim, fitnes dhe stërvitje të përditshme — për sportistë dhe njerëz aktivë që duan amortizim të butë.', 'Ideal for running, fitness and daily training — for athletes and active people who want soft cushioning.'], specs: ['Активен гел за амортизација', 'Се сече по големина', 'За спортски патики'] },
+    'anatomiX': { cat: 'sportski', tag: ['🏃 Премиум RUN & HIKING', '🏃 Premium RUN & HIKING', '🏃 Premium RUN & HIKING'], desc: ['Премиум влошка од линијата RUN & HIKING со рециклирана антибактериска пена — за интензивни тренинзи и планинарење.', 'Taban premium nga linja RUN & HIKING me shkumë antibakteriale të ricikluar — për stërvitje intensive dhe alpinizëm.', 'Premium insole from the RUN & HIKING line with recycled antibacterial foam — for intense training and hiking.'], target: ['За тркачи и планинари кои бараат издржливост, стабилност и заштита при долги напори.', 'Për vrapues dhe alpinistë që kërkojnë qëndrueshmëri, stabilitet dhe mbrojtje në përpjekje të gjata.', 'For runners and hikers who need durability, stability and protection on long efforts.'], specs: ['Рециклирана антибактериска пена', 'Се пере до 30°C', 'За RUN & HIKING'] },
+    'carbon': { cat: 'letni', tag: ['☀️ Летна — активен јаглен', '☀️ Verore — karbon aktiv', '☀️ Summer — activated charcoal'], desc: ['Летна влошка со активен јаглен — анти-габична и перфорирана за максимална вентилација и свежина.', 'Taban veror me karbon aktiv — antifungal dhe i shpuar për ventilim dhe freski maksimale.', 'Summer insole with activated charcoal — anti-fungal and perforated for maximum ventilation and freshness.'], target: ['Совршена за летни обувки, патики и обувки без чорапи — за свежина и против мирис и потење.', 'E përkryer për këpucë verore, atlete dhe këpucë pa çorape — për freski dhe kundër erës dhe djersës.', 'Perfect for summer shoes, sneakers and no-sock footwear — for freshness and against odor and sweat.'], specs: ['Активен јаглен', 'Анти-габична', 'Универзална — се сече по големина'] },
+    'duck': { cat: 'detski', tag: ['👶 Детска', '👶 Për fëmijë', '👶 Kids'], desc: ['Детска анатомска влошка од 100% памук со латекс и карбосан калап за правилен развој на детското стапало.', 'Taban anatomik për fëmijë prej 100% pambuku me lateks dhe kallëp karboni për zhvillim të duhur të këmbës.', 'Kids anatomical insole of 100% cotton with latex and carbon mold for proper foot development.'], target: ['За деца во развој — за училиште, патики и секојдневно носење.', 'Për fëmijë në rritje — për shkollë, atlete dhe përdorim të përditshëm.', 'For growing kids — for school, sneakers and daily wear.'], specs: ['100% памук', 'Латекс + карбосан калап', 'Правилен развој на стапалото'] },
+    'heel-pad': { cat: 'heelpad', tag: ['🔧 Heel Pad — за пета', '🔧 Heel Pad — për thembër', '🔧 Heel Pad — for heel'], desc: ['Кожна влошка за пета со карбосан перниче и самолеплив слој — амортизација токму таму каде што боли.', 'Taban lëkure për thembër me jastëk karboni dhe shtresë vetëngjitëse — amortizim pikërisht aty ku dhemb.', 'Leather heel insole with carbon cushion and self-adhesive layer — cushioning right where it hurts.'], target: ['За болка во петата и чевли со тврда пета — брзо олеснување.', 'Për dhimbje thembrash dhe këpucë me thembër të fortë — lehtësim i shpejtë.', 'For heel pain and hard-heeled shoes — quick relief.'], specs: ['Карбосан перниче', 'Самолеплив слој', 'Се става директно во чевлот'] },
+    'heel-pad-fix': { cat: 'heelpad', tag: ['🔧 Heel Pad FIX', '🔧 Heel Pad FIX', '🔧 Heel Pad FIX'], desc: ['Кожна влошка за пета со карбосан перниче и ЗАЈАКНАТ самолеплив слој — се држи цврсто на место.', 'Taban lëkure për thembër me jastëk karboni dhe shtresë vetëngjitëse të PËRFORCUAR — mbahet fort në vend.', 'Leather heel insole with carbon cushion and REINFORCED self-adhesive layer — holds firmly in place.'], target: ['За стабилно позиционирање на петата и долготрајно носење без поместување.', 'Për pozicionim të qëndrueshëm të thembrës dhe përdorim afatgjatë pa lëvizje.', 'For stable heel positioning and long-lasting wear without shifting.'], specs: ['Зајакнат самолеплив слој', 'Карбосан перниче', 'Стабилно позиционирање'] },
+    'heel-pad-grip': { cat: 'heelpad', tag: ['🔧 Heel Pad GRIP', '🔧 Heel Pad GRIP', '🔧 Heel Pad GRIP'], desc: ['Самолепливо перниче за пета од мека кожа со карбосан пена — против лизгање и триење.', 'Jastëk vetëngjitës për thembër prej lëkure të butë me shkumë karboni — kundër rrëshqitjes dhe fërkimit.', 'Self-adhesive heel cushion of soft leather with carbon foam — against slipping and friction.'], target: ['За чевли кои се лизгаат на петата и за заштита од жулење.', 'Për këpucë që rrëshqasin në thembër dhe mbrojtje nga gërryerja.', 'For shoes that slip at the heel and protection from chafing.'], specs: ['Универзален', 'Самолеплив', 'Против лизгање'] },
+    'hunter-camo': { cat: 'hunter', tag: ['🏔️ HUNTER — камуфлажна', '🏔️ HUNTER — kamuflazh', '🏔️ HUNTER — camouflage'], desc: ['Камуфлажна влошка со перфорирана PES ткаенина и латекс пена со активен јаглен — за најтешки услови.', 'Taban kamuflazh me pëlhurë PES të shpuar dhe shkumë lateksi me karbon aktiv — për kushtet më të vështira.', 'Camouflage insole with perforated PES fabric and latex foam with activated charcoal — for the toughest conditions.'], target: ['За лов, планинарење и outdoor активности — стабилност и свежина во секој терен.', 'Për gjueti, alpinizëm dhe aktivitete outdoor — stabilitet dhe freski në çdo terren.', 'For hunting, hiking and outdoor activities — stability and freshness on any terrain.'], specs: ['Перфорирана PES ткаенина', 'Латекс со активен јаглен', 'Камуфлажен дизајн'] },
+    'hunter-flex': { cat: 'hunter', tag: ['🏔️ HUNTER — термо', '🏔️ HUNTER — termik', '🏔️ HUNTER — thermal'], desc: ['Термо влошка со Cambrella ткаенина, алуминиумска фолија и филц — топлина за зимски активности.', 'Taban termik me pëlhurë Cambrella, fletë alumini dhe shami — ngrohtësi për aktivitete dimërore.', 'Thermal insole with Cambrella fabric, aluminum foil and felt — warmth for winter activities.'], target: ['За лов и планинарење во зима, ладно време и снежни услови.', 'Për gjueti dhe alpinizëm në dimër, mot të ftohtë dhe kushte me borë.', 'For hunting and hiking in winter, cold weather and snowy conditions.'], specs: ['3-слојна: Cambrella + алуминиум + филц', 'Топлинска изолација', 'За зимски активности'] },
+    'hunter-outdoor': { cat: 'hunter', tag: ['🏔️ HUNTER — outdoor', '🏔️ HUNTER — outdoor', '🏔️ HUNTER — outdoor'], desc: ['Анатомска влошка со Viscolat мемориска пена, PES филц и алуминиумска фолија — за пролет/есен.', 'Taban anatomik me shkumë memorie Viscolat, shami PES dhe fletë alumini — për pranverë/vjeshtë.', 'Anatomical insole with Viscolat memory foam, PES felt and aluminum foil — for spring/autumn.'], target: ['За лов и outdoor во преодни сезони — удобност и изолација во едно.', 'Për gjueti dhe outdoor në stinë të ndërmjetme — rehati dhe izolim në një.', 'For hunting and outdoor in transitional seasons — comfort and insulation in one.'], specs: ['4-слојна со Viscolat мемориска пена', 'PES филц + алуминиум', 'За пролет/есен'] },
+    'memosole': { cat: 'sportski', tag: ['🧠 MEMOSOLE — мемориска пена', '🧠 MEMOSOLE — shkumë memorie', '🧠 MEMOSOLE — memory foam'], desc: ['Влошка со мемориска пена што се прилагодува точно на обликот на вашето стапало + латекс со активен јаглен за свежина.', 'Taban me shkumë memorie që përshtatet saktësisht me formën e këmbës suaj + lateks me karbon aktiv për freski.', 'Insole with memory foam that molds exactly to your foot shape + latex with activated charcoal for freshness.'], target: ['За секојдневен комфор — за луѓе кои сакаат влошка по мерка на својата нога.', 'Për rehati të përditshme — për njerëz që duan taban të përshtatur me këmbën e tyre.', 'For everyday comfort — for people who want a custom-molded insole.'], specs: ['Мемориска пена (прилагодување)', 'Латекс со активен јаглен', 'Универзален комфор'] },
+    'relax': { cat: 'kozni', tag: ['👞 Кожна — Relax', '👞 Lëkure — Relax', '👞 Leather — Relax'], desc: ['Анатомска кожна влошка од перфорирана јагнешка кожа со латекс со активен јаглен и пластичен носач.', 'Taban anatomik lëkure prej lëkure delesh të shpuar me lateks me karbon aktiv dhe mbajtëse plastike.', 'Anatomical leather insole of perforated lambskin with activated charcoal latex and plastic arch support.'], target: ['За секојдневни и деловни чевли — удобност за целиот работен ден.', 'Për këpucë të përditshme dhe biznes — rehati për tërë ditën e punës.', 'For everyday and business shoes — comfort for the whole workday.'], specs: ['Перфорирана јагнешка кожа', 'Латекс со активен јаглен', 'Пластичен носач'] },
+    'simona': { cat: 'letni', tag: ['☀️ Летна — Simona', '☀️ Verore — Simona', '☀️ Summer — Simona'], desc: ['Летни памучни влошки од 100% памук со латекс со активен јаглен и ароматична карбосан пена.', 'Tabanë verorë prej 100% pambuku me lateks me karbon aktiv dhe shkumë karboni aromatike.', 'Summer cotton insoles of 100% cotton with activated charcoal latex and aromatic carbon foam.'], target: ['За летни чевли и балетанки — лесни, дишечки и со пријатен мирис.', 'Për këpucë verore dhe baletina — të lehta, që marrin frymë dhe me aromë të këndshme.', 'For summer shoes and flats — light, breathable and with a pleasant scent.'], specs: ['100% памук', 'Ароматична карбосан пена', 'Латекс со активен јаглен'] },
+    'soft-gel': { cat: 'kozni', tag: ['👞 Кожна + гел — Soft Gel', '👞 Lëkure + xhel — Soft Gel', '👞 Leather + gel — Soft Gel'], desc: ['Комбинација од јагнешка кожа, гел перничиња и активен јаглен — максимална удобност и свежина.', 'Kombinim prej lëkure delesh, jastëkësh xhel dhe karboni aktiv — rehati dhe freski maksimale.', 'A combination of lambskin, gel cushions and activated charcoal — maximum comfort and freshness.'], target: ['За највисок комфор — за луѓе со чувствителни стапала кои сакаат врвна удобност.', 'Për rehatinë më të lartë — për njerëz me këmbë të ndjeshme që duan rehati maksimale.', 'For the highest comfort — for people with sensitive feet who want premium comfort.'], specs: ['Јагнешка кожа', 'Гел перничиња во зоните на контакт', 'Активен јаглен'] },
+    'sport-style': { cat: 'sportski', tag: ['🏃 Спортска — Sport Style', '🏃 Sportive — Sport Style', '🏃 Sports — Sport Style'], desc: ['Анатомска влошка од памучен фротир со латекс пена и пластичен носач — стабилност при секој чекор.', 'Taban anatomik prej pambuku terri me shkumë lateksi dhe mbajtëse plastike — stabilitet në çdo hap.', 'Anatomical insole of cotton terry with latex foam and plastic support — stability with every step.'], target: ['За секојдневни патики и спортски чевли — за активни луѓе.', 'Për atlete dhe këpucë sportive të përditshme — për njerëz aktivë.', 'For everyday sneakers and sports shoes — for active people.'], specs: ['Памучен фротир', 'Латекс пена', 'Пластичен носач'] },
+    'sportex': { cat: 'sportski', tag: ['🏃 Спортска — Sportex', '🏃 Sportive — Sportex', '🏃 Sports — Sportex'], desc: ['Спортска влошка со воздушно перниче во петата, антибактериски материјали и ароматичен ефект на алое вера.', 'Taban sportiv me jastëk ajri në thembër, materiale antibakteriale dhe efekt aromatik aloe vera.', 'Sports insole with an air cushion in the heel, antibacterial materials and a soothing aloe vera effect.'], target: ['За трчање и тренинг — апсорпција на удари и свежина во едно.', 'Për vrap dhe stërvitje — thithje goditjesh dhe freski në një.', 'For running and training — shock absorption and freshness in one.'], specs: ['Воздушно перниче во петата', 'Антибактериски материјали', 'Ефект на алое вера'] },
+    'thermo-alu': { cat: 'zimski', tag: ['❄️ Зимска — Thermo Alu', '❄️ Dimërore — Thermo Alu', '❄️ Winter — Thermo Alu'], desc: ['Зимска влошка од 100% волна со латекс пена и алуминиумска фолија — топлинска изолација од ладен под.', 'Taban dimëror prej 100% leshi me shkumë lateksi dhe fletë alumini — izolim termik nga dyshemeja e ftohtë.', 'Winter insole of 100% wool with latex foam and aluminum foil — thermal insulation from cold floors.'], target: ['За зимски чизми и обувки — топли стапала во најладните денови.', 'Për çizme dhe këpucë dimërore — këmbë të ngrohta në ditët më të ftohta.', 'For winter boots and shoes — warm feet on the coldest days.'], specs: ['100% волна', 'Алуминиумска фолија (изолација)', 'Латекс пена'] },
+    'topas': { cat: 'kozni', tag: ['👞 Кожна — Topas (3/4)', '👞 Lëkure — Topas (3/4)', '👞 Leather — Topas (3/4)'], desc: ['3/4 кратка влошка за елегантни чевли од перфорирана јагнешка кожа со анатомски носач.', 'Taban i shkurtër 3/4 për këpucë elegante prej lëkure delesh të shpuar me mbajtëse anatomike.', '3/4 short insole for elegant shoes of perforated lambskin with anatomical arch support.'], target: ['За тесни, елегантни и деловни чевли со ограничен простор.', 'Për këpucë të ngushta, elegante dhe biznes me hapësirë të kufizuar.', 'For narrow, elegant and business shoes with limited space.'], specs: ['3/4 дизајн', 'Перфорирана јагнешка кожа', 'Анатомски носач'] },
+    'vital': { cat: 'kozni', tag: ['👞 Кожна — Vital', '👞 Lëkure — Vital', '👞 Leather — Vital'], desc: ['Кожна влошка од перфорирана кожа со латекс со активен јаглен и карбосан перниче за петата.', 'Taban lëkure prej lëkure të shpuar me lateks me karbon aktiv dhe jastëk karboni për thembrën.', 'Leather insole of perforated leather with activated charcoal latex and a carbon heel cushion.'], target: ['За секојдневни чевли — комфор на петата и свежина.', 'Për këpucë të përditshme — rehati thembrash dhe freski.', 'For everyday shoes — heel comfort and freshness.'], specs: ['Перфорирана кожа', 'Карбосан перниче', 'Латекс со активен јаглен'] },
+    'x-treme': { cat: 'sportski', tag: ['🏃 Премиум — X-TREME', '🏃 Premium — X-TREME', '🏃 Premium — X-TREME'], desc: ['Премиум 4-слојна спортска влошка со WAP материјал и амортизирачка зона — за екстремни напори.', 'Taban sportiv premium me 4 shtresa me material WAP dhe zonë amortizimi — për përpjekje ekstreme.', 'Premium 4-layer sports insole with WAP material and cushioning zone — for extreme efforts.'], target: ['За outdoor активности, тешки тренинзи и долги маршеви.', 'Për aktivitete outdoor, stërvitje të rënda dhe marshime të gjata.', 'For outdoor activities, heavy training and long marches.'], specs: ['4-слојна конструкција', 'WAP амортизирачка зона', 'За outdoor'] }
   };
+
+  // Модели со универзална големина (fallback ако MonetaData сè уште не е вчитан)
+  const UNIVERSAL = ['carbon', 'heel-pad', 'heel-pad-fix', 'heel-pad-grip'];
+
+  // ============================================================
+  // ПРЕПОРАКИ — врз основа на потребата/симптомот на корисникот
+  // ============================================================
+  const RECS = [
+    { id: 'umor', kw: ['умор', 'уморн', 'замор', 'морни', 'нозе', 'ноги', 'tired', 'fatigue', 'lodh'], strong: ['умор', 'уморн', 'замор', 'tired', 'fatigue', 'lodh'], models: ['soft-gel', 'memosole', 'active-gel', 'x-treme'], title: t('🦶 За уморни нозе', '🦶 Për këmbë të lodhura', '🦶 For tired feet'), text: t('При умор и тежина во нозете најважна е амортизацијата и мекоста. Овие модели ја апсорбираат силата при одење и го намалуваат заморот преку денот:', 'Me lodhje dhe rëndim në këmbë, më e rëndësishme është amortizimi dhe butësia. Këto modele thithin forcën gjatë ecjes dhe reduktojnë lodhjen gjatë ditës:', 'For fatigue and heaviness in the legs, cushioning and softness matter most. These models absorb force while walking and reduce daily fatigue:') },
+    { id: 'peta', kw: ['пета', 'петица', 'болка', 'бол', 'болки', 'paine', 'heel', 'thembr', 'dhimbje'], strong: ['пета', 'петица', 'болка', 'бол', 'болки', 'paine', 'heel', 'thembr', 'dhimbje'], models: ['heel-pad', 'heel-pad-fix', 'heel-pad-grip', 'vital'], title: t('👟 Болка во петата', '👟 Dhimbje thembrash', '👟 Heel pain'), text: t('За болка во петата препорачуваме влошки со карбосан перниче кое ја амортизира петата при секој чекор:', 'Për dhimbje thembrash rekomandojmë tabanë me jastëk karboni që amortizon thembrën në çdo hap:', 'For heel pain we recommend insoles with a carbon cushion that absorbs the heel with every step:') },
+    { id: 'trcanje', kw: ['трча', 'трчање', 'тренинг', 'спорт', 'фитнес', 'вежба', 'run', 'running', 'training', 'sport', 'vrap', 'stërvit'], strong: ['трча', 'трчање', 'тренинг', 'run', 'running', 'vrap'], models: ['anatomiX', 'active-gel', 'sportex', 'x-treme'], title: t('🏃 За трчање и тренинг', '🏃 Për vrap dhe stërvitje', '🏃 For running & training'), text: t('За трчање и спорт најважна е апсорпцијата на удари и стабилноста на стапалото. Овие модели се создадени за тоа:', 'Për vrap dhe sport, më e rëndësishme është thithja e goditjeve dhe stabiliteti i këmbës. Këto modele janë krijuar për këtë:', 'For running and sports, shock absorption and foot stability matter most. These models are made for that:') },
+    { id: 'planina', kw: ['планинаре', 'лов', 'ловец', 'outdoor', 'hiking', 'hunt', 'planin', 'priroda', 'terren'], strong: ['планинаре', 'лов', 'outdoor', 'hiking', 'hunt'], models: ['hunter-camo', 'hunter-outdoor', 'hunter-flex', 'anatomiX'], title: t('🏔️ За планинарење и лов', '🏔️ Për alpinizëm dhe gjueti', '🏔️ For hiking & hunting'), text: t('За планинарење, лов и outdoor активности ви требаат издржливи влошки со добра изолација и стабилност:', 'Për alpinizëm, gjueti dhe aktivitete outdoor ju duhen tabanë të qëndrueshëm me izolim dhe stabilitet të mirë:', 'For hiking, hunting and outdoor activities you need durable insoles with good insulation and stability:') },
+    { id: 'rabota', kw: ['канцелар', 'работа', 'работ', 'служб', 'цел ден', 'стоење', 'стои', 'work', 'office', 'pune', 'qëndro'], strong: ['канцелар', 'работа', 'цел ден', 'work', 'office'], models: ['relax', 'vital', 'topas', 'soft-gel'], title: t('💼 За цел ден на нозе', '💼 Për tërë ditën në këmbë', '💼 For all day on your feet'), text: t('Ако цел ден стоите или одите на работа, најважни се комфорот и потпората на сводот. Кожните модели се најдобар избор:', 'Nëse tërë ditën qëndroni ose ecni në punë, më e rëndësishme është rehatia dhe mbështetja e harkut. Modelet lëkure janë zgjedhja më e mirë:', 'If you stand or walk all day at work, comfort and arch support matter most. Leather models are the best choice:') },
+    { id: 'elegant', kw: ['елегант', 'деловн', 'балетанки', 'штикли', 'високи', 'свечен', 'elegant', 'business', 'thekë', 'taka'], strong: ['елегант', 'деловн', 'штикли', 'elegant', 'business'], models: ['topas', 'vital', 'relax', 'soft-gel'], title: t('👠 За елегантни чевли', '👠 Për këpucë elegante', '👠 For elegant shoes'), text: t('За елегантни и тесни чевли најдобро одговараат тенки кожни влошки кои не заземаат простор:', 'Për këpucë elegante dhe të ngushta më të mirat janë tabanët e hollë prej lëkure që nuk zënë hapësirë:', 'For elegant and narrow shoes, thin leather insoles that take no space are best:') },
+    { id: 'zima', kw: ['зима', 'зимск', 'студ', 'студен', 'ладни', 'ладно', 'ladno', 'winter', 'cold', 'ftoht', 'dimër'], strong: ['зима', 'зимск', 'студ', 'ладни', 'winter', 'cold'], models: ['thermo-alu', 'hunter-flex'], title: t('❄️ За зима и ладно време', '❄️ Për dimër dhe mot të ftohtë', '❄️ For winter & cold weather'), text: t('За ладни стапала во зима препорачуваме термо влошки со топлинска изолација:', 'Për këmbë të ftohta në dimër rekomandojmë tabanë termikë me izolim termik:', 'For cold feet in winter we recommend thermal insoles with insulation:') },
+    { id: 'leto', kw: ['лето', 'летн', 'топло', 'мирис', 'мириз', 'потење', 'пот', 'зно', 'sweat', 'odor', 'smell', 'summer', 'verë', 'nxeht'], strong: ['лето', 'летн', 'мирис', 'потење', 'sweat', 'smell'], models: ['carbon', 'simona', 'sportex', 'active-gel'], title: t('☀️ За лето и свежина', '☀️ Për verë dhe freski', '☀️ For summer & freshness'), text: t('За лето, потење и мирис најважна е вентилацијата и активниот јаглен:', 'Për verë, djersë dhe erë, më e rëndësishme është ventilimi dhe karboni aktiv:', 'For summer, sweat and odor, ventilation and activated charcoal matter most:') },
+    { id: 'deca', kw: ['деца', 'дете', 'детск', 'дечиња', 'kids', 'child', 'fëmij', 'femij'], strong: ['деца', 'детск', 'дете', 'kids', 'fëmij'], models: ['duck'], title: t('👶 За деца', '👶 Për fëmijë', '👶 For kids'), text: t('За правилен развој на детското стапало препорачуваме анатомска детска влошка:', 'Për zhvillim të duhur të këmbës së fëmijës rekomandojmë tabanin anatomik për fëmijë:', 'For proper development of kids feet we recommend the anatomical kids insole:') },
+    { id: 'zglo', kw: ['колена', 'колен', 'зглоб', 'рбет', 'грб', 'knee', 'joint', 'back', 'gju'], strong: ['колена', 'зглоб', 'рбет', 'knee', 'joint'], models: ['soft-gel', 'active-gel', 'x-treme'], title: t('🦵 За колена и зглобови', '🦵 Për gjunjë dhe nyje', '🦵 For knees & joints'), text: t('Амортизацијата на удари ја намалува оптовареноста на колената, зглобовите и на рбетот. Овие модели даваат најдобра заштита:', 'Thithja e goditjeve redukton ngarkesën në gjunjë, nyje dhe shtyllë. Këto modele japin mbrojtjen më të mirë:', 'Shock absorption reduces the load on knees, joints and spine. These models give the best protection:') }
+  ];
 
   // ============================================================
   // ДВИЖОК (engine) — препознавање намера
@@ -200,6 +221,9 @@
       for (let j = 0; j < kf.length; j++) {
         const w = wf[i], k = kf[j];
         if (!w || !k) continue;
+        // Омекнатата форма на клучниот збор мора да е доволно долга —
+        // кратки омекнати форми (на пр. wash→вас) даваат лажни совпаѓања
+        if (j === 1 && k.length < 4) continue;
         // 1) субниз — нормален случај (зборот го содржи клучниот збор)
         if (w.indexOf(k) !== -1) return true;
         // 2) строго fuzzy — само подолги зборови, со ИСТ почеток (2 букви)
@@ -225,7 +249,7 @@
 
   function findModel(n) {
     const prods = (window.MonetaData && window.MonetaData.products) ? Object.values(window.MonetaData.products) : [];
-    const list = prods.length ? prods : Object.keys(MODEL_HIGHLIGHTS).map(function (slug) { return { slug: slug, name_mk: slug, name_en: slug }; });
+    const list = prods.length ? prods : Object.keys(MODEL_DETAILS).map(function (slug) { return { slug: slug, name_mk: slug, name_en: slug }; });
     const inText = function (name) {
       const f = forms(name);
       for (let j = 0; j < f.length; j++) {
@@ -267,16 +291,55 @@
     return null;
   }
 
-  function modelAnswer(p) {
+  function modelData(slug) {
     const prods = (window.MonetaData && window.MonetaData.products) || {};
-    const db = prods[p.slug];
-    const price = db ? Number(db.price) : null;
-    const name = (L() === 'en' ? (p.name_en || p.name_mk) : (p.name_mk || p.name_en)) || p.slug;
-    const highlight = MODEL_HIGHLIGHTS[p.slug] || '';
-    let out = '🏷️ ' + name + (highlight ? ' — ' + highlight : '');
-    if (price) out += '\n💰 Цена: ' + price.toLocaleString('mk-MK') + ' ден.';
-    out += '\n🔗 Погледни: modeli/' + p.slug + '.html';
-    return out;
+    const db = prods[slug];
+    const d = MODEL_DETAILS[slug] || { cat: '', tag: ['', '', ''], desc: ['', '', ''], target: ['', '', ''], specs: ['', '', ''] };
+    const li = L() === 'en' ? 2 : (L() === 'sq' ? 1 : 0);
+    return {
+      slug: slug,
+      name: (L() === 'en' ? (db && (db.name_en || db.name_mk)) : (db && (db.name_mk || db.name_en))) || slug,
+      price: db ? Number(db.price) : null,
+      cat: d.cat,
+      tag: d.tag[li] || '',
+      desc: d.desc[li] || '',
+      target: d.target[li] || '',
+      specs: Array.isArray(d.specs) ? d.specs : []
+    };
+  }
+
+  function imgPath(slug) {
+    return (/\/modeli\//.test(window.location.pathname) ? '../' : './') + 'images/cards/' + slug + '.webp';
+  }
+
+  function modelCardHtml(m) {
+    const price = m.price ? '<div class="b-card__price">💰 ' + m.price.toLocaleString('mk-MK') + ' ден.</div>' : '';
+    const target = m.target ? '<div class="b-card__target">🎯 ' + esc(m.target) + '</div>' : '';
+    return '<div class="b-card">'
+      + '<div class="b-card__imgwrap"><img src="' + imgPath(m.slug) + '" alt="' + esc(m.name) + '" loading="lazy" data-zoom="' + esc(m.slug) + '"><span class="b-card__zoom">🔍 ' + esc(t('кликни за зголеми', 'kliko për zmadhim', 'click to enlarge')) + '</span></div>'
+      + '<div class="b-card__body">'
+      + '<div class="b-card__name">' + esc(m.name) + '</div>'
+      + (m.tag ? '<div class="b-card__tag">' + esc(m.tag) + '</div>' : '')
+      + '<div class="b-card__desc">' + esc(m.desc) + '</div>'
+      + target
+      + price
+      + '</div>'
+      + '<div class="b-card__actions">'
+      + '<button class="b-chip" data-action="specs" data-slug="' + esc(m.slug) + '">🔍 ' + esc(t('Карактеристики', 'Karakteristikat', 'Specs')) + '</button>'
+      + '<button class="b-chip" data-action="add" data-slug="' + esc(m.slug) + '">🛒 ' + esc(t('Додај во кошничка', 'Shto në shportë', 'Add to cart')) + '</button>'
+      + '<a class="b-chip b-chip--link" href="' + imgPath(m.slug).replace(/images\/cards.*/, '') + 'modeli/' + esc(m.slug) + '.html" target="_blank" rel="noopener">↗ ' + esc(t('На сајтот', 'Në faqe', 'On site')) + '</a>'
+      + '</div>'
+      + '</div>';
+  }
+
+  function modelAnswer(p) {
+    return { html: modelCardHtml(modelData(p.slug)), chips: [] };
+  }
+
+  function modelSpecsText(slug) {
+    const m = modelData(slug);
+    const lines = (m.specs || []).map(function (s) { return '• ' + s; }).join('\n');
+    return m.name + '\n' + lines + (m.price ? '\n💰 Цена: ' + m.price.toLocaleString('mk-MK') + ' ден.' : '');
   }
 
   function categoriesAnswer(cat) {
@@ -351,6 +414,21 @@
     }
   ];
 
+  function buildRec(rec) {
+    const lines = rec.models.map(function (slug) {
+      const m = modelData(slug);
+      return '• ' + m.name + (m.price ? ' — ' + m.price.toLocaleString('mk-MK') + ' ден.' : '');
+    }).join('\n');
+    const chips = rec.models.map(function (slug) {
+      const m = modelData(slug);
+      return { label: m.name, q: slug };
+    });
+    return {
+      text: rec.title + '\n' + rec.text + '\n' + lines + '\n\n' + t('Кликни на модел за повеќе детали или за додавање во кошничка.', 'Kliko një model për më shumë detaje ose për ta shtuar në shportë.', 'Click a model for more details or to add it to your cart.'),
+      chips: chips
+    };
+  }
+
   function answer(text) {
     const n = normalize(text);
     // 1) Прво — FAQ (поконкретни прашања од сајтот)
@@ -360,7 +438,18 @@
       f.kw.forEach(function (k) { s += kwScore(n.words, k); });
       if (s > bestFaqScore) { bestFaqScore = s; bestFaq = f; }
     });
-    if (bestFaq && bestFaqScore > 0) return bestFaq.q + '\n' + bestFaq.a;
+    if (bestFaq && bestFaqScore > 0) return { text: bestFaq.q + '\n' + bestFaq.a };
+    // 1.5) Препораки — врз основа на потребата (умор, болка, спорт, сезона...)
+    let bestRec = null, bestRecScore = 0;
+    RECS.forEach(function (rec) {
+      let s = 0, strong = 0;
+      rec.kw.forEach(function (k) {
+        if (kwScore(n.words, k) > 0) { s++; if (rec.strong.indexOf(k) !== -1) strong++; }
+      });
+      const sc = s * 3 + strong * 5;
+      if (sc > bestRecScore) { bestRecScore = sc; bestRec = rec; }
+    });
+    if (bestRec && bestRecScore >= 8) return buildRec(bestRec);
     // 2) Потоа — општи намери
     let best = null, bestScore = 0;
     INTENTS.forEach(function (int) {
@@ -373,10 +462,12 @@
       const p = findModel(n);
       if (p) return modelAnswer(p);
       const cat = findCategory(n);
-      if (cat) return categoriesAnswer(cat);
-      return INFO.fallback;
+      if (cat) return { text: categoriesAnswer(cat) };
+      return { text: INFO.fallback };
     }
-    return best.answer(n) || INFO.fallback;
+    const a = best.answer(n);
+    if (a && typeof a === 'object') return a;
+    return { text: a };
   }
 
   // ============================================================
@@ -416,6 +507,27 @@
     '#monetaBotChips{display:flex;flex-wrap:wrap;gap:7px;padding:0 14px 10px;background:#faf7f6;}',
     '.b-chip{border:1px solid rgba(236,23,82,.35);background:#fff;color:#EC1752;border-radius:999px;padding:7px 12px;font-size:12.5px;font-weight:700;cursor:pointer;transition:background .15s;}',
     '.b-chip:hover{background:rgba(236,23,82,.08);}',
+    '#monetaBotCart{position:relative;background:none;border:none;color:#fff;font-size:18px;cursor:pointer;padding:6px;display:flex;align-items:center;margin-left:auto;margin-right:2px;}',
+    '#monetaBotCart svg{width:20px;height:20px;}',
+    '#monetaBotCart .b-cart__badge{position:absolute;top:-2px;right:-2px;min-width:16px;height:16px;border-radius:8px;background:#fff;color:#EC1752;font-size:10px;font-weight:800;display:none;align-items:center;justify-content:center;padding:0 4px;}',
+    '.b-msg.b-bot.is-card{max-width:100%;padding:0;background:transparent;border:none;border-bottom-left-radius:0;}',
+    '.b-card{background:#fff;border:1px solid #efe9e6;border-radius:14px;overflow:hidden;}',
+    '.b-card__imgwrap{position:relative;cursor:zoom-in;overflow:hidden;}',
+    '.b-card__imgwrap img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;}',
+    '.b-card__zoom{position:absolute;left:8px;bottom:8px;background:rgba(0,0,0,.55);color:#fff;font-size:10.5px;padding:3px 8px;border-radius:999px;pointer-events:none;}',
+    '.b-card__body{padding:10px 12px 4px;}',
+    '.b-card__name{font-weight:800;font-size:14.5px;}',
+    '.b-card__tag{font-size:11.5px;color:#EC1752;font-weight:700;margin-top:1px;}',
+    '.b-card__desc{font-size:12.5px;color:#4a4a4a;line-height:1.45;margin-top:6px;}',
+    '.b-card__target{font-size:12px;color:#7a6f6a;margin-top:5px;}',
+    '.b-card__price{font-weight:800;font-size:14px;margin-top:6px;color:#17171c;}',
+    '.b-card__actions{display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px 12px;}',
+    '.b-chip--link{display:inline-flex;align-items:center;text-decoration:none;}',
+    '#monetaBotZoom{position:fixed;inset:0;z-index:10030;background:rgba(10,8,12,.82);display:none;align-items:center;justify-content:center;padding:24px;}',
+    '#monetaBotZoom.is-open{display:flex;animation:botFade .18s ease;}',
+    '@keyframes botFade{from{opacity:0}to{opacity:1}}',
+    '#monetaBotZoom img{max-width:min(640px,92vw);max-height:82vh;border-radius:14px;box-shadow:0 30px 80px rgba(0,0,0,.5);object-fit:contain;}',
+    '#monetaBotZoom .b-zoom-close{position:absolute;top:16px;right:20px;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:26px;width:44px;height:44px;border-radius:50%;cursor:pointer;line-height:1;}',
     '#monetaBotInput{display:flex;gap:8px;padding:10px 14px;border-top:1px solid #efe9e6;background:#fff;flex-shrink:0;}',
     '#monetaBotInput input{flex:1;border:1px solid #e8e1de;border-radius:12px;padding:10px 12px;font-size:13.5px;outline:none;}',
     '#monetaBotInput input:focus{border-color:rgba(236,23,82,.5);}',
@@ -440,6 +552,7 @@
     '<div id="monetaBotHead">',
     '<span class="b-avatar">🤖</span>',
     '<div><div class="b-title" data-b="title">МОНЕТА асистент</div><div class="b-sub" data-b="sub">Одговара веднаш · 24/7</div></div>',
+    '<button class="b-cart" id="monetaBotCart" aria-label="Кошница" title="Кошница"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><span class="b-cart__badge" id="monetaBotCartBadge">0</span></button>',
     '<button class="b-close" id="monetaBotClose" aria-label="Затвори">×</button>',
     '</div>',
     '<div id="monetaBotBody"></div>',
@@ -448,8 +561,13 @@
     '<input id="monetaBotText" type="text" autocomplete="off" placeholder="Напиши прашање...">',
     '<button id="monetaBotSend" aria-label="Испрати"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>',
     '</div>',
-    '</div>'
+    '</div>',
+    '<div id="monetaBotZoom"><button class="b-zoom-close" aria-label="Затвори">×</button><img id="monetaBotZoomImg" alt=""></div>'
   ].join('');
+
+  function base() {
+    return /\/modeli\//.test(window.location.pathname) ? '../' : './';
+  }
 
   function build() {
     injectCss();
@@ -465,12 +583,20 @@
     const btn = document.getElementById('monetaBotBtn');
     const close = document.getElementById('monetaBotClose');
     const send = document.getElementById('monetaBotSend');
+    const cartBtn = document.getElementById('monetaBotCart');
+    const cartBadge = document.getElementById('monetaBotCartBadge');
+    const zoom = document.getElementById('monetaBotZoom');
+    const zoomImg = document.getElementById('monetaBotZoomImg');
     let first = true;
 
-    function addMsg(text, who) {
+    function addMsg(content, who, isCard) {
       const div = document.createElement('div');
-      div.className = 'b-msg ' + (who === 'user' ? 'b-user' : 'b-bot');
-      div.innerHTML = esc(text).replace(/\n/g, '<br>');
+      div.className = 'b-msg ' + (who === 'user' ? 'b-user' : 'b-bot') + (isCard ? ' is-card' : '');
+      if (isCard) {
+        div.innerHTML = content; // доверлив HTML од нашите картички (esc-нат)
+      } else {
+        div.innerHTML = esc(content).replace(/\n/g, '<br>');
+      }
       body.appendChild(div);
       body.scrollTop = body.scrollHeight;
       return div;
@@ -489,6 +615,15 @@
       chips.innerHTML = QUICK.map(function (c) {
         const label = L() === 'en' ? c[3] : (L() === 'sq' ? c[2] : c[1]);
         return '<button class="b-chip" data-q="' + c[1] + '">' + c[0] + ' ' + esc(label) + '</button>';
+      }).join('');
+    }
+
+    function renderChipsArr(arr) {
+      chips.innerHTML = (arr || []).map(function (c) {
+        if (c.action === 'size') {
+          return '<button class="b-chip" data-action="size" data-slug="' + esc(c.slug) + '" data-size="' + esc(c.size) + '">' + esc(c.label) + '</button>';
+        }
+        return '<button class="b-chip" data-q="' + esc(c.q == null ? '' : c.q) + '">' + esc(c.label) + '</button>';
       }).join('');
     }
 
@@ -517,36 +652,203 @@
       input.value = '';
       chips.innerHTML = '';
       typing(function () {
-        const a = answer(q);
-        addMsg(a, 'bot');
-        // Ако ботот нема одговор → „префрлање": понуди директен контакт
-        if (a === INFO.fallback) {
+        const res = answer(q) || { text: INFO.fallback };
+        if (res.html) {
+          addMsg(res.html, 'bot', true);
+        } else {
+          addMsg(res.text || '', 'bot');
+        }
+        if (res.chips && res.chips.length) {
+          renderChipsArr(res.chips);
+        } else if (res.text === INFO.fallback) {
+          // „префрлање": понуди директен контакт
           chips.innerHTML = '<button class="b-chip" data-q="контакт">📞 ' + esc(t('Разговарај со нас', 'Flisni me ne', 'Talk to us')) + '</button>';
         } else {
           renderChips();
         }
+        syncCartBadge();
       });
     }
 
+    // ---- Кошничка во чатот ----
+    function syncCartBadge() {
+      if (!cartBadge) return;
+      const n = (window.MonetaCart && window.MonetaCart.totalQty(window.MonetaCart.getCart())) || 0;
+      cartBadge.textContent = n > 99 ? '99+' : n;
+      cartBadge.style.display = n > 0 ? 'flex' : 'none';
+    }
+    function openCartInChat() {
+      if (!win.classList.contains('is-open')) open();
+      const cart = (window.MonetaCart && window.MonetaCart.getCart()) || {};
+      const slugs = Object.keys(cart);
+      if (!slugs.length) {
+        addMsg('🛒 ' + t('Кошничката е празна. Додади некоја влошка од картичките погоре!', 'Shporta është bosh. Shto një taban nga kartat më sipër!', 'Your cart is empty. Add an insole from the cards above!'), 'bot');
+        renderChips();
+        return;
+      }
+      const lines = [];
+      let total = 0;
+      slugs.forEach(function (slug) {
+        const it = cart[slug];
+        if (!it) return;
+        lines.push('• ' + (it.nameMk || slug) + ' ×' + it.qty + ' — ' + ((it.price || 0) * it.qty).toLocaleString('mk-MK') + ' ден.');
+        total += (it.price || 0) * it.qty;
+      });
+      addMsg('🛒 ' + t('Во кошничката:', 'Në shportë:', 'In your cart:') + '\n' + lines.join('\n') + '\n' + t('Вкупно:', 'Totali:', 'Total:') + ' ' + total.toLocaleString('mk-MK') + ' ден.', 'bot');
+      renderChipsArr([
+        { label: '🛒 ' + t('Отвори ја кошничката', 'Hap shportën', 'Open cart'), q: 'OPEN_CART' },
+        { label: t('Продолжи со купување', 'Vazhdo blerjen', 'Continue shopping'), q: '' }
+      ]);
+    }
+
+    // ---- Додавање во кошничка (истата кошничка како сајтот) ----
+    function addToCart(slug, size, qty) {
+      if (!window.MonetaCart) return false;
+      const prods = (window.MonetaData && window.MonetaData.products) || {};
+      const db = prods[slug];
+      const cart = window.MonetaCart.getCart();
+      const it = cart[slug] || {
+        slug: slug,
+        code: (db && db.code) || slug,
+        price: Number(db && db.price) || 0,
+        nameMk: (db && db.name_mk) || slug,
+        nameEn: (db && db.name_en) || slug,
+        sizes: {}, size: '', qty: 0
+      };
+      it.sizes = it.sizes || {};
+      const sk = size || 'univerzalna';
+      it.sizes[sk] = (it.sizes[sk] || 0) + (qty || 1);
+      it.size = sk;
+      it.qty = Object.values(it.sizes).reduce(function (a, b) { return a + (b || 0); }, 0);
+      cart[slug] = it;
+      window.MonetaCart.setCart(cart);
+      if (window.MonetaCart.renderNavBadges) window.MonetaCart.renderNavBadges();
+      if (window.MonetaCart.renderFreeShip) window.MonetaCart.renderFreeShip(cart);
+      if (window.MonetaCartOnChange) window.MonetaCartOnChange(cart);
+      syncCartBadge();
+      return true;
+    }
+    function startAddFlow(slug) {
+      let sizes = [];
+      const sd = window.MonetaData && window.MonetaData.sizes && window.MonetaData.sizes[slug];
+      if (sd && Object.keys(sd).length) {
+        sizes = Object.keys(sd);
+      } else if (UNIVERSAL.indexOf(slug) !== -1) {
+        sizes = ['univerzalna'];
+      } else {
+        sizes = ['35-36', '37-38', '39-40', '41-42', '43-44', '45-46'];
+      }
+      const m = modelData(slug);
+      addMsg('🛒 ' + m.name + ' — ' + t('која големина?', 'cila madhësi?', 'which size?'), 'bot');
+      renderChipsArr(sizes.map(function (s) {
+        const label = s === 'univerzalna' ? t('Универзална', 'Universale', 'Universal') : s;
+        return { label: label, action: 'size', slug: slug, size: s };
+      }));
+    }
+    function addWithSize(slug, size) {
+      const ok = addToCart(slug, size, 1);
+      const m = modelData(slug);
+      if (ok) {
+        const sizeLabel = size === 'univerzalna' ? t('Универзална', 'Universale', 'Universal') : size;
+        addMsg('✅ ' + t('Додадено во кошничката:', 'U shtua në shportë:', 'Added to your cart:') + ' ' + m.name + ' (' + sizeLabel + ')', 'bot');
+        renderChipsArr([
+          { label: '🛒 ' + t('Отвори кошничка', 'Hap shportën', 'Open cart'), q: 'OPEN_CART' },
+          { label: t('Продолжи', 'Vazhdo', 'Continue'), q: '' }
+        ]);
+        const img = body.querySelector('.b-card__imgwrap img[data-zoom="' + slug + '"]');
+        if (img) flyToCart(img);
+      } else {
+        addMsg('⚠️ ' + t('Не можев да го додадам. Пробај повторно.', 'Nuk munda ta shtoja. Provo përsëri.', 'Could not add it. Try again.'), 'bot');
+      }
+      syncCartBadge();
+    }
+
+    // ---- Лет-анимација кон кошничката на сајтот (горе-десно) ----
+    function flyToCart(srcEl) {
+      const cartEl = document.querySelector('.navbar__cart');
+      if (!cartEl) return;
+      const from = srcEl.getBoundingClientRect();
+      const to = cartEl.getBoundingClientRect();
+      const img = srcEl.cloneNode(true);
+      img.style.cssText = 'position:fixed;left:' + from.left + 'px;top:' + from.top + 'px;width:' + from.width + 'px;height:' + from.height + 'px;object-fit:cover;border-radius:10px;z-index:10020;pointer-events:none;transition:all .8s cubic-bezier(.5,-0.2,.6,.5);box-shadow:0 8px 24px rgba(0,0,0,.3);';
+      document.body.appendChild(img);
+      requestAnimationFrame(function () {
+        img.style.left = (to.left + to.width / 2 - from.width / 2) + 'px';
+        img.style.top = (to.top + to.height / 2 - from.height / 2) + 'px';
+        img.style.width = '28px';
+        img.style.height = '28px';
+        img.style.opacity = '0.35';
+        img.style.borderRadius = '50%';
+      });
+      setTimeout(function () { img.remove(); }, 850);
+    }
+
+    // ---- Зголемена слика (preview надвор од рамките на чатот) ----
+    function openZoom(slug) {
+      zoomImg.src = imgPath(slug);
+      zoom.classList.add('is-open');
+    }
+    function closeZoom() {
+      zoom.classList.remove('is-open');
+    }
+
+    // ---- Настани ----
     btn.addEventListener('click', function () {
       if (win.classList.contains('is-open')) closeWin(); else open();
     });
     close.addEventListener('click', closeWin);
+    if (cartBtn) cartBtn.addEventListener('click', openCartInChat);
     send.addEventListener('click', function () { ask(input.value); });
     input.addEventListener('keydown', function (e) { if (e.key === 'Enter') ask(input.value); });
     chips.addEventListener('click', function (e) {
       const b = e.target.closest('.b-chip');
-      if (b) ask(b.getAttribute('data-q'));
+      if (!b) return;
+      const act = b.getAttribute('data-action');
+      if (act === 'size') {
+        addWithSize(b.getAttribute('data-slug'), b.getAttribute('data-size'));
+        return;
+      }
+      const q = b.getAttribute('data-q') || '';
+      if (q === 'OPEN_CART') { window.location.href = base() + 'cart.html'; return; }
+      ask(q);
     });
+    // Акции во картичките (во body) + зголемување на слика
+    body.addEventListener('click', function (e) {
+      const chip = e.target.closest('.b-chip');
+      if (chip) {
+        const act = chip.getAttribute('data-action');
+        const slug = chip.getAttribute('data-slug');
+        if (act === 'specs' && slug) {
+          addMsg(modelSpecsText(slug), 'bot');
+          renderChips();
+          return;
+        }
+        if (act === 'add' && slug) {
+          startAddFlow(slug);
+          return;
+        }
+        return;
+      }
+      const zi = e.target.closest('[data-zoom]');
+      if (zi) openZoom(zi.getAttribute('data-zoom'));
+    });
+    if (zoom) zoom.addEventListener('click', function (e) {
+      if (e.target === zoom || e.target.closest('.b-zoom-close')) closeZoom();
+    });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeZoom(); });
+
+    // Синхронизација со кошничката (друг таб / враќање назад)
+    window.addEventListener('storage', function (e) { if (e.key === 'moneta_cart') syncCartBadge(); });
+    window.addEventListener('pageshow', syncCartBadge);
+    syncCartBadge();
 
     // Промена на јазик → ажурирај го насловот и копчињата
     function refreshLang() {
       const title = document.querySelector('[data-b="title"]');
       const sub = document.querySelector('[data-b="sub"]');
-      const ph = input;
       if (title) title.textContent = t('МОНЕТА асистент', 'Asistenti MONETA', 'MONETA assistant');
       if (sub) sub.textContent = t('Одговара веднаш · 24/7', 'Përgjigjet menjëherë · 24/7', 'Answers instantly · 24/7');
-      if (ph) ph.placeholder = t('Напиши прашање...', 'Shkruaj pyetje...', 'Type a question...');
+      if (input) input.placeholder = t('Напиши прашање...', 'Shkruaj pyetje...', 'Type a question...');
       renderChips();
     }
     refreshLang();
