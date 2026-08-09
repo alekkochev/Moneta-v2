@@ -317,13 +317,23 @@
     const li = L() === 'en' ? 2 : (L() === 'sq' ? 1 : 0);
     var price = db ? Number(db.price) : null;
     var oldPrice = db ? Number(db.old_price) : 0;
-    if (oldPrice <= price) oldPrice = 0; // самo ако има вистински попуст
+    var discCol = db ? Number(db.discount) : 0; // колона discount од Supabase → %
+    // Пресметај % попуст: од old_price или од discount колоната
+    var discPct = 0;
+    if (oldPrice > price && oldPrice > 0) {
+      discPct = Math.round((1 - price / oldPrice) * 100);
+    } else if (discCol > 0) {
+      // discount колона: ако < 100 → %, инаку → денари (backward compat)
+      discPct = discCol < 100 ? discCol : Math.round(discCol / price * 100);
+      oldPrice = discPct > 0 ? Math.round(price / (1 - discPct / 100)) : 0;
+    }
+    if (oldPrice <= price) oldPrice = 0;
     return {
       slug: slug,
       name: (L() === 'en' ? (db && (db.name_en || db.name_mk)) : (db && (db.name_mk || db.name_en))) || slug,
       price: price,
       oldPrice: oldPrice,
-      discountPct: oldPrice > 0 ? Math.round((1 - price / oldPrice) * 100) : 0,
+      discountPct: discPct,
       cat: d.cat,
       tag: d.tag[li] || '',
       desc: d.desc[li] || '',
@@ -332,19 +342,39 @@
     };
   }
 
+  // Враќа листа на производи со попуст (од MonetaData / Supabase)
+  function getDiscountedProducts() {
+    const prods = (window.MonetaData && window.MonetaData.products) || {};
+    const discounted = [];
+    Object.keys(prods).forEach(function (slug) {
+      const m = modelData(slug);
+      if (m.discountPct > 0) discounted.push(m);
+    });
+    discounted.sort(function (a, b) { return b.discountPct - a.discountPct; });
+    return discounted;
+  }
+
   function imgPath(slug) {
     return (/\/modeli\//.test(window.location.pathname) ? '../' : './') + 'images/cards/' + slug + '.webp';
   }
 
   function modelCardHtml(m) {
-    const price = m.price ? '<div class="b-card__price">💰 ' + m.price.toLocaleString('mk-MK') + ' ден.</div>' : '';
+    var priceHtml = '';
+    if (m.price) {
+      if (m.oldPrice > 0) {
+        priceHtml = '<div class="b-card__price">💰 <span class="b-card__price-old">' + m.oldPrice.toLocaleString('mk-MK') + ' ден.</span> ' + m.price.toLocaleString('mk-MK') + ' ден. <span class="b-card__discount-badge">−' + m.discountPct + '%</span></div>';
+      } else {
+        priceHtml = '<div class="b-card__price">💰 ' + m.price.toLocaleString('mk-MK') + ' ден.</div>';
+      }
+    }
+    var discBadgeImg = m.discountPct > 0 ? '<div class="b-thumb__discount">-' + m.discountPct + '%</div>' : '';
     const target = m.target ? '<div class="b-card__target">🎯 ' + esc(m.target) + '</div>' : '';
     return '<div class="b-card">'
-      + '<div class="b-card__imgwrap"><img src="' + imgPath(m.slug) + '" alt="' + esc(m.name) + '" loading="lazy" data-zoom="' + esc(m.slug) + '"><span class="b-card__zoom">🔍</span></div>'
+      + '<div class="b-card__imgwrap"><img src="' + imgPath(m.slug) + '" alt="' + esc(m.name) + '" loading="lazy" data-zoom="' + esc(m.slug) + '">' + discBadgeImg + '<span class="b-card__zoom">🔍</span></div>'
       + '<div class="b-card__body">'
       + '<div class="b-card__name">' + esc(m.name) + '</div>'
       + (m.tag ? '<div class="b-card__tag">' + esc(m.tag) + '</div>' : '')
-      + price
+      + priceHtml
       + '<div class="b-card__desc">' + esc(m.desc) + '</div>'
       + target
       + '<div class="b-card__actions">'
@@ -378,6 +408,34 @@
   }
 
   const INTENTS = [
+    {
+      // 🏷️ ПРАШАЊЕ ЗА ПОПУСТИ — чита од Supabase (MonetaData) која моментално има попуст
+      id: 'discounts', kw: ['попуст', 'намален', 'акци', 'снижен', 'поевти', 'евтино', 'продажб', 'распродажб', 'discount', 'sale', 'deal', 'offer', 'promo', 'zbrit', 'ofer'],
+      answer: function () {
+        const discounted = getDiscountedProducts();
+        if (!discounted.length) {
+          return t(
+            '🎯 Моментално немаме активни попусти. Сите производи се по редовна цена. Проверете повторно или контактирајте нè за специјални понуди: info@calivita.mk 📩',
+            '🎯 Aktualisht nuk kemi zbritje aktive. Të gjitha produktet janë me çmim të rregullt. Kontrolloni përsëri ose na kontaktoni për oferta speciale: info@calivita.mk 📩',
+            '🎯 We currently have no active discounts. All products are at regular price. Check again or contact us for special offers: info@calivita.mk 📩');
+        }
+        var lines = [t('🏷️ **Производи на попуст:**', '🏷️ **Produkte me zbritje:**', '🏷️ **Discounted products:**'), ''];
+        discounted.forEach(function (m) {
+          var line = '• **' + m.name + '** — 💰 ' + m.price.toLocaleString('mk-MK') + ' ден.';
+          if (m.oldPrice > 0) {
+            line += ' ~~' + m.oldPrice.toLocaleString('mk-MK') + ' ден.~~';
+          }
+          line += '  🏷️ **−' + m.discountPct + '%**';
+          lines.push(line);
+        });
+        lines.push('');
+        lines.push(t(
+          'Напиши ми го името на моделот (пр. „' + discounted[0].name + '") за детали и онлајн нарачка! 🛒',
+          'Më shkruaj emrin e modelit (p.sh. „' + discounted[0].name + '") për detaje dhe porosi online! 🛒',
+          'Write me the model name (e.g. "' + discounted[0].name + '") for details and online ordering! 🛒'));
+        return lines.join('\n');
+      }
+    },
     {
       id: 'delivery', kw: ['достава', 'испорак', 'достав', 'курир', '48', 'ispak', 'dorëzim', 'dërges', 'delivery', 'ship'],
       answer: function () { return INFO.delivery; }
@@ -416,14 +474,22 @@
       }
     },
     {
-      id: 'prices', kw: ['цен', 'чини', 'колку', 'попуст', 'den', 'çmim', 'kushton', 'price', 'cost'],
+      id: 'prices', kw: ['цен', 'чини', 'колку', 'ден', 'çmim', 'kushton', 'price', 'cost'],
       answer: function (n) {
         const p = findModel(n);
         if (p) return modelAnswer(p);
+        // Провери дали има попусти → спомни ги во одговорот
+        const discounted = getDiscountedProducts();
+        var extra = '';
+        if (discounted.length) {
+          var names = discounted.slice(0, 3).map(function (d) { return d.name + ' (−' + d.discountPct + '%)'; }).join(', ');
+          if (discounted.length > 3) names += t(' и уште ' + (discounted.length - 3), ' dhe ' + (discounted.length - 3) + ' të tjerë', ' and ' + (discounted.length - 3) + ' more');
+          extra = '\n\n🏷️ ' + t('Моментално на попуст: ' + names + '. Пиши „попуст" за цела листа!', 'Aktualisht me zbritje: ' + names + '. Shkruaj „zbritje" për listën!', 'Currently discounted: ' + names + '. Write "discount" for the full list!');
+        }
         return t(
-          '💰 Цените можеш да ги видиш на секоја модел-страница (од 100 до 820 ден.). Кажи кој модел те интересира, па ќе ти ја кажам цената!',
-          '💰 Çmimet mund t\'i shohësh në çdo faqe modeli (nga 100 deri 820 den.). Më thuaj cili model të intereson!',
-          '💰 You can see prices on each model page (from 100 to 820 MKD). Tell me which model interests you!');
+          '💰 Цените се од 100 до 820 ден. (во зависност од моделот). Кажи кој модел те интересира за точна цена!' + extra,
+          '💰 Çmimet janë nga 100 deri 820 den. (në varësi të modelit). Më thuaj cili model të intereson për çmimin e saktë!' + extra,
+          '💰 Prices range from 100 to 820 MKD (depending on the model). Tell me which model interests you for the exact price!' + extra);
       }
     },
     {
@@ -646,6 +712,13 @@
         if (n.raw.indexOf(kf[i]) !== -1 || n.cyr.indexOf(kf[i]) !== -1) return true;
       }
       return false;
+    });
+  }
+
+  const DISCOUNT_KW = ['попуст', 'намален', 'намале', 'акци', 'снижен', 'снижу', 'поевти', 'евтино', 'продажб', 'распродажб', 'дискаунт', 'discount', 'sale', 'deal', 'offer', 'promo', 'zbrit', 'ofer', 'акција'];
+  function isDiscountQuery(n) {
+    return DISCOUNT_KW.some(function (k) {
+      return matchAnyInWords(n, k);
     });
   }
 
@@ -912,6 +985,11 @@
       return buildRec(bestRec, n);
     }
     clarifyState = null;
+    // 1.8) Прашање за попуст/акција → провери Supabase и врати листа (пред општите намери)
+    if (isDiscountQuery(n)) {
+      const discInt = INTENTS[0]; // discounts е прв во низата
+      return { text: discInt.answer(n), chips: [] };
+    }
     // 2) Потоа — општи намери
     let best = null, bestScore = 0;
     INTENTS.forEach(function (int) {
@@ -1001,6 +1079,8 @@
     '.b-card__desc{font-size:12.5px;color:#4a4a4a;line-height:1.45;margin-top:6px;}',
     '.b-card__target{font-size:12px;color:#7a6f6a;margin-top:5px;}',
     '.b-card__price{font-weight:700;font-size:13.5px;margin-top:6px;color:#17171c;}',
+    '.b-card__price-old{text-decoration:line-through;color:#9e9490;font-weight:400;font-size:12px;margin-right:4px;}',
+    '.b-card__discount-badge{display:inline-block;background:#EC1752;color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:999px;margin-left:6px;vertical-align:middle;}',
     '.b-card__actions{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}',
     '.b-chip--link{display:inline-flex;align-items:center;text-decoration:none;}',
     '#monetaBotZoom{position:fixed;inset:0;z-index:10030;background:rgba(10,8,12,.82);display:none;align-items:center;justify-content:center;padding:24px;}',

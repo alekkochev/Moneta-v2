@@ -3582,9 +3582,10 @@ window.MonetaData = {
             const cart = layout.querySelector('.model-cart');
             const price = Number(prod.price) || 0;
             const oldRaw = prod.old_price ? Number(prod.old_price) : 0;
-            const discount = Number(prod.discount) || 0;
-            // стара цена = old_price (ако е поголема) или price + discount (ако има изречен попуст)
-            const old = oldRaw > price ? oldRaw : (discount > 0 ? price + discount : 0);
+            const discRaw = Number(prod.discount) || 0;
+            // discount колона: < 100 → %, ≥ 100 → денари (backward compat)
+            const discPct = discRaw > 0 ? (discRaw < 100 ? discRaw : Math.round(discRaw / price * 100)) : 0;
+            const old = oldRaw > price ? oldRaw : (discPct > 0 ? Math.round(price / (1 - discPct / 100)) : 0);
             const pct = old > price ? Math.round((old - price) / old * 100) : 0;
             const isEn = document.documentElement.lang === 'en';
 
@@ -3612,20 +3613,19 @@ window.MonetaData = {
                     oldEl.style.display = 'none';
                 }
 
-                // значка за попуст: изречен (ден.) или процент
+                // значка за попуст — секогаш во %
                 let badge = null;
                 if (priceEl.parentElement) {
                     badge = priceEl.parentElement.querySelector(':scope > .promo-badge');
                 }
-                if (discount > 0 || pct > 0) {
+                const showPct = discPct || pct;
+                if (showPct > 0) {
                     if (!badge) {
                         badge = document.createElement('span');
                         badge.className = 'promo-badge';
                         priceEl.insertAdjacentElement('afterend', badge);
                     }
-                    badge.textContent = discount > 0
-                        ? '−' + discount + (isEn ? ' MKD' : ' ден.')
-                        : '−' + pct + '%';
+                    badge.textContent = '−' + showPct + '%';
                     badge.style.display = '';
                 } else if (badge) {
                     badge.style.display = 'none';
@@ -3663,19 +3663,21 @@ window.MonetaData = {
             if (!prod) return;
             const price = Number(prod.price) || 0;
             const oldRaw = prod.old_price ? Number(prod.old_price) : 0;
-            const discount = Number(prod.discount) || 0;
-            const old = oldRaw > price ? oldRaw : (discount > 0 ? price + discount : 0);
+            const discRaw = Number(prod.discount) || 0;
+            const discPct = discRaw > 0 ? (discRaw < 100 ? discRaw : Math.round(discRaw / price * 100)) : 0;
+            const old = oldRaw > price ? oldRaw : (discPct > 0 ? Math.round(price / (1 - discPct / 100)) : 0);
             const pct = old > price ? Math.round((old - price) / old * 100) : 0;
             // ВАЖНО: значката мора на .card (overflow:visible), НЕ на .card__image (overflow:hidden) — инаку долниот дел што виси надвор е отсечен
             const imgWrap = card;
             let badge = imgWrap.querySelector('.promo-badge--card');
-            if (discount > 0 || pct > 0) {
+            const showPct = discPct || pct;
+            if (showPct > 0) {
                 if (!badge) {
                     badge = document.createElement('span');
                     badge.className = 'promo-badge promo-badge--card';
                     imgWrap.appendChild(badge);
                 }
-                badge.textContent = discount > 0 ? '−' + discount + ' ден.' : pct + '%';
+                badge.textContent = showPct + '%';
             } else if (badge) {
                 badge.remove();
             }
