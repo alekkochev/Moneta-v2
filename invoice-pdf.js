@@ -41,25 +41,46 @@
     });
   }
 
+  // ВАЖНО: pdfmake.min.js МОРА да се вчита ПРВО, па дури потоа vfs_fonts.js.
+  // Паралелното вчитување (Promise.all) создава трка: ако vfs_fonts.js стигне прв,
+  // window.pdfMake останува само {vfs} без createPdf → PDF-от не се генерира.
+  function loadLibs() {
+    if (libPromise) return libPromise;
+    libPromise = loadScript(PDFMAKE_URL).then(function () {
+      return loadScript(VFS_URL);
+    });
+    return libPromise;
+  }
+
   function fmt(n) {
     return n.toLocaleString('mk-MK') + ' ден.';
   }
 
-  function sizesText(it) {
-    if (!it.sizes || typeof it.sizes !== 'object') return '';
-    return Object.keys(it.sizes)
-      .filter(function (s) { return Number(it.sizes[s]) > 0; })
-      .map(function (s) { return s + ' × ' + it.sizes[s]; })
-      .join(', ');
-  }
-
+  // Секоја големина = посебна ставка (ред) во табелата.
   function buildDocDef(order, invNo, vatRate, dateStr) {
     var items = Array.isArray(order.items) ? order.items : [];
-    var goods = items.reduce(function (s, it) { return s + (Number(it.price) || 0) * (Number(it.qty) || 0); }, 0);
-    var taxBase = Math.round((goods / (1 + vatRate)) * 100) / 100;
-    var vat = Math.round((goods - taxBase) * 100) / 100;
+    var rows = [];
+    items.forEach(function (it) {
+      var price = Number(it.price) || 0;
+      var name = String(it.name || it.slug || '?');
+      var sizes = (it.sizes && typeof it.sizes === 'object') ? it.sizes : {};
+      var keys = Object.keys(sizes).filter(function (s) { return Number(sizes[s]) > 0; });
+      if (keys.length === 0) {
+        var qty = Number(it.qty) || 1;
+        rows.push({ name: name, size: '-', qty: qty, price: price });
+      } else {
+        keys.forEach(function (s) {
+          rows.push({ name: name, size: String(s), qty: Number(sizes[s]), price: price });
+        });
+      }
+    });
+
+    // Цените се БЕЗ ДДВ (нето); ДДВ се додава на крајот.
+    var goods = rows.reduce(function (s, r) { return s + r.price * r.qty; }, 0);
+    var taxBase = Math.round(goods * 100) / 100;
+    var vat = Math.round((taxBase * vatRate) * 100) / 100;
     var delivery = Number(order.delivery) || 0;
-    var grand = goods + delivery;
+    var grand = Math.round((taxBase + vat + delivery) * 100) / 100;
 
     var tableBody = [[
       { text: '#', style: 'th' },
@@ -69,16 +90,14 @@
       { text: 'Цена', style: 'th' },
       { text: 'Износ', style: 'th' },
     ]];
-    items.forEach(function (it, i) {
-      var price = Number(it.price) || 0;
-      var qty = Number(it.qty) || 0;
+    rows.forEach(function (r, i) {
       tableBody.push([
         String(i + 1),
-        String(it.name || it.slug || '?'),
-        sizesText(it) || '-',
-        String(qty),
-        fmt(price),
-        { text: fmt(price * qty), bold: true },
+        r.name,
+        r.size,
+        String(r.qty),
+        fmt(r.price),
+        { text: fmt(r.price * r.qty), bold: true },
       ]);
     });
 
@@ -104,7 +123,7 @@
               width: 'auto',
               alignment: 'right',
               stack: [
-                { text: 'Испратница-Фактура', fontSize: 24, bold: true, color: '#212124' },
+                { text: 'Испратница', fontSize: 24, bold: true, color: '#212124' },
                 { text: 'Број: ' + invNo, fontSize: 10, color: '#808080' },
                 { text: 'Датум: ' + dateStr, fontSize: 10, color: '#808080' },
               ],
@@ -200,16 +219,15 @@
     // Враќа { base64, invNo } или null при грешка.
     build: async function (order, vatRate) {
       try {
-        if (!libPromise) {
-          libPromise = Promise.all([loadScript(PDFMAKE_URL), loadScript(VFS_URL)]);
-        }
-        await libPromise;
+        await loadLibs();
         var now = new Date();
         var invNo = 'INV-' + now.getFullYear()
           + String(now.getMonth() + 1).padStart(2, '0')
           + String(now.getDate()).padStart(2, '0') + '-'
           + String(Math.floor(Math.random() * 9000) + 1000);
-        var dateStr = now.toLocaleDateString('mk-MK');
+        // Датум во МК формат: 9.авг.2026
+        var MK_MONTHS = ['јан.', 'фев.', 'мар.', 'апр.', 'мај.', 'јун.', 'јул.', 'авг.', 'септ.', 'окт.', 'ноем.', 'дек.'];
+        var dateStr = now.getDate() + '.' + MK_MONTHS[now.getMonth()] + now.getFullYear();
         await loadLogo();
         var docDef = buildDocDef(order, invNo, vatRate || 0.18, dateStr);
         var b64 = await new Promise(function (resolve, reject) {

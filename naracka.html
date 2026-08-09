@@ -254,7 +254,7 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
     <!-- ===== SCRIPTS ===== -->
     <script src="./vendor/aos.js" defer></script>
     <script src="./script.js?v=20260810" defer></script>
-    <script src="./invoice-pdf.js" defer></script>
+    <script src="./invoice-pdf.js?v=20260809" defer></script>
     <script>
         // ===== CHECKOUT LOGIC (нарачка) =====
         document.addEventListener('DOMContentLoaded', () => {
@@ -285,17 +285,33 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
                         </div>`;
                     return;
                 }
-                const total = items.reduce((s, it) => s + it.qty * (it.price || 0), 0);
+                // Секоја големина = посебен артикл (како во испратницата)
+                const rows = [];
+                items.forEach((it) => {
+                    const name = isEn() ? it.nameEn : it.nameMk;
+                    const sizeEntries = Object.entries((it && it.sizes) || {})
+                        .filter(([, q]) => (Number(q) || 0) > 0);
+                    if (sizeEntries.length === 0) {
+                        rows.push({ name, size: null, qty: it.qty, price: it.price || 0 });
+                    } else {
+                        sizeEntries.forEach(([sz, q]) => {
+                            rows.push({ name, size: sz, qty: Number(q), price: it.price || 0 });
+                        });
+                    }
+                });
+                const total = rows.reduce((s, r) => s + r.qty * r.price, 0);
                 const freeShip = total >= window.MonetaCart.FREE_SHIP_THRESHOLD;
                 const delivery = freeShip ? 0 : 160;
                 const grand = total + delivery;
 
-                summaryEl.innerHTML = items.map((it) => {
-                    const bd = sizeBreakdown(it);
+                summaryEl.innerHTML = rows.map((r) => {
+                    const sizeTxt = r.size === null
+                        ? ` × ${r.qty}`
+                        : ` — ${isEn() ? 'Size' : 'Број'} ${r.size || (isEn() ? 'Universal' : 'Универзална')} × ${r.qty}`;
                     return `
                     <div class="checkout__summary-item">
-                        <span class="n">${isEn() ? it.nameEn : it.nameMk}${bd ? ' — ' + bd : ' × ' + it.qty}</span>
-                        <span>${fmt(it.qty * (it.price || 0))}</span>
+                        <span class="n">${r.name}${sizeTxt}</span>
+                        <span>${fmt(r.qty * r.price)}</span>
                     </div>`;
                 }).join('') + `
                     <div class="checkout__summary-item">
