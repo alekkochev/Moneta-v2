@@ -316,18 +316,18 @@
     const price = m.price ? '<div class="b-card__price">💰 ' + m.price.toLocaleString('mk-MK') + ' ден.</div>' : '';
     const target = m.target ? '<div class="b-card__target">🎯 ' + esc(m.target) + '</div>' : '';
     return '<div class="b-card">'
-      + '<div class="b-card__imgwrap"><img src="' + imgPath(m.slug) + '" alt="' + esc(m.name) + '" loading="lazy" data-zoom="' + esc(m.slug) + '"><span class="b-card__zoom">🔍 ' + esc(t('кликни за зголеми', 'kliko për zmadhim', 'click to enlarge')) + '</span></div>'
+      + '<div class="b-card__imgwrap"><img src="' + imgPath(m.slug) + '" alt="' + esc(m.name) + '" loading="lazy" data-zoom="' + esc(m.slug) + '"><span class="b-card__zoom">🔍</span></div>'
       + '<div class="b-card__body">'
       + '<div class="b-card__name">' + esc(m.name) + '</div>'
       + (m.tag ? '<div class="b-card__tag">' + esc(m.tag) + '</div>' : '')
+      + price
       + '<div class="b-card__desc">' + esc(m.desc) + '</div>'
       + target
-      + price
-      + '</div>'
       + '<div class="b-card__actions">'
       + '<button class="b-chip" data-action="specs" data-slug="' + esc(m.slug) + '">🔍 ' + esc(t('Карактеристики', 'Karakteristikat', 'Specs')) + '</button>'
       + '<button class="b-chip" data-action="add" data-slug="' + esc(m.slug) + '">🛒 ' + esc(t('Додај во кошничка', 'Shto në shportë', 'Add to cart')) + '</button>'
       + '<a class="b-chip b-chip--link" href="' + imgPath(m.slug).replace(/images\/cards.*/, '') + 'modeli/' + esc(m.slug) + '.html" target="_blank" rel="noopener">↗ ' + esc(t('На сајтот', 'Në faqe', 'On site')) + '</a>'
+      + '</div>'
       + '</div>'
       + '</div>';
   }
@@ -546,8 +546,11 @@
       const pct = r.pct != null ? '<div class="b-thumb__match">' + r.pct + '%</div>' : '';
       thumbs += '<div class="b-thumb" data-model="' + esc(r.slug) + '">'
         + '<div class="b-thumb__img"><img src="' + base + 'images/cards/' + r.slug + '.webp" alt="' + esc(m.name) + '" loading="lazy" data-zoom="' + esc(r.slug) + '">' + pct + '</div>'
+        + '<div class="b-thumb__info">'
         + '<div class="b-thumb__name">' + esc(m.name) + '</div>'
         + '<div class="b-thumb__price">' + (m.price ? m.price.toLocaleString('mk-MK') + ' ден.' : '') + '</div>'
+        + '<div class="b-thumb__desc">' + esc((m.desc || '').slice(0, 55)) + '</div>'
+        + '</div>'
         + '</div>';
       chips.push({ label: m.name, q: r.slug });
     });
@@ -834,35 +837,35 @@
     '.b-typing span:nth-child(2){animation-delay:.2s}.b-typing span:nth-child(3){animation-delay:.4s}',
     '@keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}',
     '#monetaBotChips{display:flex;flex-wrap:wrap;gap:7px;padding:0 14px 10px;background:#faf7f6;}',
-    '.b-chip{border:1px solid rgba(236,23,82,.35);background:#fff;color:#EC1752;border-radius:999px;padding:7px 12px;font-size:12.5px;font-weight:700;cursor:pointer;transition:background .15s;}',
+    '.b-chip{border:1px solid rgba(236,23,82,.35);background:#fff;color:#EC1752;border-radius:999px;padding:7px 12px;font-size:12.5px;font-weight:400;cursor:pointer;transition:background .15s;}',
     '.b-chip:hover{background:rgba(236,23,82,.08);}',
     '.b-rec{padding:2px 0;}',
     '.b-rec__title{font-weight:800;font-size:14px;margin-bottom:4px;}',
     '.b-rec__text{font-size:12.5px;color:#4a4a4a;line-height:1.45;margin-bottom:10px;}',
-    '.b-thumbs{display:flex;flex-wrap:wrap;gap:10px;margin:4px 0;}',
-    '.b-thumb{width:calc(50% - 5px);min-width:120px;background:#fff;border:1px solid #efe9e6;border-radius:12px;overflow:hidden;cursor:pointer;transition:transform .14s ease,box-shadow .14s ease;}',
-    '.b-thumb:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.08);}',
-    '.b-thumb__img{aspect-ratio:4/3;overflow:hidden;position:relative;}',
+    '.b-thumbs{display:flex;flex-direction:column;gap:8px;margin:4px 0;}',
+    '.b-thumb{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #efe9e6;border-radius:12px;overflow:hidden;cursor:pointer;transition:transform .14s ease,box-shadow .14s ease;padding:8px;}',
+    '.b-thumb:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.07);}',
+    '.b-thumb__img{width:64px;height:64px;flex-shrink:0;border-radius:10px;overflow:hidden;position:relative;}',
     '.b-thumb__img img{display:block;width:100%;height:100%;object-fit:cover;}',
-    '.b-thumb__match{position:absolute;top:6px;right:6px;background:#EC1752;color:#fff;font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:999px;box-shadow:0 2px 8px rgba(236,23,82,.4);}',
-    '.b-thumb__name{font-size:11.5px;font-weight:700;padding:6px 8px 0;line-height:1.2;}',
-    '.b-thumb__price{font-size:11.5px;font-weight:800;padding:2px 8px 8px;color:#17171c;}',
+    '.b-thumb__match{position:absolute;top:3px;right:3px;background:#EC1752;color:#fff;font-size:10px;font-weight:600;padding:2px 6px;border-radius:999px;box-shadow:0 2px 6px rgba(236,23,82,.35);}',
+    '.b-thumb__info{flex:1;min-width:0;}',
+    '.b-thumb__name{font-size:12.5px;font-weight:600;line-height:1.2;}',
+    '.b-thumb__price{font-size:12px;font-weight:600;color:#17171c;margin-top:2px;}',
+    '.b-thumb__desc{font-size:11px;color:#6a6360;line-height:1.3;margin-top:3px;}',
     '.b-rec__hint{font-size:11px;color:#9a918b;margin-top:8px;}',
-    '#monetaBotCart{position:relative;background:none;border:none;color:#fff;font-size:18px;cursor:pointer;padding:6px;display:flex;align-items:center;margin-left:auto;margin-right:2px;}',
-    '#monetaBotCart svg{width:20px;height:20px;}',
-    '#monetaBotCart .b-cart__badge{position:absolute;top:-2px;right:-2px;min-width:16px;height:16px;border-radius:8px;background:#fff;color:#EC1752;font-size:10px;font-weight:800;display:none;align-items:center;justify-content:center;padding:0 4px;}',
+    '#monetaBotCart{display:none;}',
     '.b-msg.b-bot.is-card{max-width:100%;padding:0;background:transparent;border:none;border-bottom-left-radius:0;}',
-    '.b-card{background:#fff;border:1px solid #efe9e6;border-radius:14px;overflow:hidden;}',
-    '.b-card__imgwrap{position:relative;cursor:zoom-in;overflow:hidden;}',
-    '.b-card__imgwrap img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;}',
+    '.b-card{background:#fff;border:1px solid #efe9e6;border-radius:14px;overflow:hidden;display:flex;gap:0;}',
+    '.b-card__imgwrap{width:120px;flex-shrink:0;position:relative;cursor:zoom-in;overflow:hidden;}',
+    '.b-card__imgwrap img{display:block;width:100%;height:100%;object-fit:cover;aspect-ratio:3/4;}',
     '.b-card__zoom{position:absolute;left:8px;bottom:8px;background:rgba(0,0,0,.55);color:#fff;font-size:10.5px;padding:3px 8px;border-radius:999px;pointer-events:none;}',
-    '.b-card__body{padding:10px 12px 4px;}',
-    '.b-card__name{font-weight:800;font-size:14.5px;}',
-    '.b-card__tag{font-size:11.5px;color:#EC1752;font-weight:700;margin-top:1px;}',
+    '.b-card__body{flex:1;min-width:0;padding:8px 10px 8px;}',
+    '.b-card__name{font-weight:700;font-size:14px;}',
+    '.b-card__tag{font-size:11px;color:#EC1752;font-weight:600;margin-top:1px;}',
     '.b-card__desc{font-size:12.5px;color:#4a4a4a;line-height:1.45;margin-top:6px;}',
     '.b-card__target{font-size:12px;color:#7a6f6a;margin-top:5px;}',
-    '.b-card__price{font-weight:800;font-size:14px;margin-top:6px;color:#17171c;}',
-    '.b-card__actions{display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px 12px;}',
+    '.b-card__price{font-weight:700;font-size:13.5px;margin-top:6px;color:#17171c;}',
+    '.b-card__actions{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}',
     '.b-chip--link{display:inline-flex;align-items:center;text-decoration:none;}',
     '#monetaBotZoom{position:fixed;inset:0;z-index:10030;background:rgba(10,8,12,.82);display:none;align-items:center;justify-content:center;padding:24px;}',
     '#monetaBotZoom.is-open{display:flex;animation:botFade .18s ease;}',
@@ -899,7 +902,6 @@
     '<div id="monetaBotHead">',
     '<span class="b-avatar">🤖</span>',
     '<div><div class="b-title" data-b="title">МОНЕТА асистент</div><div class="b-sub" data-b="sub">Одговара веднаш · 24/7</div></div>',
-    '<button class="b-cart" id="monetaBotCart" aria-label="Кошница" title="Кошница"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><span class="b-cart__badge" id="monetaBotCartBadge">0</span></button>',
     '<button class="b-close" id="monetaBotClose" aria-label="Затвори">×</button>',
     '</div>',
     '<div id="monetaBotBody"></div>',
@@ -930,8 +932,6 @@
     const btn = document.getElementById('monetaBotBtn');
     const close = document.getElementById('monetaBotClose');
     const send = document.getElementById('monetaBotSend');
-    const cartBtn = document.getElementById('monetaBotCart');
-    const cartBadge = document.getElementById('monetaBotCartBadge');
     const zoom = document.getElementById('monetaBotZoom');
     const zoomImg = document.getElementById('monetaBotZoomImg');
     let first = true;
@@ -975,6 +975,7 @@
     }
 
     function open() {
+      document.body.style.overflow = 'hidden';
       win.classList.add('is-open');
       btn.classList.add('is-open');
       if (first) {
@@ -989,6 +990,7 @@
       input.focus();
     }
     function closeWin() {
+      document.body.style.overflow = '';
       win.classList.remove('is-open');
       btn.classList.remove('is-open');
     }
@@ -1013,42 +1015,28 @@
         } else {
           renderChips();
         }
-        syncCartBadge();
       });
     }
 
-    // ---- Кошничка во чатот ----
-    function syncCartBadge() {
-      if (!cartBadge) return;
-      const n = (window.MonetaCart && window.MonetaCart.totalQty(window.MonetaCart.getCart())) || 0;
-      cartBadge.textContent = n > 99 ? '99+' : n;
-      cartBadge.style.display = n > 0 ? 'flex' : 'none';
-    }
-    function openCartInChat() {
-      if (!win.classList.contains('is-open')) open();
-      const cart = (window.MonetaCart && window.MonetaCart.getCart()) || {};
-      const slugs = Object.keys(cart);
-      if (!slugs.length) {
-        addMsg('🛒 ' + t('Кошничката е празна. Додади некоја влошка од картичките погоре!', 'Shporta është bosh. Shto një taban nga kartat më sipër!', 'Your cart is empty. Add an insole from the cards above!'), 'bot');
-        renderChips();
-        return;
-      }
-      const lines = [];
-      let total = 0;
-      slugs.forEach(function (slug) {
-        const it = cart[slug];
-        if (!it) return;
-        lines.push('• ' + (it.nameMk || slug) + ' ×' + it.qty + ' — ' + ((it.price || 0) * it.qty).toLocaleString('mk-MK') + ' ден.');
-        total += (it.price || 0) * it.qty;
+    // ---- Лет-анимација: магента "м" лета кон кошничката (1.5 сек) ----
+    function flyToCart() {
+      const cartEl = document.querySelector('.navbar__cart');
+      if (!cartEl) return;
+      const btn = document.getElementById('monetaBotBtn');
+      const from = btn ? btn.getBoundingClientRect() : { left: 100, top: window.innerHeight - 80 };
+      const to = cartEl.getBoundingClientRect();
+      const m = document.createElement('div');
+      m.textContent = 'm';
+      m.style.cssText = 'position:fixed;left:' + from.left + 'px;top:' + from.top + 'px;font-size:28px;font-weight:800;color:#EC1752;z-index:10025;pointer-events:none;transition:all 1.5s cubic-bezier(.25,.1,.25,1);';
+      document.body.appendChild(m);
+      requestAnimationFrame(function () {
+        m.style.left = (to.left + to.width / 2 - 14) + 'px';
+        m.style.top = (to.top + to.height / 2 - 14) + 'px';
+        m.style.fontSize = '14px';
+        m.style.opacity = '0.3';
       });
-      addMsg('🛒 ' + t('Во кошничката:', 'Në shportë:', 'In your cart:') + '\n' + lines.join('\n') + '\n' + t('Вкупно:', 'Totali:', 'Total:') + ' ' + total.toLocaleString('mk-MK') + ' ден.', 'bot');
-      renderChipsArr([
-        { label: '🛒 ' + t('Отвори ја кошничката', 'Hap shportën', 'Open cart'), q: 'OPEN_CART' },
-        { label: t('Продолжи со купување', 'Vazhdo blerjen', 'Continue shopping'), q: '' }
-      ]);
+      setTimeout(function () { m.remove(); }, 1550);
     }
-
-    // ---- Додавање во кошничка (истата кошничка како сајтот) ----
     function addToCart(slug, size, qty) {
       if (!window.MonetaCart) return false;
       const prods = (window.MonetaData && window.MonetaData.products) || {};
@@ -1072,7 +1060,6 @@
       if (window.MonetaCart.renderNavBadges) window.MonetaCart.renderNavBadges();
       if (window.MonetaCart.renderFreeShip) window.MonetaCart.renderFreeShip(cart);
       if (window.MonetaCartOnChange) window.MonetaCartOnChange(cart);
-      syncCartBadge();
       return true;
     }
     function startAddFlow(slug) {
@@ -1102,12 +1089,10 @@
           { label: '🛒 ' + t('Отвори кошничка', 'Hap shportën', 'Open cart'), q: 'OPEN_CART' },
           { label: t('Продолжи', 'Vazhdo', 'Continue'), q: '' }
         ]);
-        const img = body.querySelector('.b-card__imgwrap img[data-zoom="' + slug + '"]');
-        if (img) flyToCart(img);
+        flyToCart();
       } else {
         addMsg('⚠️ ' + t('Не можев да го додадам. Пробај повторно.', 'Nuk munda ta shtoja. Provo përsëri.', 'Could not add it. Try again.'), 'bot');
       }
-      syncCartBadge();
     }
 
     // ---- Лет-анимација кон кошничката на сајтот (горе-десно) ----
@@ -1153,7 +1138,6 @@
       if (win.classList.contains('is-open')) closeWin(); else open();
     });
     close.addEventListener('click', closeWin);
-    if (cartBtn) cartBtn.addEventListener('click', openCartInChat);
     send.addEventListener('click', function () { ask(input.value); });
     input.addEventListener('keydown', function (e) { if (e.key === 'Enter') ask(input.value); });
     chips.addEventListener('click', function (e) {
@@ -1201,11 +1185,6 @@
       if (e.target === zoom || e.target.closest('.b-zoom-close')) closeZoom();
     });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeZoom(); });
-
-    // Синхронизација со кошничката (друг таб / враќање назад)
-    window.addEventListener('storage', function (e) { if (e.key === 'moneta_cart') syncCartBadge(); });
-    window.addEventListener('pageshow', syncCartBadge);
-    syncCartBadge();
 
     // Промена на јазик → ажурирај го насловот и копчињата
     function refreshLang() {
