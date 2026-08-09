@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Симулација — Потврда на нарачка</title>
+<style>
+  body {
+    font-family: system-ui, sans-serif;
+    background: linear-gradient(180deg, #fdf1f4 0%, #f6f2ef 100%);
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 16px;
+    box-sizing: border-box;
+  }
+  .sim-head { text-align: center; margin-bottom: 24px; }
+  .sim-head h1 { font-size: 22px; color: #212124; margin: 0 0 6px; }
+  .sim-head p { font-size: 14px; color: #666; margin: 0; }
+  .sim-controls { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; justify-content: center; }
+  .sim-btn {
+    border: none; border-radius: 999px; padding: 12px 22px;
+    font-size: 14px; font-weight: 800; cursor: pointer;
+    background: linear-gradient(135deg, #EC1752, #C4123F); color: #fff;
+    box-shadow: 0 8px 18px rgba(236,23,82,0.25);
+    transition: transform .15s ease, opacity .2s ease;
+  }
+  .sim-btn:hover { transform: translateY(-2px); }
+  .sim-btn:disabled { opacity: .5; cursor: default; transform: none; }
+  .sim-note {
+    font-size: 13px; color: #2ecc71; font-weight: 800;
+    background: rgba(46,204,113,0.12); border: 1px solid rgba(46,204,113,0.3);
+    border-radius: 12px; padding: 10px 16px; display: none;
+    margin-bottom: 16px; text-align: center;
+  }
+  .stage {
+    width: 100%; max-width: 560px; display: flex; justify-content: center;
+  }
+
+  /* ===== ИСТИОТ CSS КАКО ВО naracka.html ===== */
+  .checkout__frame {
+    border: 1px solid rgba(23,23,28,0.08);
+    border-radius: 38px;
+    background: rgba(255,255,255,0.92);
+    box-shadow: 0 24px 60px rgba(23,23,28,0.12);
+    padding: clamp(22px, 3vw, 34px);
+  }
+  .checkout__success {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    min-height: 240px;
+    cursor: pointer;
+  }
+  .checkout__success::before { display: none !important; }
+  .success-badge {
+    color: #fff;
+    background: #2ecc71;
+    border-radius: 50%;
+    width: 88px;
+    height: 88px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 14px 28px rgba(46, 204, 113, 0.38);
+    opacity: 0;
+    transform: translateY(-80px) scale(0.3);
+    animation: success-drop 0.85s cubic-bezier(0.22, 0.9, 0.32, 1.35) forwards;
+  }
+  @keyframes success-drop {
+    0%   { opacity: 0; transform: translateY(-80px) scale(0.3); }
+    70%  { opacity: 1; transform: translateY(8px) scale(1.12); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .success-title {
+    font-size: clamp(24px, 3.4vw, 40px);
+    line-height: 1.25;
+    margin: 0;
+    color: #EC1752;
+    animation: success-title-green 0.5s ease 0.7s forwards;
+  }
+  @keyframes success-title-green {
+    to { color: #2ecc71; }
+  }
+  .checkout__success.is-leaving {
+    animation: success-fadeout 0.45s ease forwards;
+  }
+  @keyframes success-fadeout {
+    to { opacity: 0; transform: translateY(12px) scale(0.97); }
+  }
+</style>
+</head>
+<body>
+
+  <div class="sim-head">
+    <h1>🎬 Симулација — Потврда на нарачка</h1>
+    <p>Истата картичка како на naracka.html — без да се прати нарачка/мејл.</p>
+  </div>
+
+  <div class="sim-controls">
+    <button class="sim-btn" id="startBtn">▶ Стартувај симулација</button>
+    <button class="sim-btn" id="restartBtn" style="background:linear-gradient(135deg,#212124,#3a3a3f);" disabled>↻ Рестарт</button>
+  </div>
+
+  <div class="sim-note" id="note"></div>
+
+  <div class="stage">
+    <div class="checkout__frame checkout__success" id="orderSuccessCard" style="display:none;">
+      <span class="success-badge" aria-hidden="true">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      <h3 class="success-title">Нарачката е испратена!</h3>
+    </div>
+    <p id="idleMsg" style="text-align:center;color:#888;font-size:15px;">Кликни „▶ Стартувај симулација" за да ја видиш анимацијата.</p>
+  </div>
+
+<script>
+  const card = document.getElementById('orderSuccessCard');
+  const idle = document.getElementById('idleMsg');
+  const note = document.getElementById('note');
+  const startBtn = document.getElementById('startBtn');
+  const restartBtn = document.getElementById('restartBtn');
+  let timers = [];
+
+  const clearTimers = () => { timers.forEach(t => clearTimeout(t)); timers = []; };
+
+  const showNote = (msg, color) => {
+    note.style.display = 'block';
+    note.style.color = color || '#2ecc71';
+    note.textContent = msg;
+  };
+
+  const reset = () => {
+    clearTimers();
+    card.classList.remove('is-leaving');
+    card.style.display = 'none';
+    card.style.opacity = '';
+    card.style.transform = '';
+    note.style.display = 'none';
+    idle.style.display = '';
+    startBtn.disabled = false;
+    restartBtn.disabled = true;
+  };
+
+  const run = () => {
+    reset();
+    startBtn.disabled = true;
+    restartBtn.disabled = false;
+    idle.style.display = 'none';
+    card.style.display = 'flex';
+    card.style.opacity = '';
+    card.style.transform = '';
+
+    const goHome = () => {
+      showNote('→ Навигација кон почетната (#kategorii) — во живо би те одвел таму.', '#212124');
+      reset();
+    };
+    const dismiss = () => {
+      if (card.dataset.leaving) return;
+      card.dataset.leaving = '1';
+      card.classList.add('is-leaving');
+      showNote('✕ Затворено (клик на/надвор од картичката) → почетна', '#EC1752');
+      timers.push(setTimeout(goHome, 450));
+    };
+
+    // клик на картичката → исчезни
+    card.onclick = (e) => { e.stopPropagation(); dismiss(); };
+    // клик надвор од картичката → исчезни
+    document.onclick = (e) => { if (card.style.display === 'flex' && !card.contains(e.target)) dismiss(); };
+
+    // автоматски по 5 секунди
+    timers.push(setTimeout(() => { showNote('⏱ 5 секунди поминаа → почетна'); dismiss(); }, 5000));
+  };
+
+  startBtn.addEventListener('click', run);
+  restartBtn.addEventListener('click', reset);
+</script>
+</body>
+</html>
