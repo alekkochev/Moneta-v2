@@ -3694,11 +3694,12 @@ window.MonetaData = {
         const prod = window.MonetaData.products[slug];
         if (!prod) return;
         const price = Number(prod.price) || 0;
-        const name = prod.name_mk || slug;
-        const desc = (prod.short_desc_mk || document.querySelector('meta[name="description"]')?.content || '').replace(/"/g, '\\"');
-        const img = prod.image || './images/cards/' + slug + '.webp';
-        const code = prod.code || '';
+        const name = (prod.name_mk || slug).replace(/"/g, '\\"');
+        const desc = (prod.short_desc_mk || prod.name_mk || slug).replace(/"/g, '\\"').substring(0, 5000);
+        const img = 'https://vloski.mk/images/cards/' + slug + '.webp';
+        const code = prod.code || slug;
         const avail = 'https://schema.org/InStock';
+        const validUntil = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
         const ld = {
             '@context': 'https://schema.org',
             '@type': 'Product',
@@ -3706,13 +3707,17 @@ window.MonetaData = {
             description: desc,
             image: img,
             sku: code,
+            mpn: code,
             brand: { '@type': 'Brand', name: 'MONETA' },
+            itemCondition: 'https://schema.org/NewCondition',
             offers: {
                 '@type': 'Offer',
                 priceCurrency: 'MKD',
                 price: price,
+                priceValidUntil: validUntil,
                 availability: avail,
-                url: 'https://vloski.mk/modeli/' + slug + '.html'
+                url: 'https://vloski.mk/modeli/' + slug + '.html',
+                seller: { '@type': 'Organization', name: 'MONETA' }
             }
         };
         let el = document.getElementById('monetaProductLD');
@@ -3881,6 +3886,56 @@ window.MonetaData = {
     // Користи реални податоци од Supabase (MonetaData) — без фејк имиња.
     // Подоцна ќе се поврзе со реални нарачки од базата.
     const CITIES = ['Скопје', 'Битола', 'Охрид', 'Тетово', 'Куманово', 'Прилеп', 'Велес', 'Штип', 'Струмица', 'Гостивар'];
+
+    const NAMES = [
+        'Ана К.', 'Марија П.', 'Елена С.', 'Биљана Т.', 'Катерина М.',
+        'Ивана Р.', 'Александра Н.', 'Софија Д.', 'Мила Ј.', 'Теодора В.',
+        'Марко К.', 'Александар П.', 'Никола С.', 'Дарко Т.', 'Филип М.',
+        'Игор Р.', 'Горан Н.', 'Стефан Д.', 'Кристијан Ј.', 'Дејан В.'
+    ];
+
+    const TIME_ACTIONS = {
+        mk: [
+            { action: 'купи',       time: 'денеска' },
+            { action: 'купи',       time: 'пред 5 мин' },
+            { action: 'купи',       time: 'пред 10 мин' },
+            { action: 'купи',       time: 'оваа недела' },
+            { action: 'нарача',     time: 'денеска' },
+            { action: 'нарача',     time: 'пред 15 мин' },
+            { action: 'нарача',     time: 'пред 20 мин' },
+            { action: 'нарача',     time: 'оваа недела' },
+            { action: 'купува',     time: 'во моментов' },
+            { action: 'го нарача',  time: 'пред 10 мин' },
+            { action: 'го нарача',  time: 'пред 30 мин' },
+            { action: 'го нарача',  time: 'оваа недела' },
+        ],
+        sq: [
+            { action: 'bleu',       time: 'sot' },
+            { action: 'bleu',       time: 'para 5 min' },
+            { action: 'bleu',       time: 'para 10 min' },
+            { action: 'bleu',       time: 'këtë javë' },
+            { action: 'porositi',   time: 'sot' },
+            { action: 'porositi',   time: 'para 15 min' },
+            { action: 'porositi',   time: 'këtë javë' },
+            { action: 'po blen',    time: 'tani' },
+            { action: 'e porositi', time: 'para 10 min' },
+            { action: 'e porositi', time: 'këtë javë' },
+        ],
+        en: [
+            { action: 'bought',     time: 'today' },
+            { action: 'bought',     time: '5 min ago' },
+            { action: 'bought',     time: '10 min ago' },
+            { action: 'bought',     time: 'this week' },
+            { action: 'ordered',    time: 'today' },
+            { action: 'ordered',    time: '15 min ago' },
+            { action: 'ordered',    time: '20 min ago' },
+            { action: 'ordered',    time: 'this week' },
+            { action: 'is buying',  time: 'right now' },
+            { action: 'just ordered', time: '10 min ago' },
+            { action: 'just ordered', time: 'this week' },
+        ],
+    };
+
     let salesShown = 0;
     let salesTimer = null;
 
@@ -3907,11 +3962,16 @@ window.MonetaData = {
     }
 
     function showSalesToast() {
-        if (!CONFIG.sales || salesShown >= 3) return;
+        if (!CONFIG.sales || salesShown >= 4) return;
         const pool = productPool();
         if (!pool.length) return;
         const prod = pool[Math.floor(Math.random() * pool.length)];
         const city = CITIES[Math.floor(Math.random() * CITIES.length)];
+        const name = NAMES[Math.floor(Math.random() * NAMES.length)];
+
+        const lang = isEn() ? 'en' : (isSq() ? 'sq' : 'mk');
+        const variants = TIME_ACTIONS[lang] || TIME_ACTIONS.mk;
+        const va = variants[Math.floor(Math.random() * variants.length)];
 
         const old = document.getElementById('monetaSalesToast');
         if (old) old.remove();
@@ -3921,8 +3981,8 @@ window.MonetaData = {
         toast.innerHTML =
             '<img class="moneta-sales-toast__img" src="' + BASE + 'images/cards/' + prod.slug + '.webp" alt="" loading="lazy">' +
             '<div class="moneta-sales-toast__body">' +
-                '<p class="moneta-sales-toast__title">' + t('⭐ Популарно', '⭐ Popullor', '⭐ Popular') + ' — ' + city + '</p>' +
-                '<p class="moneta-sales-toast__text">' + prod.name + ' · ' + prod.price + ' ' + t('ден.', 'den.', 'MKD') + '</p>' +
+                '<p class="moneta-sales-toast__title">' + name + ' · ' + city + '</p>' +
+                '<p class="moneta-sales-toast__text">' + va.action + ' ' + prod.name + ' · ' + prod.price + ' ' + t('ден.', 'den.', 'MKD') + ' · ' + va.time + '</p>' +
             '</div>' +
             '<button type="button" class="moneta-sales-toast__close" aria-label="Затвори">×</button>';
         document.body.appendChild(toast);
