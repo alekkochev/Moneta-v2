@@ -4945,7 +4945,7 @@ textarea {
    NAVBAR — light links, active link grayish (not pink), on ALL pages
    ======================================== */
 .navbar__links a {
-    font-weight: 400 !important;
+    font-weight: 300 !important;
 }
 @media (min-width: 861px) {
     .navbar__links a.is-active,
@@ -6197,7 +6197,7 @@ p { color: var(--ink-700); }
 }
 .navbar__inner {
     pointer-events: auto;
-    padding: 12px 16px;
+    padding: 7px 16px;
     border: 1px solid rgba(255, 255, 255, 0.74);
     border-radius: var(--radius-pill);
     background: rgba(255, 255, 255, 0.72);
@@ -6211,7 +6211,7 @@ p { color: var(--ink-700); }
 .page-sistem .navbar__links a {
     color: rgba(23, 23, 28, 0.70) !important;
     font-size: 14px;
-    font-weight: 750 !important;
+    font-weight: 300 !important;
     letter-spacing: -0.01em;
 }
 .navbar__links a:hover,
