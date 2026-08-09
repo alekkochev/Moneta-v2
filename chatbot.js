@@ -948,6 +948,12 @@
       clarifyState = null; funnel = null;
       return computeSizeAnswer(n);
     }
+    // 0.8) Конкретен модел спомнат → директно прикажи ја само неговата картичка (без препораки)
+    const specificModel = findModel(n);
+    if (specificModel) {
+      clarifyState = null; funnel = null;
+      return modelAnswer(specificModel);
+    }
     // 1) Прво — FAQ (поконкретни прашања од сајтот)
     let bestFaq = null, bestFaqScore = 0;
     FAQ.forEach(function (f) {
