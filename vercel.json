@@ -1,6 +1,11 @@
 {
   "redirects": [
     {
+      "source": "/index.html",
+      "destination": "https://vloski.mk/",
+      "permanent": true
+    },
+    {
       "source": "/(.*)",
       "has": [{ "type": "host", "value": "moneta-v2-orpin.vercel.app" }],
       "destination": "https://vloski.mk/$1",
