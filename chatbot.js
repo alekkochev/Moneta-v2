@@ -144,34 +144,126 @@
   };
 
   // ============================================================
-  // ДВИЖОК (engine) — препознавање намера по клучни зборови
+  // ДВИЖОК (engine) — препознавање намера
+  // Разбира: кирилица + латиница (транслитерација) + помали грешки
   // ============================================================
-  function normalize(s) { return String(s || '').toLowerCase().replace(/[^а-шѓѕјќљњџa-z0-9\s]/gi, ' ').replace(/\s+/g, ' ').trim(); }
 
-  function findModel(text) {
+  // Латиница → Кирилица (македонска)
+  function toCyr(s) {
+    const digraphs = { 'sh': 'ш', 'zh': 'ж', 'ch': 'ч', 'dzh': 'џ', 'gj': 'ѓ', 'kj': 'ќ', 'lj': 'љ', 'nj': 'њ', 'dj': 'ѓ' };
+    const singles = { 'a': 'а', 'b': 'б', 'c': 'ц', 'd': 'д', 'e': 'е', 'f': 'ф', 'g': 'г', 'h': 'х', 'i': 'и', 'j': 'ј', 'k': 'к', 'l': 'л', 'm': 'м', 'n': 'н', 'o': 'о', 'p': 'п', 'q': 'к', 'r': 'р', 's': 'с', 't': 'т', 'u': 'у', 'v': 'в', 'w': 'в', 'x': 'кс', 'y': 'ј', 'z': 'з', 'č': 'ч', 'ć': 'ќ', 'š': 'ш', 'ž': 'ж', 'đ': 'ѓ', 'ç': 'ц', 'ë': 'е' };
+    let out = '';
+    const lower = String(s || '').toLowerCase();
+    for (let i = 0; i < lower.length; i++) {
+      const three = lower.substr(i, 3);
+      const two = lower.substr(i, 2);
+      if (digraphs[three]) { out += digraphs[three]; i += 2; continue; }
+      if (digraphs[two]) { out += digraphs[two]; i += 1; continue; }
+      out += singles[lower[i]] || lower[i];
+    }
+    return out;
+  }
+
+  // „Омекнување": ш≈с, ж≈з, ч≈ц, ќ≈к, ѓ≈г, љ≈л, њ≈н (најчести неформални замени)
+  function soften(s) {
+    return toCyr(s)
+      .replace(/ш/g, 'с').replace(/ж/g, 'з').replace(/ч/g, 'ц')
+      .replace(/ќ/g, 'к').replace(/ѓ/g, 'г').replace(/љ/g, 'л')
+      .replace(/њ/g, 'н').replace(/ѕ/g, 'з');
+  }
+
+  // Леванштајн растојание — толеранција на грешки при пишување
+  function editDist(a, b) {
+    const m = a.length, n = b.length;
+    if (!m) return n; if (!n) return m;
+    const d = [];
+    for (let i = 0; i <= m; i++) d[i] = [i];
+    for (let j = 0; j <= n; j++) d[0][j] = j;
+    for (let i = 1; i <= m; i++) {
+      for (let j = 1; j <= n; j++) {
+        d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      }
+    }
+    return d[m][n];
+  }
+
+  // Форми на еден збор: оригинал + омекната кирилица
+  function forms(s) {
+    const raw = String(s || '').toLowerCase().trim();
+    const soft = soften(raw);
+    return raw === soft ? [raw] : [raw, soft];
+  }
+
+  function matchAny(word, kw) {
+    const wf = forms(word), kf = forms(kw);
+    for (let i = 0; i < wf.length; i++) {
+      for (let j = 0; j < kf.length; j++) {
+        const w = wf[i], k = kf[j];
+        if (!w || !k) continue;
+        // 1) субниз — нормален случај (зборот го содржи клучниот збор)
+        if (w.indexOf(k) !== -1) return true;
+        // 2) строго fuzzy — само подолги зборови, со ИСТ почеток (2 букви)
+        if (w.length >= 4 && k.length >= 4 && w[0] === k[0] && w[1] === k[1]) {
+          const tol = w.length <= 6 ? 1 : 2;
+          if (Math.abs(w.length - k.length) <= tol && editDist(w, k) <= tol) return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  function kwScore(words, kw) {
+    let s = 0;
+    words.forEach(function (w) { if (matchAny(w, kw)) s += Math.max(1, String(kw).length); });
+    return s;
+  }
+
+  function normalize(s) {
+    const raw = String(s || '').toLowerCase().replace(/[^а-шѓѕјќљњџa-z0-9çë\s]/gi, ' ').replace(/\s+/g, ' ').trim();
+    return { raw: raw, cyr: soften(raw), words: raw.split(' ').filter(Boolean) };
+  }
+
+  function findModel(n) {
     const prods = (window.MonetaData && window.MonetaData.products) ? Object.values(window.MonetaData.products) : [];
     const list = prods.length ? prods : Object.keys(MODEL_HIGHLIGHTS).map(function (slug) { return { slug: slug, name_mk: slug, name_en: slug }; });
+    const inText = function (name) {
+      const f = forms(name);
+      for (let j = 0; j < f.length; j++) {
+        if (n.raw.indexOf(f[j]) !== -1 || n.cyr.indexOf(f[j]) !== -1) return true;
+      }
+      return false;
+    };
     for (let i = 0; i < list.length; i++) {
       const p = list[i];
-      const names = [p.name_mk, p.name_en, p.slug].filter(Boolean).map(function (n) { return n.toLowerCase(); });
-      for (let j = 0; j < names.length; j++) {
-        if (text.indexOf(names[j]) !== -1) return p;
+      if (inText(p.name_mk) || inText(p.name_en) || inText(p.slug)) return p;
+    }
+    // fallback: некој збор од прашањето е дел од име на модел (на пр. „active")
+    const words = n.raw.split(' ').filter(function (w) { return w.length >= 4; });
+    for (let i = 0; i < list.length; i++) {
+      const p = list[i];
+      const allNames = [p.name_mk, p.name_en, p.slug].filter(Boolean).map(function (x) { return x.toLowerCase(); });
+      for (let w = 0; w < words.length; w++) {
+        for (let a = 0; a < allNames.length; a++) {
+          if (allNames[a].indexOf(words[w]) !== -1) return p;
+        }
       }
     }
     return null;
   }
 
-  function findCategory(text) {
+  function findCategory(n) {
     const map = {
       'спорт': 'sportski', 'трча': 'sportski', 'фитнес': 'sportski',
       'кожн': 'kozni', 'елегант': 'kozni', 'деловн': 'kozni',
       'летн': 'letni', 'карбон': 'letni', 'симон': 'letni',
       'зимск': 'zimski', 'термо': 'zimski', 'топлин': 'zimski',
-      'hunter': 'hunter', 'лов': 'hunter',
-      'детск': 'detski', 'деца': 'detski', 'дик': 'detski',
-      'пета': 'heelpad', 'heel': 'heelpad'
+      'хунтер': 'hunter', 'хантер': 'hunter', 'лов': 'hunter',
+      'детск': 'detski', 'деца': 'detski',
+      'пета': 'heelpad', 'хил': 'heelpad'
     };
-    for (const k in map) { if (text.indexOf(k) !== -1) return map[k]; }
+    for (const k in map) {
+      if (n.cyr.indexOf(k) !== -1 || n.cyr.indexOf(soften(k)) !== -1) return map[k];
+    }
     return null;
   }
 
@@ -225,10 +317,10 @@
     },
     {
       id: 'models', kw: ['модел', 'влошк', 'модели', 'производ', 'табан', 'model', 'produkt', 'insole'],
-      answer: function (text) {
-        const p = findModel(text);
+      answer: function (n) {
+        const p = findModel(n);
         if (p) return modelAnswer(p);
-        const cat = findCategory(text);
+        const cat = findCategory(n);
         if (cat) return categoriesAnswer(cat);
         return t(
           'Имаме 20 модели во категории: 🏃 Спортски, 👞 Кожни, ☀️ Летни, ❄️ Зимски, 🏔️ HUNTER, 👶 Детски и 🔧 Heel Pad. Побарај конкретен модел или категорија!',
@@ -238,8 +330,8 @@
     },
     {
       id: 'prices', kw: ['цен', 'чини', 'колку', 'попуст', 'den', 'çmim', 'kushton', 'price', 'cost'],
-      answer: function (text) {
-        const p = findModel(text);
+      answer: function (n) {
+        const p = findModel(n);
         if (p) return modelAnswer(p);
         return t(
           '💰 Цените можеш да ги видиш на секоја модел-страница (од 100 до 820 ден.). Кажи кој модел те интересира, па ќе ти ја кажам цената!',
@@ -260,12 +352,12 @@
   ];
 
   function answer(text) {
-    const norm = normalize(text);
+    const n = normalize(text);
     // 1) Прво — FAQ (поконкретни прашања од сајтот)
     let bestFaq = null, bestFaqScore = 0;
     FAQ.forEach(function (f) {
       let s = 0;
-      f.kw.forEach(function (k) { if (norm.indexOf(k) !== -1) s += k.length; });
+      f.kw.forEach(function (k) { s += kwScore(n.words, k); });
       if (s > bestFaqScore) { bestFaqScore = s; bestFaq = f; }
     });
     if (bestFaq && bestFaqScore > 0) return bestFaq.q + '\n' + bestFaq.a;
@@ -273,11 +365,18 @@
     let best = null, bestScore = 0;
     INTENTS.forEach(function (int) {
       let score = 0;
-      int.kw.forEach(function (k) { if (norm.indexOf(k) !== -1) score += k.length; });
+      int.kw.forEach(function (k) { score += kwScore(n.words, k); });
       if (score > bestScore) { bestScore = score; best = int; }
     });
-    if (!best) return INFO.fallback;
-    return best.answer(norm) || INFO.fallback;
+    if (!best || bestScore === 0) {
+      // Сепак пробај: конкретен модел или категорија напишани сами (на пр. „memosole")
+      const p = findModel(n);
+      if (p) return modelAnswer(p);
+      const cat = findCategory(n);
+      if (cat) return categoriesAnswer(cat);
+      return INFO.fallback;
+    }
+    return best.answer(n) || INFO.fallback;
   }
 
   // ============================================================
@@ -417,7 +516,16 @@
       addMsg(q, 'user');
       input.value = '';
       chips.innerHTML = '';
-      typing(function () { addMsg(answer(q), 'bot'); renderChips(); });
+      typing(function () {
+        const a = answer(q);
+        addMsg(a, 'bot');
+        // Ако ботот нема одговор → „префрлање": понуди директен контакт
+        if (a === INFO.fallback) {
+          chips.innerHTML = '<button class="b-chip" data-q="контакт">📞 ' + esc(t('Разговарај со нас', 'Flisni me ne', 'Talk to us')) + '</button>';
+        } else {
+          renderChips();
+        }
+      });
     }
 
     btn.addEventListener('click', function () {
