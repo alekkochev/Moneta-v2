@@ -19,6 +19,25 @@
       .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
+  // ---------- Живи цени од Supabase (fallback ако MonetaData не е вчитано) ----------
+  function ensurePrices() {
+    if (window.MonetaData && window.MonetaData.products && Object.keys(window.MonetaData.products).length) return;
+    var SUPABASE_URL = 'https://wkpkrnjrtpywuzemirbw.supabase.co';
+    var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndrcHBybmpydHB5d3V6ZW1pcmJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQyMjYzNjgsImV4cCI6MjA1OTgwMjM2OH0.fGkOnLxqcoyBxfhTsFAVmf0Fw4Gq0Z7QyVWomxWvkVg'; // анонимен public key — безбедно за front-end
+    fetch(SUPABASE_URL + '/rest/v1/products?select=slug,name_mk,name_en,code,price,old_price,discount', {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (prods) {
+      if (!window.MonetaData) window.MonetaData = {};
+      if (!window.MonetaData.products) window.MonetaData.products = {};
+      prods.forEach(function (p) {
+        window.MonetaData.products[p.slug] = p;
+      });
+    })
+    .catch(function () { /* тивко — MonetaData ќе биде достапно од script.js */ });
+  }
+
   // ============================================================
   // ЗНАЕЊЕ (knowledge base) — сите информации од страницата
   // ============================================================
@@ -296,10 +315,15 @@
     const db = prods[slug];
     const d = MODEL_DETAILS[slug] || { cat: '', tag: ['', '', ''], desc: ['', '', ''], target: ['', '', ''], specs: ['', '', ''] };
     const li = L() === 'en' ? 2 : (L() === 'sq' ? 1 : 0);
+    var price = db ? Number(db.price) : null;
+    var oldPrice = db ? Number(db.old_price) : 0;
+    if (oldPrice <= price) oldPrice = 0; // самo ако има вистински попуст
     return {
       slug: slug,
       name: (L() === 'en' ? (db && (db.name_en || db.name_mk)) : (db && (db.name_mk || db.name_en))) || slug,
-      price: db ? Number(db.price) : null,
+      price: price,
+      oldPrice: oldPrice,
+      discountPct: oldPrice > 0 ? Math.round((1 - price / oldPrice) * 100) : 0,
       cat: d.cat,
       tag: d.tag[li] || '',
       desc: d.desc[li] || '',
@@ -543,11 +567,17 @@
     const chips = [];
     ranked.forEach(function (r) {
       const m = modelData(r.slug);
+      var discBadge = m.discountPct > 0 ? '<div class="b-thumb__discount">-' + m.discountPct + '%</div>' : '';
+      var priceHtml = m.price ? m.price.toLocaleString('mk-MK') + ' ден.' : '';
+      if (m.oldPrice > 0 && m.price) {
+        priceHtml = '<span class="b-thumb__price-old">' + m.oldPrice.toLocaleString('mk-MK') + ' ден.</span> '
+          + m.price.toLocaleString('mk-MK') + ' ден.';
+      }
       thumbs += '<div class="b-thumb" data-model="' + esc(r.slug) + '">'
-        + '<div class="b-thumb__img"><img src="' + base + 'images/cards/' + r.slug + '.webp" alt="' + esc(m.name) + '" loading="lazy" data-zoom="' + esc(r.slug) + '"></div>'
+        + '<div class="b-thumb__img"><img src="' + base + 'images/cards/' + r.slug + '.webp" alt="' + esc(m.name) + '" loading="lazy" data-zoom="' + esc(r.slug) + '">' + discBadge + '</div>'
         + '<div class="b-thumb__info">'
         + '<div class="b-thumb__name">' + esc(m.name) + '</div>'
-        + '<div class="b-thumb__price">' + (m.price ? m.price.toLocaleString('mk-MK') + ' ден.' : '') + '</div>'
+        + '<div class="b-thumb__price">' + priceHtml + '</div>'
         + '<div class="b-thumb__desc">' + esc((m.desc || '').slice(0, 55)) + '</div>'
         + '</div>'
         + '</div>';
@@ -941,6 +971,8 @@
     '#monetaBotChips{display:flex;flex-wrap:wrap;gap:7px;padding:0 14px 10px;background:#faf7f6;}',
     '.b-chip{border:1px solid rgba(236,23,82,.35);background:#fff;color:#EC1752;border-radius:999px;padding:7px 12px;font-size:12.5px;font-weight:400;cursor:pointer;transition:background .15s;}',
     '.b-chip:hover{background:rgba(236,23,82,.08);}',
+    '.b-chip--fb{border-color:rgba(236,23,82,.2);color:#7a6f6a;font-size:11px;font-weight:400;}',
+    '.b-chip--done{background:#f0f0f0;pointer-events:none;}',
     '.b-rec{padding:2px 0;}',
     '.b-rec__title{font-weight:800;font-size:14px;margin-bottom:4px;}',
     '.b-rec__text{font-size:12.5px;color:#4a4a4a;line-height:1.45;margin-bottom:10px;}',
@@ -950,6 +982,8 @@
     '.b-thumb__img{width:64px;height:64px;flex-shrink:0;border-radius:10px;overflow:hidden;position:relative;}',
     '.b-thumb__img img{display:block;width:100%;height:100%;object-fit:cover;}',
     '.b-thumb__match{display:none;}',
+    '.b-thumb__discount{position:absolute;top:4px;right:4px;background:#EC1752;color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:999px;z-index:2;}',
+    '.b-thumb__price-old{text-decoration:line-through;color:#a09893;font-size:10.5px;margin-right:4px;}',
     '.b-thumb__info{flex:1;min-width:0;}',
     '.b-thumb__name{font-size:12.5px;font-weight:600;line-height:1.2;}',
     '.b-thumb__price{font-size:12px;font-weight:600;color:#17171c;margin-top:2px;}',
@@ -1023,6 +1057,7 @@
   }
 
   function build() {
+    ensurePrices();
     injectCss();
     const holder = document.createElement('div');
     holder.id = 'monetaBotRoot';
@@ -1100,9 +1135,21 @@
       const bd = document.getElementById('monetaBotBackdrop');
       if (bd) bd.style.display = 'none';
     }
+    var lastUserQ = '';
+
+    function logFallback(question) {
+      try {
+        var arr = JSON.parse(localStorage.getItem('moneta_bot_log') || '[]');
+        arr.push({ q: question, t: new Date().toISOString() });
+        if (arr.length > 200) arr = arr.slice(-100);
+        localStorage.setItem('moneta_bot_log', JSON.stringify(arr));
+      } catch (e) { /* ignore */ }
+    }
+
     function ask(text) {
       const q = String(text || '').trim();
       if (!q) return;
+      lastUserQ = q;
       addMsg(q, 'user');
       input.value = '';
       chips.innerHTML = '';
@@ -1116,10 +1163,14 @@
         if (res.chips && res.chips.length) {
           renderChipsArr(res.chips);
         } else if (res.text === INFO.fallback) {
-          // „префрлање": понуди директен контакт
-          chips.innerHTML = '<button class="b-chip" data-q="контакт">📞 ' + esc(t('Разговарај со нас', 'Flisni me ne', 'Talk to us')) + '</button>';
+          logFallback(q); // логирај непознати прашања
+          chips.innerHTML = '<button class="b-chip" data-q="контакт">📞 ' + esc(t('Разговарај со нас', 'Flisni me ne', 'Talk to us')) + '</button>'
+            + '<button class="b-chip b-chip--fb" data-fb="no">👎 ' + esc(t('Не помогна', 'Nuk ndihmoi', 'Not helpful')) + '</button>';
         } else {
           renderChips();
+          // фидбек чип после секој нормален одговор
+          chips.innerHTML += '<button class="b-chip b-chip--fb" data-fb="yes">👍 ' + esc(t('Корисно', 'E dobishme', 'Helpful')) + '</button>'
+            + '<button class="b-chip b-chip--fb" data-fb="no">👎 ' + esc(t('Не', 'Jo', 'No')) + '</button>';
         }
       });
     }
@@ -1251,6 +1302,19 @@
     chips.addEventListener('click', function (e) {
       const b = e.target.closest('.b-chip');
       if (!b) return;
+      const fb = b.getAttribute('data-fb');
+      if (fb) {
+        // логирај фидбек
+        try {
+          var flog = JSON.parse(localStorage.getItem('moneta_bot_feedback') || '[]');
+          flog.push({ fb: fb, q: lastUserQ, t: new Date().toISOString() });
+          if (flog.length > 200) flog = flog.slice(-100);
+          localStorage.setItem('moneta_bot_feedback', JSON.stringify(flog));
+        } catch (ex) { /* ignore */ }
+        b.textContent = fb === 'yes' ? '✅ ' + t('Фала!', 'Faleminderit!', 'Thanks!') : '✅ ' + t('Забележано', 'Shënuar', 'Noted');
+        b.classList.add('b-chip--done');
+        return;
+      }
       const act = b.getAttribute('data-action');
       if (act === 'size') {
         addWithSize(b.getAttribute('data-slug'), b.getAttribute('data-size'));
