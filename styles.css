@@ -6198,10 +6198,10 @@ p { color: var(--ink-700); }
 .navbar__inner {
     pointer-events: auto;
     padding: 7px 16px;
-    border: 1px solid rgba(255, 255, 255, 0.74);
+    border: 1px solid rgba(255, 255, 255, 0.55);
     border-radius: var(--radius-pill);
-    background: rgba(255, 255, 255, 0.72);
-    box-shadow: 0 18px 54px rgba(23, 23, 28, 0.10);
+    background: rgba(255, 255, 255, 0.45);
+    box-shadow: 0 18px 54px rgba(23, 23, 28, 0.08);
     backdrop-filter: blur(22px) saturate(155%);
     -webkit-backdrop-filter: blur(22px) saturate(155%);
 }
