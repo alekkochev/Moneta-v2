@@ -32,7 +32,7 @@
         'Insoles are made in standard European shoe sizes (35-46). We recommend choosing the same size you wear most often.')
     },
     {
-      kw: ['тра', 'трае', 'живот', 'колку долго', 'last', 'zgjat'],
+      kw: ['трае', 'траат', 'живот', 'колку долго', 'last', 'zgjat'],
       q: t('Колку траат влошките?', 'Sa zgjasin tabanët?', 'How long do the insoles last?'),
       a: t(
         'Со редовно користење, очекуваниот век на влошките е помеѓу 6 и 12 месеци, зависно од тежината, активноста и подлогата.',
@@ -152,16 +152,16 @@
   // ПРЕПОРАКИ — врз основа на потребата/симптомот на корисникот
   // ============================================================
   const RECS = [
-    { id: 'umor', kw: ['умор', 'уморн', 'замор', 'морни', 'нозе', 'ноги', 'tired', 'fatigue', 'lodh'], strong: ['умор', 'уморн', 'замор', 'tired', 'fatigue', 'lodh'], models: ['soft-gel', 'memosole', 'active-gel', 'x-treme'], title: t('🦶 За уморни нозе', '🦶 Për këmbë të lodhura', '🦶 For tired feet'), text: t('При умор и тежина во нозете најважна е амортизацијата и мекоста. Овие модели ја апсорбираат силата при одење и го намалуваат заморот преку денот:', 'Me lodhje dhe rëndim në këmbë, më e rëndësishme është amortizimi dhe butësia. Këto modele thithin forcën gjatë ecjes dhe reduktojnë lodhjen gjatë ditës:', 'For fatigue and heaviness in the legs, cushioning and softness matter most. These models absorb force while walking and reduce daily fatigue:') },
-    { id: 'peta', kw: ['пета', 'петица', 'болка', 'бол', 'болки', 'paine', 'heel', 'thembr', 'dhimbje'], strong: ['пета', 'петица', 'болка', 'бол', 'болки', 'paine', 'heel', 'thembr', 'dhimbje'], models: ['heel-pad', 'heel-pad-fix', 'heel-pad-grip', 'vital'], title: t('👟 Болка во петата', '👟 Dhimbje thembrash', '👟 Heel pain'), text: t('За болка во петата препорачуваме влошки со карбосан перниче кое ја амортизира петата при секој чекор:', 'Për dhimbje thembrash rekomandojmë tabanë me jastëk karboni që amortizon thembrën në çdo hap:', 'For heel pain we recommend insoles with a carbon cushion that absorbs the heel with every step:') },
-    { id: 'trcanje', kw: ['трча', 'трчање', 'тренинг', 'спорт', 'фитнес', 'вежба', 'run', 'running', 'training', 'sport', 'vrap', 'stërvit'], strong: ['трча', 'трчање', 'тренинг', 'run', 'running', 'vrap'], models: ['anatomiX', 'active-gel', 'sportex', 'x-treme'], title: t('🏃 За трчање и тренинг', '🏃 Për vrap dhe stërvitje', '🏃 For running & training'), text: t('За трчање и спорт најважна е апсорпцијата на удари и стабилноста на стапалото. Овие модели се создадени за тоа:', 'Për vrap dhe sport, më e rëndësishme është thithja e goditjeve dhe stabiliteti i këmbës. Këto modele janë krijuar për këtë:', 'For running and sports, shock absorption and foot stability matter most. These models are made for that:') },
-    { id: 'planina', kw: ['планинаре', 'лов', 'ловец', 'outdoor', 'hiking', 'hunt', 'planin', 'priroda', 'terren'], strong: ['планинаре', 'лов', 'outdoor', 'hiking', 'hunt'], models: ['hunter-camo', 'hunter-outdoor', 'hunter-flex', 'anatomiX'], title: t('🏔️ За планинарење и лов', '🏔️ Për alpinizëm dhe gjueti', '🏔️ For hiking & hunting'), text: t('За планинарење, лов и outdoor активности ви требаат издржливи влошки со добра изолација и стабилност:', 'Për alpinizëm, gjueti dhe aktivitete outdoor ju duhen tabanë të qëndrueshëm me izolim dhe stabilitet të mirë:', 'For hiking, hunting and outdoor activities you need durable insoles with good insulation and stability:') },
-    { id: 'rabota', kw: ['канцелар', 'работа', 'работ', 'служб', 'цел ден', 'стоење', 'стои', 'work', 'office', 'pune', 'qëndro'], strong: ['канцелар', 'работа', 'цел ден', 'work', 'office'], models: ['relax', 'vital', 'topas', 'soft-gel'], title: t('💼 За цел ден на нозе', '💼 Për tërë ditën në këmbë', '💼 For all day on your feet'), text: t('Ако цел ден стоите или одите на работа, најважни се комфорот и потпората на сводот. Кожните модели се најдобар избор:', 'Nëse tërë ditën qëndroni ose ecni në punë, më e rëndësishme është rehatia dhe mbështetja e harkut. Modelet lëkure janë zgjedhja më e mirë:', 'If you stand or walk all day at work, comfort and arch support matter most. Leather models are the best choice:') },
-    { id: 'elegant', kw: ['елегант', 'деловн', 'балетанки', 'штикли', 'високи', 'свечен', 'elegant', 'business', 'thekë', 'taka'], strong: ['елегант', 'деловн', 'штикли', 'elegant', 'business'], models: ['topas', 'vital', 'relax', 'soft-gel'], title: t('👠 За елегантни чевли', '👠 Për këpucë elegante', '👠 For elegant shoes'), text: t('За елегантни и тесни чевли најдобро одговараат тенки кожни влошки кои не заземаат простор:', 'Për këpucë elegante dhe të ngushta më të mirat janë tabanët e hollë prej lëkure që nuk zënë hapësirë:', 'For elegant and narrow shoes, thin leather insoles that take no space are best:') },
-    { id: 'zima', kw: ['зима', 'зимск', 'студ', 'студен', 'ладни', 'ладно', 'ladno', 'winter', 'cold', 'ftoht', 'dimër'], strong: ['зима', 'зимск', 'студ', 'ладни', 'winter', 'cold'], models: ['thermo-alu', 'hunter-flex'], title: t('❄️ За зима и ладно време', '❄️ Për dimër dhe mot të ftohtë', '❄️ For winter & cold weather'), text: t('За ладни стапала во зима препорачуваме термо влошки со топлинска изолација:', 'Për këmbë të ftohta në dimër rekomandojmë tabanë termikë me izolim termik:', 'For cold feet in winter we recommend thermal insoles with insulation:') },
-    { id: 'leto', kw: ['лето', 'летн', 'топло', 'мирис', 'мириз', 'потење', 'пот', 'зно', 'sweat', 'odor', 'smell', 'summer', 'verë', 'nxeht'], strong: ['лето', 'летн', 'мирис', 'потење', 'sweat', 'smell'], models: ['carbon', 'simona', 'sportex', 'active-gel'], title: t('☀️ За лето и свежина', '☀️ Për verë dhe freski', '☀️ For summer & freshness'), text: t('За лето, потење и мирис најважна е вентилацијата и активниот јаглен:', 'Për verë, djersë dhe erë, më e rëndësishme është ventilimi dhe karboni aktiv:', 'For summer, sweat and odor, ventilation and activated charcoal matter most:') },
-    { id: 'deca', kw: ['деца', 'дете', 'детск', 'дечиња', 'kids', 'child', 'fëmij', 'femij'], strong: ['деца', 'детск', 'дете', 'kids', 'fëmij'], models: ['duck'], title: t('👶 За деца', '👶 Për fëmijë', '👶 For kids'), text: t('За правилен развој на детското стапало препорачуваме анатомска детска влошка:', 'Për zhvillim të duhur të këmbës së fëmijës rekomandojmë tabanin anatomik për fëmijë:', 'For proper development of kids feet we recommend the anatomical kids insole:') },
-    { id: 'zglo', kw: ['колена', 'колен', 'зглоб', 'рбет', 'грб', 'knee', 'joint', 'back', 'gju'], strong: ['колена', 'зглоб', 'рбет', 'knee', 'joint'], models: ['soft-gel', 'active-gel', 'x-treme'], title: t('🦵 За колена и зглобови', '🦵 Për gjunjë dhe nyje', '🦵 For knees & joints'), text: t('Амортизацијата на удари ја намалува оптовареноста на колената, зглобовите и на рбетот. Овие модели даваат најдобра заштита:', 'Thithja e goditjeve redukton ngarkesën në gjunjë, nyje dhe shtyllë. Këto modele japin mbrojtjen më të mirë:', 'Shock absorption reduces the load on knees, joints and spine. These models give the best protection:') }
+    { id: 'umor', kw: ['умор', 'уморн', 'замор', 'морни', 'нозе', 'ноги', 'tired', 'fatigue', 'lodh'], strong: ['умор', 'уморн', 'замор', 'tired', 'fatigue', 'lodh'], models: ['soft-gel', 'memosole', 'active-gel', 'x-treme'], title: t('🦶 За уморни нозе', '🦶 Për këmbë të lodhura', '🦶 For tired feet'), text: t('При умор и тежина во нозете најважна е амортизацијата и мекоста. Овие модели ја апсорбираат силата при одење и го намалуваат заморот преку денот:', 'Me lodhje dhe rëndim në këmbë, më e rëndësishme është amortizimi dhe butësia. Këto modele thithin forcën gjatë ecjes dhe reduktojnë lodhjen gjatë ditës:', 'For fatigue and heaviness in the legs, cushioning and softness matter most. These models absorb force while walking and reduce daily fatigue:'), clarify: t('Каде најмногу чувствувате замор — во целото стапало, петиците или предниот дел? Дали сте на нозе цел ден или после одредена активност?', 'Ku ndjeni më shumë lodhje — në të gjithë këmbën, thembrat apo pjesën e përparme? A jeni në këmbë gjithë ditën apo pas një aktiviteti?', 'Where do you feel the most fatigue — the whole foot, the heels or the front? Are you on your feet all day or after a specific activity?'), details: ['стое', 'стојам', 'одење', 'одам', 'трча', 'работа', 'тренинг', 'фитнес', 'цел ден', 'часа', 'саати', 'after', 'kada', 'koga'] },
+    { id: 'peta', kw: ['пета', 'петица', 'болка', 'бол', 'болки', 'paine', 'heel', 'thembr', 'dhimbje'], strong: ['пета', 'петица', 'болка', 'бол', 'болки', 'paine', 'heel', 'thembr', 'dhimbje'], models: ['heel-pad', 'heel-pad-fix', 'heel-pad-grip', 'vital'], title: t('👟 Болка во стапалото', '👟 Dhimbje këmbe', '👟 Foot pain'), text: t('За болка во стапалото имаме неколку решенија зависно од тоа каде и како ве боли:', 'Për dhimbje këmbe kemi disa zgjidhje në varësi se ku dhe si ju dhemb:', 'For foot pain we have several solutions depending on where and how it hurts:'), clarify: t('Во кој дел од стапалото ја чувствувате болката — под петата, во средината (свод) или во предниот дел? Каков е интензитетот — остра, тапа или повремена болка? Дали ве боли при одење, трчање или цело време?', 'Në cilën pjesë të këmbës e ndjeni dhimbjen — nën thembër, në mes (hark) apo në pjesën e përparme? Cili është intensiteti — i mprehtë, i shurdhët apo i përkohshëm? A ju dhemb gjatë ecjes, vrapimit apo gjithë kohës?', 'In which part of the foot do you feel the pain — under the heel, in the middle (arch) or in the front? What is the intensity — sharp, dull or occasional? Does it hurt when walking, running or all the time?'), details: ['пета', 'петица', 'petic', 'под', 'табан', 'сред', 'свод', 'пред', 'прсти', 'пал', 'ostra', 'тапа', 'tapa', 'поврем', 'постојан', 'при одењ', 'при трча', 'цел ден', 'kada', 'koga', 'duri'] },
+    { id: 'trcanje', kw: ['трча', 'трчање', 'тренинг', 'спорт', 'фитнес', 'вежба', 'run', 'running', 'training', 'sport', 'vrap', 'stërvit'], strong: ['трча', 'трчање', 'тренинг', 'run', 'running', 'vrap'], models: ['anatomiX', 'active-gel', 'sportex', 'x-treme'], title: t('🏃 За трчање и тренинг', '🏃 Për vrap dhe stërvitje', '🏃 For running & training'), text: t('За трчање и спорт најважна е апсорпцијата на удари и стабилноста на стапалото. Овие модели се создадени за тоа:', 'Për vrap dhe sport, më e rëndësishme është thithja e goditjeve dhe stabiliteti i këmbës. Këto modele janë krijuar për këtë:', 'For running and sports, shock absorption and foot stability matter most. These models are made for that:'), clarify: t('Каков тип на активност — трчање, фитнес, тимски спортови? На каква подлога тренирате (асфалт, трева, сала)? Колку често и колку долго?', 'Çfarë lloj aktiviteti — vrapim, fitnes, sporte ekipore? Në çfarë sipërfaqe stërviteni (asfalt, bar, sallë)? Sa shpesh dhe sa gjatë?', 'What type of activity — running, fitness, team sports? On what surface (asphalt, grass, gym)? How often and how long?'), details: ['трча', 'трчам', 'тренинг', 'фитнес', 'спорт', 'вежба', 'run', 'асфалт', 'трева', 'сала', 'днев', 'недел', 'километ', 'минут', 'часа'] },
+    { id: 'planina', kw: ['планинаре', 'лов', 'ловец', 'outdoor', 'hiking', 'hunt', 'planin', 'priroda', 'terren'], strong: ['планинаре', 'лов', 'outdoor', 'hiking', 'hunt'], models: ['hunter-camo', 'hunter-outdoor', 'hunter-flex', 'anatomiX'], title: t('🏔️ За планинарење и лов', '🏔️ Për alpinizëm dhe gjueti', '🏔️ For hiking & hunting'), text: t('За планинарење, лов и outdoor активности ви требаат издржливи влошки со добра изолација и стабилност:', 'Për alpinizëm, gjueti dhe aktivitete outdoor ju duhen tabanë të qëndrueshëm me izolim dhe stabilitet të mirë:', 'For hiking, hunting and outdoor activities you need durable insoles with good insulation and stability:'), clarify: t('Дали одите на планинарење, лов или долги прошетки во природа? Во кој период од годината најчесто — пролет, лето, есен или зима? Колку часови траат активностите?', 'A shkoni në alpinizëm, gjueti apo shëtitje të gjata në natyrë? Në cilën periudhë të vitit më shpesh — pranverë, verë, vjeshtë apo dimër? Sa orë zgjasin aktivitetet?', 'Do you go hiking, hunting or long nature walks? In which season mostly — spring, summer, autumn or winter? How many hours do your activities last?'), details: ['планинаре', 'лов', 'outdoor', 'hiking', 'hunt', 'mount', 'teren', 'тешки', 'пролет', 'есен', 'зима', 'лето', 'часа', 'ден'] },
+    { id: 'rabota', kw: ['канцелар', 'работа', 'работ', 'служб', 'цел ден', 'стоење', 'стои', 'work', 'office', 'pune', 'qëndro'], strong: ['канцелар', 'работа', 'цел ден', 'work', 'office'], models: ['relax', 'vital', 'topas', 'soft-gel'], title: t('💼 За цел ден на нозе', '💼 Për tërë ditën në këmbë', '💼 For all day on your feet'), text: t('Ако цел ден стоите или одите на работа, најважни се комфорот и потпората на сводот. Кожните модели се најдобар избор:', 'Nëse tërë ditën qëndroni ose ecni në punë, më e rëndësishme është rehatia dhe mbështetja e harkut. Modelet lëkure janë zgjedhja më e mirë:', 'If you stand or walk all day at work, comfort and arch support matter most. Leather models are the best choice:'), clarify: t('Каков тип на работа — канцеларија, продавница, болница? Во какви обувки сте најчесто — елегантни, работни или патики? Колку часа дневно стоите/одите?', 'Çfarë lloj pune — zyrë, dyqan, spital? Në çfarë këpucësh jeni më shpesh — elegante, pune apo atlete? Sa orë në ditë qëndroni/ecni?', 'What type of work — office, shop, hospital? What shoes do you wear most — elegant, work or sneakers? How many hours do you stand/walk daily?'), details: ['канцелар', 'работа', 'продав', 'фабри', 'болниц', 'училиш', 'стое', 'стојам', 'цел ден', 'часа', 'елегант', 'работ', 'патики'] },
+    { id: 'elegant', kw: ['елегант', 'деловн', 'балетанки', 'штикли', 'високи', 'свечен', 'elegant', 'business', 'thekë', 'taka'], strong: ['елегант', 'деловн', 'штикли', 'elegant', 'business'], models: ['topas', 'vital', 'relax', 'soft-gel'], title: t('👠 За елегантни чевли', '👠 Për këpucë elegante', '👠 For elegant shoes'), text: t('За елегантни и тесни чевли најдобро одговараат тенки кожни влошки кои не заземаат простор:', 'Për këpucë elegante dhe të ngushta më të mirat janë tabanët e hollë prej lëkure që nuk zënë hapësirë:', 'For elegant and narrow shoes, thin leather insoles that take no space are best:'), details: ['елегант', 'деловн', 'балетанки', 'штикли', 'потпети', 'рамни', 'тесни', '3/4', 'topas', 'број', 'голем'] },
+    { id: 'zima', kw: ['зима', 'зимск', 'студ', 'студен', 'ладни', 'ладно', 'ladno', 'winter', 'cold', 'ftoht', 'dimër'], strong: ['зима', 'зимск', 'студ', 'ладни', 'winter', 'cold'], models: ['thermo-alu', 'hunter-flex'], title: t('❄️ За зима и ладно време', '❄️ Për dimër dhe mot të ftohtë', '❄️ For winter & cold weather'), text: t('За ладни стапала во зима препорачуваме термо влошки со топлинска изолација:', 'Për këmbë të ftohta në dimër rekomandojmë tabanë termikë me izolim termik:', 'For cold feet in winter we recommend thermal insoles with insulation:'), details: ['зимски', 'зима', 'чизма', 'скија', 'студен', 'ладно', 'мраз', 'снег', 'winter', 'boots', 'cold'] },
+    { id: 'leto', kw: ['лето', 'летн', 'топло', 'мирис', 'мириз', 'потење', 'пот', 'зно', 'sweat', 'odor', 'smell', 'summer', 'verë', 'nxeht'], strong: ['лето', 'летн', 'мирис', 'потење', 'sweat', 'smell'], models: ['carbon', 'simona', 'sportex', 'active-gel'], title: t('☀️ За лето и свежина', '☀️ Për verë dhe freski', '☀️ For summer & freshness'), text: t('За лето, потење и мирис најважна е вентилацијата и активниот јаглен:', 'Për verë, djersë dhe erë, më e rëndësishme është ventilimi dhe karboni aktiv:', 'For summer, sweat and odor, ventilation and activated charcoal matter most:'), details: ['летни', 'лето', 'топло', 'мирис', 'пот', 'зно', 'без чорап', 'verë', 'патики'] },
+    { id: 'deca', kw: ['деца', 'дете', 'детск', 'дечиња', 'kids', 'child', 'fëmij', 'femij'], strong: ['деца', 'детск', 'дете', 'kids', 'fëmij'], models: ['duck'], title: t('👶 За деца', '👶 Për fëmijë', '👶 For kids'), text: t('За правилен развој на детското стапало препорачуваме анатомска детска влошка:', 'Për zhvillim të duhur të këmbës së fëmijës rekomandojmë tabanin anatomik për fëmijë:', 'For proper development of kids feet we recommend the anatomical kids insole:'), details: ['дете', 'детск', 'детињ', 'син', 'ќерка', 'години', 'училиш', 'возраст', 'голем', 'број', 'age', 'years', 'kids', 'child'] },
+    { id: 'zglo', kw: ['колена', 'колен', 'зглоб', 'рбет', 'грб', 'knee', 'joint', 'back', 'gju'], strong: ['колена', 'зглоб', 'рбет', 'knee', 'joint'], models: ['soft-gel', 'active-gel', 'x-treme'], title: t('🦵 За колена и зглобови', '🦵 Për gjunjë dhe nyje', '🦵 For knees & joints'), text: t('Амортизацијата на удари ја намалува оптовареноста на колената, зглобовите и на рбетот. Овие модели даваат најдобра заштита:', 'Thithja e goditjeve redukton ngarkesën në gjunjë, nyje dhe shtyllë. Këto modele japin mbrojtjen më të mirë:', 'Shock absorption reduces the load on knees, joints and spine. These models give the best protection:'), clarify: t('Каде најмногу чувствувате оптоварување — во колената, зглобовите или грбот? Дали болката се јавува после одредена активност (трчање, долго одење, стоење)?', 'Ku e ndjeni më shumë ngarkesën — në gjunjë, kyçe apo shpinë? A shfaqet dhimbja pas një aktiviteti të caktuar (vrapim, ecje e gjatë, qëndrim)?', 'Where do you feel the most load — knees, joints or back? Does the pain appear after a specific activity (running, long walking, standing)?'), details: ['колена', 'колен', 'зглоб', 'рбет', 'грб', 'после', 'по трча', 'од стое', 'при оде', 'kada', 'posle'] }
   ];
 
   // ============================================================
@@ -414,17 +414,43 @@
     }
   ];
 
-  function buildRec(rec) {
-    const lines = rec.models.map(function (slug) {
-      const m = modelData(slug);
-      return '• ' + m.name + (m.price ? ' — ' + m.price.toLocaleString('mk-MK') + ' ден.' : '');
-    }).join('\n');
-    const chips = rec.models.map(function (slug) {
-      const m = modelData(slug);
-      return { label: m.name, q: slug };
+  // Разговорна состојба — памти ако треба дообјаснување пред препорака (#4 од спецификацијата)
+  let clarifyState = null;
+
+  function isTooVague(n, rec) {
+    if (!rec.details || !rec.details.length) return false;
+    if (clarifyState && clarifyState.id === rec.id) return false; // веќе прашавме, сега корисникот одговори
+    const allWords = (n.raw + ' ' + n.cyr).split(/\s+/).filter(function (w) { return w.length > 1; });
+    return !rec.details.some(function (d) {
+      for (let wi = 0; wi < allWords.length; wi++) {
+        if (matchAny(allWords[wi], d)) return true;
+      }
+      return false;
     });
+  }
+
+  function buildRec(rec) {
+    const IS_MODELI = /\/modeli\//.test(window.location.pathname);
+    const base = IS_MODELI ? '../' : './';
+    let thumbs = '<div class="b-thumbs">';
+    const chips = [];
+    rec.models.forEach(function (slug) {
+      const m = modelData(slug);
+      thumbs += '<div class="b-thumb" data-model="' + esc(slug) + '">'
+        + '<div class="b-thumb__img"><img src="' + base + 'images/cards/' + slug + '.webp" alt="' + esc(m.name) + '" loading="lazy" data-zoom="' + esc(slug) + '"></div>'
+        + '<div class="b-thumb__name">' + esc(m.name) + '</div>'
+        + '<div class="b-thumb__price">' + (m.price ? m.price.toLocaleString('mk-MK') + ' ден.' : '') + '</div>'
+        + '</div>';
+      chips.push({ label: m.name, q: slug });
+    });
+    thumbs += '</div>';
     return {
-      text: rec.title + '\n' + rec.text + '\n' + lines + '\n\n' + t('Кликни на модел за повеќе детали или за додавање во кошничка.', 'Kliko një model për më shumë detaje ose për ta shtuar në shportë.', 'Click a model for more details or to add it to your cart.'),
+      html: '<div class="b-rec">'
+        + '<div class="b-rec__title">' + esc(rec.title) + '</div>'
+        + '<div class="b-rec__text">' + esc(rec.text) + '</div>'
+        + thumbs
+        + '<div class="b-rec__hint">' + esc(t('Кликни на сликичка за детали, додавање во кошничка или зголемување.', 'Kliko foton për detaje, shtim në shportë ose zmadhim.', 'Click a thumbnail for details, adding to cart or zoom.')) + '</div>'
+        + '</div>',
       chips: chips
     };
   }
@@ -438,7 +464,10 @@
       f.kw.forEach(function (k) { s += kwScore(n.words, k); });
       if (s > bestFaqScore) { bestFaqScore = s; bestFaq = f; }
     });
-    if (bestFaq && bestFaqScore > 0) return { text: bestFaq.q + '\n' + bestFaq.a };
+    if (bestFaq && bestFaqScore > 0) {
+      clarifyState = null;
+      return { text: bestFaq.q + '\n' + bestFaq.a };
+    }
     // 1.5) Препораки — врз основа на потребата (умор, болка, спорт, сезона...)
     let bestRec = null, bestRecScore = 0;
     RECS.forEach(function (rec) {
@@ -449,7 +478,16 @@
       const sc = s * 3 + strong * 5;
       if (sc > bestRecScore) { bestRecScore = sc; bestRec = rec; }
     });
-    if (bestRec && bestRecScore >= 8) return buildRec(bestRec);
+    if (bestRec && bestRecScore >= 8) {
+      // #4 ПРАШАЈ ПРЕД ДА ПРЕПОРАЧАШ: ако прашањето е премногу општо → дообјаснување
+      if (isTooVague(n, bestRec)) {
+        clarifyState = { id: bestRec.id };
+        return { text: bestRec.clarify || bestRec.text, chips: [] };
+      }
+      clarifyState = null;
+      return buildRec(bestRec);
+    }
+    clarifyState = null;
     // 2) Потоа — општи намери
     let best = null, bestScore = 0;
     INTENTS.forEach(function (int) {
@@ -507,6 +545,17 @@
     '#monetaBotChips{display:flex;flex-wrap:wrap;gap:7px;padding:0 14px 10px;background:#faf7f6;}',
     '.b-chip{border:1px solid rgba(236,23,82,.35);background:#fff;color:#EC1752;border-radius:999px;padding:7px 12px;font-size:12.5px;font-weight:700;cursor:pointer;transition:background .15s;}',
     '.b-chip:hover{background:rgba(236,23,82,.08);}',
+    '.b-rec{padding:2px 0;}',
+    '.b-rec__title{font-weight:800;font-size:14px;margin-bottom:4px;}',
+    '.b-rec__text{font-size:12.5px;color:#4a4a4a;line-height:1.45;margin-bottom:10px;}',
+    '.b-thumbs{display:flex;flex-wrap:wrap;gap:10px;margin:4px 0;}',
+    '.b-thumb{width:calc(50% - 5px);min-width:120px;background:#fff;border:1px solid #efe9e6;border-radius:12px;overflow:hidden;cursor:pointer;transition:transform .14s ease,box-shadow .14s ease;}',
+    '.b-thumb:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.08);}',
+    '.b-thumb__img{aspect-ratio:4/3;overflow:hidden;}',
+    '.b-thumb__img img{display:block;width:100%;height:100%;object-fit:cover;}',
+    '.b-thumb__name{font-size:11.5px;font-weight:700;padding:6px 8px 0;line-height:1.2;}',
+    '.b-thumb__price{font-size:11.5px;font-weight:800;padding:2px 8px 8px;color:#17171c;}',
+    '.b-rec__hint{font-size:11px;color:#9a918b;margin-top:8px;}',
     '#monetaBotCart{position:relative;background:none;border:none;color:#fff;font-size:18px;cursor:pointer;padding:6px;display:flex;align-items:center;margin-left:auto;margin-right:2px;}',
     '#monetaBotCart svg{width:20px;height:20px;}',
     '#monetaBotCart .b-cart__badge{position:absolute;top:-2px;right:-2px;min-width:16px;height:16px;border-radius:8px;background:#fff;color:#EC1752;font-size:10px;font-weight:800;display:none;align-items:center;justify-content:center;padding:0 4px;}',
@@ -526,7 +575,13 @@
     '#monetaBotZoom{position:fixed;inset:0;z-index:10030;background:rgba(10,8,12,.82);display:none;align-items:center;justify-content:center;padding:24px;}',
     '#monetaBotZoom.is-open{display:flex;animation:botFade .18s ease;}',
     '@keyframes botFade{from{opacity:0}to{opacity:1}}',
-    '#monetaBotZoom img{max-width:min(640px,92vw);max-height:82vh;border-radius:14px;box-shadow:0 30px 80px rgba(0,0,0,.5);object-fit:contain;}',
+    '#monetaBotZoom img{max-width:min(640px,92vw);max-height:62vh;border-radius:14px 14px 0 0;box-shadow:0 20px 60px rgba(0,0,0,.5);object-fit:contain;}',
+    '#monetaBotZoom .b-zoom__footer{background:#fff;border-radius:0 0 14px 14px;padding:14px 16px;max-width:min(640px,92vw);text-align:left;}',
+    '#monetaBotZoom .b-zoom__name{font-weight:800;font-size:15px;margin-bottom:4px;}',
+    '#monetaBotZoom .b-zoom__price{font-weight:800;font-size:14px;color:#17171c;margin-bottom:8px;}',
+    '#monetaBotZoom .b-zoom__specs{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:12px;color:#5a5552;margin-bottom:10px;}',
+    '#monetaBotZoom .b-zoom__link{display:inline-block;background:linear-gradient(135deg,#EC1752,#C4123F);color:#fff;font-weight:700;font-size:13px;padding:7px 14px;border-radius:999px;text-decoration:none;margin-top:4px;}',
+    '#monetaBotZoom .b-zoom__link:hover{opacity:.9;}',
     '#monetaBotZoom .b-zoom-close{position:absolute;top:16px;right:20px;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:26px;width:44px;height:44px;border-radius:50%;cursor:pointer;line-height:1;}',
     '#monetaBotInput{display:flex;gap:8px;padding:10px 14px;border-top:1px solid #efe9e6;background:#fff;flex-shrink:0;}',
     '#monetaBotInput input{flex:1;border:1px solid #e8e1de;border-radius:12px;padding:10px 12px;font-size:13.5px;outline:none;}',
@@ -562,7 +617,7 @@
     '<button id="monetaBotSend" aria-label="Испрати"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>',
     '</div>',
     '</div>',
-    '<div id="monetaBotZoom"><button class="b-zoom-close" aria-label="Затвори">×</button><img id="monetaBotZoomImg" alt=""></div>'
+    '<div id="monetaBotZoom"><button class="b-zoom-close" aria-label="Затвори">×</button><img id="monetaBotZoomImg" alt=""><div class="b-zoom__footer" id="monetaBotZoomFooter"><div class="b-zoom__name" id="monetaBotZoomName"></div><div class="b-zoom__price" id="monetaBotZoomPrice"></div><div class="b-zoom__specs" id="monetaBotZoomSpecs"></div><a class="b-zoom__link" id="monetaBotZoomLink" href="#" target="_blank" rel="noopener">↗ ' + t('Погледни на сајтот','Në faqe','View on site') + '</a></div></div>'
   ].join('');
 
   function base() {
@@ -786,6 +841,15 @@
     // ---- Зголемена слика (preview надвор од рамките на чатот) ----
     function openZoom(slug) {
       zoomImg.src = imgPath(slug);
+      const m = modelData(slug);
+      const zName = document.getElementById('monetaBotZoomName');
+      const zPrice = document.getElementById('monetaBotZoomPrice');
+      const zSpecs = document.getElementById('monetaBotZoomSpecs');
+      const zLink = document.getElementById('monetaBotZoomLink');
+      if (zName) zName.textContent = m.name;
+      if (zPrice) zPrice.textContent = m.price ? '💰 ' + m.price.toLocaleString('mk-MK') + ' ден.' : '';
+      if (zSpecs) zSpecs.innerHTML = (Array.isArray(m.specs) ? m.specs : []).map(function (s) { return '<span>• ' + esc(s) + '</span>'; }).join('');
+      if (zLink) zLink.href = imgPath(slug).replace(/images\/cards.*/, '') + 'modeli/' + slug + '.html';
       zoom.classList.add('is-open');
     }
     function closeZoom() {
@@ -812,8 +876,9 @@
       if (q === 'OPEN_CART') { window.location.href = base() + 'cart.html'; return; }
       ask(q);
     });
-    // Акции во картичките (во body) + зголемување на слика
+    // Акции во картичките (во body) + зголемување на слика + клик на thumbnail
     body.addEventListener('click', function (e) {
+      // Картичка-акции (спецификации, додај во кошничка)
       const chip = e.target.closest('.b-chip');
       if (chip) {
         const act = chip.getAttribute('data-action');
@@ -829,6 +894,14 @@
         }
         return;
       }
+      // Thumbnail-сликичка (отвори модел-картичка)
+      const thumb = e.target.closest('.b-thumb');
+      if (thumb) {
+        const slug = thumb.getAttribute('data-model');
+        if (slug) ask(slug);
+        return;
+      }
+      // Зголемување на слика
       const zi = e.target.closest('[data-zoom]');
       if (zi) openZoom(zi.getAttribute('data-zoom'));
     });
