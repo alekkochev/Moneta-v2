@@ -3693,12 +3693,12 @@ window.MonetaData = {
         const slug = sel.getAttribute('data-model');
         const prod = window.MonetaData.products[slug];
         if (!prod) return;
-        const price = Number(prod.price) || 0;
+        const price = Number(prod.price);
+        if (!price || price <= 0) return; // без валидна цена — не инјектирај
         const name = (prod.name_mk || slug).replace(/"/g, '\\"');
         const desc = (prod.short_desc_mk || prod.name_mk || slug).replace(/"/g, '\\"').substring(0, 5000);
         const img = 'https://vloski.mk/images/cards/' + slug + '.webp';
         const code = prod.code || slug;
-        const avail = 'https://schema.org/InStock';
         const validUntil = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
         const ld = {
             '@context': 'https://schema.org',
@@ -3715,7 +3715,7 @@ window.MonetaData = {
                 priceCurrency: 'MKD',
                 price: price,
                 priceValidUntil: validUntil,
-                availability: avail,
+                availability: 'https://schema.org/InStock',
                 url: 'https://vloski.mk/modeli/' + slug + '.html',
                 seller: { '@type': 'Organization', name: 'MONETA' }
             }
