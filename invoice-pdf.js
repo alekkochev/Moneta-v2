@@ -122,7 +122,7 @@
               width: 'auto',
               alignment: 'right',
               stack: [
-                { text: 'Испратница', fontSize: 24, bold: true, color: '#212124' },
+                { text: 'Испратница-Фактура', fontSize: 24, bold: true, color: '#212124' },
                 { text: 'Број: ' + invNo, fontSize: 10, color: '#808080' },
                 { text: 'Датум: ' + dateStr, fontSize: 10, color: '#808080' },
               ],
