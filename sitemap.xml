@@ -1,36 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://vloski.mk/</loc></url>
-  <url><loc>https://vloski.mk/sistem.html</loc></url>
-  <url><loc>https://vloski.mk/kviz.html</loc></url>
-  <url><loc>https://vloski.mk/sportski.html</loc></url>
-  <url><loc>https://vloski.mk/kozni.html</loc></url>
-  <url><loc>https://vloski.mk/letni.html</loc></url>
-  <url><loc>https://vloski.mk/zimski.html</loc></url>
-  <url><loc>https://vloski.mk/outdoor.html</loc></url>
-  <url><loc>https://vloski.mk/hunter.html</loc></url>
-  <url><loc>https://vloski.mk/detski.html</loc></url>
-  <url><loc>https://vloski.mk/heelpad.html</loc></url>
-  <url><loc>https://vloski.mk/dostava.html</loc></url>
-  <url><loc>https://vloski.mk/uslovi.html</loc></url>
-  <url><loc>https://vloski.mk/modeli/active-gel.html</loc></url>
-  <url><loc>https://vloski.mk/modeli/anatomiX.html</loc></url>
-  <url><loc>https://vloski.mk/modeli/carbon.html</loc></url>
-  <url><loc>https://vloski.mk/modeli/duck.html</loc></url>
-  <url><loc>https://vloski.mk/modeli/heel-pad.html</loc></url>
-  <url><loc>https://vloski.mk/modeli/heel-pad-fix.html</loc></url>
-  <url><loc>https://vloski.mk/modeli/heel-pad-grip.html</loc></url>
-  <url><loc>https://vloski.mk/modeli/hunter-camo.html</loc></url>
-  <url><loc>https://vloski.mk/modeli/hunter-flex.html</loc></url>
-  <url><loc>https://vloski.mk/modeli/hunter-outdoor.html</loc></url>
-  <url><loc>https://vloski.mk/modeli/memosole.html</loc></url>
-  <url><loc>https://vloski.mk/modeli/relax.html</loc></url>
-  <url><loc>https://vloski.mk/modeli/simona.html</loc></url>
-  <url><loc>https://vloski.mk/modeli/soft-gel.html</loc></url>
-  <url><loc>https://vloski.mk/modeli/sport-style.html</loc></url>
-  <url><loc>https://vloski.mk/modeli/sportex.html</loc></url>
-  <url><loc>https://vloski.mk/modeli/thermo-alu.html</loc></url>
-  <url><loc>https://vloski.mk/modeli/topas.html</loc></url>
-  <url><loc>https://vloski.mk/modeli/vital.html</loc></url>
-  <url><loc>https://vloski.mk/modeli/x-treme.html</loc></url>
+  <!-- ====== ГЛАВНИ СТРАНИ (највисок приоритет) ====== -->
+  <url><loc>https://vloski.mk/</loc><lastmod>2026-08-09</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://vloski.mk/index.html</loc><lastmod>2026-08-09</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
+
+  <!-- ====== КАТЕГОРИИ ====== -->
+  <url><loc>https://vloski.mk/sportski.html</loc><lastmod>2026-08-09</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://vloski.mk/kozni.html</loc><lastmod>2026-08-09</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://vloski.mk/letni.html</loc><lastmod>2026-08-09</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://vloski.mk/zimski.html</loc><lastmod>2026-08-09</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://vloski.mk/hunter.html</loc><lastmod>2026-08-09</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://vloski.mk/outdoor.html</loc><lastmod>2026-08-09</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://vloski.mk/detski.html</loc><lastmod>2026-08-09</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://vloski.mk/heelpad.html</loc><lastmod>2026-08-09</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+
+  <!-- ====== МОДЕЛИ (20 производи — висок приоритет) ====== -->
+  <url><loc>https://vloski.mk/modeli/active-gel.html</loc><lastmod>2026-08-09</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://vloski.mk/modeli/anatomiX.html</loc><lastmod>2026-08-09</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://vloski.mk/modeli/carbon.html</loc><lastmod>2026-08-09</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://vloski.mk/modeli/duck.html</loc><lastmod>2026-08-09</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://vloski.mk/modeli/heel-pad.html</loc><lastmod>2026-08-09</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://vloski.mk/modeli/heel-pad-fix.html</loc><lastmod>2026-08-09</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://vloski.mk/modeli/heel-pad-grip.html</loc><lastmod>2026-08-09</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://vloski.mk/modeli/hunter-camo.html</loc><lastmod>2026-08-09</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://vloski.mk/modeli/hunter-flex.html</loc><lastmod>2026-08-09</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://vloski.mk/modeli/hunter-outdoor.html</loc><lastmod>2026-08-09</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://vloski.mk/modeli/memosole.html</loc><lastmod>2026-08-09</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://vloski.mk/modeli/relax.html</loc><lastmod>2026-08-09</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://vloski.mk/modeli/simona.html</loc><lastmod>2026-08-09</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://vloski.mk/modeli/soft-gel.html</loc><lastmod>2026-08-09</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://vloski.mk/modeli/sport-style.html</loc><lastmod>2026-08-09</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://vloski.mk/modeli/sportex.html</loc><lastmod>2026-08-09</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://vloski.mk/modeli/thermo-alu.html</loc><lastmod>2026-08-09</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://vloski.mk/modeli/topas.html</loc><lastmod>2026-08-09</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://vloski.mk/modeli/vital.html</loc><lastmod>2026-08-09</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://vloski.mk/modeli/x-treme.html</loc><lastmod>2026-08-09</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <!-- ====== ИНФО СТРАНИ ====== -->
+  <url><loc>https://vloski.mk/dostava.html</loc><lastmod>2026-08-09</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://vloski.mk/uslovi.html</loc><lastmod>2026-08-09</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://vloski.mk/sistem.html</loc><lastmod>2026-08-09</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://vloski.mk/vodic.html</loc><lastmod>2026-08-09</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://vloski.mk/kviz.html</loc><lastmod>2026-08-09</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://vloski.mk/slajdovi.html</loc><lastmod>2026-08-09</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://vloski.mk/naracka.html</loc><lastmod>2026-08-09</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://vloski.mk/cart.html</loc><lastmod>2026-08-09</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>
 </urlset>

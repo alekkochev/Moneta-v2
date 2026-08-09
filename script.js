@@ -3682,7 +3682,48 @@ window.MonetaData = {
                 badge.remove();
             }
         });
+
+        // ---- JSON-LD Product schema (динамично од MonetaData) ----
+        injectProductLD();
     };
+
+    function injectProductLD() {
+        const sel = document.querySelector('.size-selector[data-model]');
+        if (!sel) return;
+        const slug = sel.getAttribute('data-model');
+        const prod = window.MonetaData.products[slug];
+        if (!prod) return;
+        const price = Number(prod.price) || 0;
+        const name = prod.name_mk || slug;
+        const desc = (prod.short_desc_mk || document.querySelector('meta[name="description"]')?.content || '').replace(/"/g, '\\"');
+        const img = prod.image || './images/cards/' + slug + '.webp';
+        const code = prod.code || '';
+        const avail = 'https://schema.org/InStock';
+        const ld = {
+            '@context': 'https://schema.org',
+            '@type': 'Product',
+            name: name,
+            description: desc,
+            image: img,
+            sku: code,
+            brand: { '@type': 'Brand', name: 'MONETA' },
+            offers: {
+                '@type': 'Offer',
+                priceCurrency: 'MKD',
+                price: price,
+                availability: avail,
+                url: 'https://vloski.mk/modeli/' + slug + '.html'
+            }
+        };
+        let el = document.getElementById('monetaProductLD');
+        if (!el) {
+            el = document.createElement('script');
+            el.type = 'application/ld+json';
+            el.id = 'monetaProductLD';
+            document.head.appendChild(el);
+        }
+        el.textContent = JSON.stringify(ld);
+    }
 
     window.MonetaData.ready = (async () => {
         try {
