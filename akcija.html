@@ -34,10 +34,13 @@
 <link rel="icon" type="image/svg+xml" href="./images/favicon/favicon.svg"/>
 <link rel="stylesheet" href="./styles.css?v=20260813"/>
 <style>
-.akcija-hero__title{text-align:center;font-size:clamp(28px,5vw,48px);font-weight:800;padding:40px 16px 8px;color:#EC1752;animation:akcijaNeonPulse 1.8s ease-in-out infinite;}
+.akcija-hero__title{text-align:center;font-size:clamp(28px,5vw,48px);font-weight:800;padding:20px 16px 8px;color:#EC1752;animation:akcijaNeonPulse 1.8s ease-in-out infinite;}
 @keyframes akcijaNeonPulse{0%,100%{text-shadow:0 0 7px rgba(236,23,82,.4),0 0 14px rgba(236,23,82,.2);}50%{text-shadow:0 0 14px rgba(236,23,82,.7),0 0 28px rgba(236,23,82,.4),0 0 42px rgba(236,23,82,.15);}}
 .akcija-hero__sub{text-align:center;font-size:15px;color:#5a5552;padding:0 16px 24px;max-width:600px;margin:0 auto;}
-.akcija-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;padding:16px 24px 48px;max-width:1200px;margin:0 auto;}
+.akcija-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;padding:16px 24px 48px;max-width:1000px;margin:0 auto;}
+/* navbar 25% потесен, logo 20% помал */
+.navbar.navbar--sistem .navbar__inner{max-width:900px;}
+.navbar.navbar--sistem .navbar__logo img{width:106px;height:auto;}
 .akcija-card{background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.08);transition:transform .2s,box-shadow .2s;position:relative;}
 .akcija-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.14);}
 .akcija-card__img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;}
@@ -110,8 +113,6 @@
             </div>
         </div>
     </header>
-  </div>
-</header>
 
 <main>
   <h1 class="akcija-hero__title">🔥 АКЦИСКИ ПОПУСТИ</h1>
@@ -122,12 +123,37 @@
 </main>
 
 <footer class="site-footer">
-  <div class="footer__inner">
-    <div class="footer__col"><strong>Контакт:</strong><p>Скопје, ул. св. Кирил и Методиј бр. 20</p><p><a href="tel:+38976454957">+389 76 454 957</a> / <a href="tel:+38923230088">+389 2 323 00 88</a></p><p><a href="mailto:info@calivita.mk">info@calivita.mk</a></p><p>МАК-ФИТ ДООЕЛ (Calivita)</p></div>
-    <div class="footer__col"><img src="./images/moneta-logo.svg" alt="MONETA" width="100"><p>© 2026 МОНЕТА. Сите права задржани.</p><p>Секој чекор заслужува удобност.</p></div>
-    <div class="footer__col"><a href="./index.html#prednosti">За нас</a> · <a href="./index.html#kontakt">Контакт</a> · <a href="./dostava.html">Достава и плаќање</a><br><a href="./uslovi.html">Услови</a> · <a href="./uslovi.html#privatnost">Приватност</a></div>
-    <div class="footer__social"><a href="https://www.facebook.com/insoles.mk" target="_blank" rel="noopener noreferrer nofollow">FB</a> <a href="https://www.instagram.com/moneta_makedonija/" target="_blank" rel="noopener noreferrer nofollow">IG</a></div>
-  </div>
+    <div class="footer__inner">
+        <div class="footer__brand">
+            <img src="./images/moneta-logo.svg" alt="MONETA" width="100" height="28">
+            <p>&copy; 2026 МОНЕТА. Сите права задржани.</p>
+            <p class="footer__tagline">Секој чекор заслужува удобност.</p>
+        </div>
+        <div class="footer__right">
+            <ul class="footer__links">
+                <li><a href="./index.html#prednosti">За нас</a></li>
+                <li><a href="./index.html#kontakt">Контакт</a></li>
+                <li><a href="./dostava.html">Достава и плаќање</a></li>
+            </ul>
+            <div class="footer__legal-links">
+                <a href="./uslovi.html">Услови за користење</a>
+                <span class="footer__legal-dot">•</span>
+                <a href="./uslovi.html#privatnost">Приватност</a>
+            </div>
+        </div>
+    </div>
+    <div class="footer__bottom">
+        <div class="footer__social">
+            <div class="social__links">
+                <a href="https://www.facebook.com/insoles.mk" target="_blank" rel="noopener noreferrer nofollow" class="social__link social__link--facebook" aria-label="МОНЕТА на Facebook" title="Facebook">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H7.5v-3H10V9.69c0-2.47 1.47-3.83 3.72-3.83 1.08 0 2.21.19 2.21.19v2.43h-1.24c-1.23 0-1.61.76-1.61 1.54V12h2.74l-.44 3h-2.3v6.8c4.56-.93 8-4.96 8-9.8z"/></svg>
+                </a>
+                <a href="https://www.instagram.com/moneta_makedonija/" target="_blank" rel="noopener noreferrer nofollow" class="social__link social__link--instagram" aria-label="МОНЕТА на Instagram" title="Instagram">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                </a>
+            </div>
+        </div>
+    </div>
 </footer>
 
 <script src="./script.js" defer></script>
