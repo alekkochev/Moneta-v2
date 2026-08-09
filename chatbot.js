@@ -619,11 +619,95 @@
     });
   }
 
-  const SIZE_QUERY_KW = ['mm', 'cm', 'милиметр', 'сантиметр', 'должина', 'измер', 'мерењ', 'стопал', 'големина на ног', 'големина на стапал', 'број од', 'бројка', 'долж', 'measure', 'foot size', 'shoe size', 'size chart', 'sizing', 'за noga', 'kolku mm', 'santimetr', 'madhës'];
+  const SIZE_QUERY_KW = ['mm', 'cm', 'милиметр', 'сантиметр', 'должина', 'измер', 'мерењ', 'стопал', 'големина на ног', 'големина на стапал', 'број од', 'бројка', 'број', 'broj', 'долж', 'measure', 'foot size', 'shoe size', 'size chart', 'sizing', 'за noga', 'kolku mm', 'santimetr', 'madhës'];
   const SIZE_GUIDE_MSG = t(
     '📏 За да ја одредите вистинската големина, измерете ја должината на стапалото во милиметри (од пета до најдолгиот прст). Потоа проверете ја табелата во МОНЕТА водичот за големини — таму се мапирани должините со европските броеви (35-46).\n🔗 vodic.html#golemini',
     '📏 Për të përcaktuar madhësinë e duhur, matni gjatësinë e këmbës në milimetra (nga thembra te gishti më i gjatë). Më pas kontrolloni tabelën në udhëzuesin MONETA për madhësi — aty janë të mapuara gjatësitë me numrat evropianë (35-46).\n🔗 vodic.html#golemini',
     '📏 To determine the right size, measure your foot length in millimeters (from heel to longest toe). Then check the table in the MONETA size guide — lengths are mapped to European sizes (35-46).\n🔗 vodic.html#golemini');
+
+  // Табела: EU големина → должина на стапало (мм)
+  var SIZE_TABLE = [
+    { eu: 28, mm: 170 }, { eu: 29, mm: 177 }, { eu: 30, mm: 183 },
+    { eu: 31, mm: 190 }, { eu: 32, mm: 197 }, { eu: 33, mm: 203 },
+    { eu: 34, mm: 210 },
+    { eu: 35, mm: 225 }, { eu: 36, mm: 232 }, { eu: 37, mm: 240 },
+    { eu: 38, mm: 247 }, { eu: 39, mm: 255 }, { eu: 40, mm: 260 },
+    { eu: 41, mm: 267 }, { eu: 42, mm: 274 }, { eu: 43, mm: 280 },
+    { eu: 44, mm: 287 }, { eu: 45, mm: 295 }, { eu: 46, mm: 302 }
+  ];
+
+  function mmToEU(mm) {
+    var closest = SIZE_TABLE[0], minDiff = Math.abs(mm - closest.mm);
+    for (var i = 1; i < SIZE_TABLE.length; i++) {
+      var diff = Math.abs(mm - SIZE_TABLE[i].mm);
+      if (diff < minDiff) { minDiff = diff; closest = SIZE_TABLE[i]; }
+    }
+    return closest;
+  }
+
+  function extractNumberFromText(raw) {
+    var m = raw.match(/(\d+)\s*(mm|cm|милиметр|сантиметр|см|мм)/i);
+    if (m) return { val: parseInt(m[1]), unit: /cm|сантиметр|см/i.test(m[2]) ? 'cm' : 'mm' };
+    m = raw.match(/EU\s*(\d+)/i);
+    if (m) return { val: parseInt(m[1]), unit: 'eu' };
+    m = raw.match(/број\s*(\d+)/i);
+    if (m) return { val: parseInt(m[1]), unit: 'eu' };
+    m = raw.match(/(\d{3})\b/); // трицифрен број = веројатно mm
+    if (m) return { val: parseInt(m[1]), unit: 'mm' };
+    m = raw.match(/(\d+)\s*(cm|сm|сантим|centim)/i);
+    if (m) return { val: parseInt(m[1]), unit: 'cm' };
+    return null;
+  }
+
+  function computeSizeAnswer(n) {
+    var num = extractNumberFromText(n.raw + ' ' + n.cyr);
+    if (!num) return { text: SIZE_GUIDE_MSG, chips: [] };
+
+    var mm = num.unit === 'cm' ? num.val * 10 : num.val;
+    if (num.unit === 'eu') {
+      // EU големина → mm
+      for (var i = 0; i < SIZE_TABLE.length; i++) {
+        if (SIZE_TABLE[i].eu >= num.val) { mm = SIZE_TABLE[i].mm; break; }
+      }
+    }
+    var info = mmToEU(mm);
+    var cm = (info.mm / 10).toFixed(1);
+
+    if (info.eu < 35) {
+      return {
+        text: t(
+          '📏 За должина на стапало од ' + (num.unit === 'eu' ? 'EU ' + num.val : num.val + ' ' + num.unit) + ', вашиот EU број е приближно ' + info.eu + ' (≈ ' + cm + ' cm / ' + info.mm + ' mm). Ова е детска големина. Препорачуваме МОНЕТА Duck — детска анатомска влошка за правилен развој на стапалото. 🦆\n🔗 modeli/duck.html',
+          '📏 Për gjatësi të këmbës ' + (num.unit === 'eu' ? 'EU ' + num.val : num.val + ' ' + num.unit) + ', numri juaj EU është afërsisht ' + info.eu + ' (≈ ' + cm + ' cm / ' + info.mm + ' mm). Kjo është madhësi për fëmijë. Rekomandojmë MONETA Duck — taban anatomik për fëmijë për zhvillim të duhur të këmbës. 🦆\n🔗 modeli/duck.html',
+          '📏 For a foot length of ' + (num.unit === 'eu' ? 'EU ' + num.val : num.val + ' ' + num.unit) + ', your EU size is approximately ' + info.eu + ' (≈ ' + cm + ' cm / ' + info.mm + ' mm). This is a kids size. We recommend MONETA Duck — anatomical kids insole for proper foot development. 🦆\n🔗 modeli/duck.html'),
+        chips: []
+      };
+    }
+    if (info.eu > 46) {
+      return {
+        text: t(
+          '📏 За должина на стапало од ' + (num.unit === 'eu' ? 'EU ' + num.val : num.val + ' ' + num.unit) + ', вашиот EU број е приближно ' + info.eu + ' (≈ ' + cm + ' cm / ' + info.mm + ' mm). За жал, МОНЕТА влошките се достапни до EU 46. Контактирајте нè за специјална нарачка: info@calivita.mk / +389 76 454 957.',
+          '📏 Për gjatësi të këmbës ' + (num.unit === 'eu' ? 'EU ' + num.val : num.val + ' ' + num.unit) + ', numri juaj EU është afërsisht ' + info.eu + ' (≈ ' + cm + ' cm / ' + info.mm + ' mm). Fatkeqësisht, tabanët MONETA janë të disponueshëm deri në EU 46. Na kontaktoni për porosi speciale: info@calivita.mk / +389 76 454 957.',
+          '📏 For a foot length of ' + (num.unit === 'eu' ? 'EU ' + num.val : num.val + ' ' + num.unit) + ', your EU size is approximately ' + info.eu + ' (≈ ' + cm + ' cm / ' + info.mm + ' mm). Unfortunately, MONETA insoles are available up to EU 46. Contact us for a special order: info@calivita.mk / +389 76 454 957.'),
+        chips: []
+      };
+    }
+    // EU 35-46 — одреди го точниот опсег
+    var range = '';
+    var ranges = [[35,36],[37,38],[39,40],[41,42],[43,44],[45,46]];
+    for (var r = 0; r < ranges.length; r++) {
+      if (info.eu >= ranges[r][0] && info.eu <= ranges[r][1]) {
+        range = ranges[r][0] + '-' + ranges[r][1];
+        break;
+      }
+    }
+    return {
+      text: t(
+        '📏 За должина на стапало од ' + (num.unit === 'eu' ? 'EU ' + num.val : num.val + ' ' + num.unit) + ', вашиот EU број е приближно ' + info.eu + ' (≈ ' + cm + ' cm / ' + info.mm + ' mm). МОНЕТА големина: ' + range + '.\n\nСакате да ви препорачам влошки за спорт, за работа или за секојдневна удобност? 😊',
+        '📏 Për gjatësi të këmbës ' + (num.unit === 'eu' ? 'EU ' + num.val : num.val + ' ' + num.unit) + ', numri juaj EU është afërsisht ' + info.eu + ' (≈ ' + cm + ' cm / ' + info.mm + ' mm). Madhësia MONETA: ' + range + '.\n\nDëshironi t\'ju rekomandoj tabanë për sport, punë apo rehati të përditshme? 😊',
+        '📏 For a foot length of ' + (num.unit === 'eu' ? 'EU ' + num.val : num.val + ' ' + num.unit) + ', your EU size is approximately ' + info.eu + ' (≈ ' + cm + ' cm / ' + info.mm + ' mm). MONETA size: ' + range + '.\n\nWould you like me to recommend insoles for sports, work or everyday comfort? 😊'),
+      chips: []
+    };
+  }
 
   function isSizeQuery(n) {
     const haystack = n.raw + ' ' + n.cyr;
@@ -756,10 +840,10 @@
         return { text: t('Не те разбрав точно. ', 'Nuk të kuptova saktësisht. ', 'I did not understand exactly. ') + st.q, chips: st.chips };
       }
     }
-    // 0.7) Прашање за големина/мерење → директно до водичот за големини
+    // 0.7) Прашање за големина/мерење → пресметај и предложи број
     if (isSizeQuery(n)) {
       clarifyState = null; funnel = null;
-      return { text: SIZE_GUIDE_MSG, chips: [] };
+      return computeSizeAnswer(n);
     }
     // 1) Прво — FAQ (поконкретни прашања од сајтот)
     let bestFaq = null, bestFaqScore = 0;
