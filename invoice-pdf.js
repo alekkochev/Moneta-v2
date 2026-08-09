@@ -75,12 +75,11 @@
       }
     });
 
-    // Цените се БЕЗ ДДВ (нето); ДДВ се додава на крајот.
+    // Основица (без ДДВ) + достава; без посебна ДДВ ставка.
     var goods = rows.reduce(function (s, r) { return s + r.price * r.qty; }, 0);
     var taxBase = Math.round(goods * 100) / 100;
-    var vat = Math.round((taxBase * vatRate) * 100) / 100;
     var delivery = Number(order.delivery) || 0;
-    var grand = Math.round((taxBase + vat + delivery) * 100) / 100;
+    var grand = Math.round((taxBase + delivery) * 100) / 100;
 
     var tableBody = [[
       { text: '#', style: 'th' },
@@ -179,12 +178,10 @@
             {
               width: 235,
               stack: [
-                { columns: [{ width: '*', text: 'Основица (без ДДВ):', fontSize: 10 }, { width: 'auto', text: fmt(taxBase), fontSize: 10 }] },
-                { columns: [{ width: '*', text: 'ДДВ (' + Math.round(vatRate * 100) + '%):', fontSize: 10 }, { width: 'auto', text: fmt(vat), fontSize: 10 }], margin: [0, 3, 0, 0] },
-                { columns: [{ width: '*', text: 'Вкупно производи:', fontSize: 10 }, { width: 'auto', text: fmt(goods), fontSize: 10 }], margin: [0, 3, 0, 0] },
-                { columns: [{ width: '*', text: 'Достава:', fontSize: 10 }, { width: 'auto', text: delivery === 0 ? 'БЕСПЛАТНА' : fmt(delivery), fontSize: 10 }], margin: [0, 3, 0, 0] },
+                { columns: [{ width: '*', text: 'Основица:', fontSize: 10 }, { width: 'auto', text: fmt(taxBase), fontSize: 10 }] },
+                { columns: [{ width: '*', text: 'Достава:', fontSize: 10 }, { width: 'auto', text: delivery === 0 ? 'БЕСПЛАТНА ДОСТАВА' : fmt(delivery), fontSize: 10 }], margin: [0, 3, 0, 0] },
                 { canvas: [{ type: 'line', x1: 0, y1: 3, x2: 235, y2: 3, lineWidth: 1.5, lineColor: '#EC1752' }], margin: [0, 6, 0, 4] },
-                { columns: [{ width: '*', text: 'ВКУПНО ЗА ПЛАЌАЊЕ:', fontSize: 11, bold: true, color: '#EC1752' }, { width: 'auto', text: fmt(grand), fontSize: 11, bold: true, color: '#EC1752' }] },
+                { columns: [{ width: '*', text: 'ВКУПНО:', fontSize: 11, bold: true, color: '#EC1752' }, { width: 'auto', text: fmt(grand), fontSize: 11, bold: true, color: '#EC1752' }] },
               ],
             },
           ],
