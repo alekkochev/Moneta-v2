@@ -144,34 +144,34 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
         <div class="checkout__inner">
             <div class="checkout__frame">
                 <h2 data-mk="Податоци за нарачка" data-sq="Të dhënat e porosisë" data-en="Order Details">Податоци за нарачка</h2>
-                <form id="checkoutForm" novalidate>
+                <form id="checkoutForm" novalidate autocomplete="off">
                     <div class="checkout__row">
                         <div class="checkout__field">
                             <label data-mk="Име и презиме *" data-sq="Emri dhe mbiemri *" data-en="Full name *">Име и презиме *</label>
-                            <input type="text" id="coName" required data-mk-placeholder="пр. Петар Петровски" data-sq-placeholder="p.sh. Petar Petrovski" data-en-placeholder="e.g. John Smith">
+                            <input type="text" id="coName" required autocomplete="off" data-mk-placeholder="пр. Петар Петровски" data-sq-placeholder="p.sh. Petar Petrovski" data-en-placeholder="e.g. John Smith">
                         </div>
                         <div class="checkout__field">
                             <label data-mk="Телефон *" data-sq="Telefoni *" data-en="Phone *">Телефон *</label>
-                            <input type="tel" id="coPhone" required data-mk-placeholder="пр. 070 123 456" data-sq-placeholder="p.sh. 070 123 456" data-en-placeholder="e.g. 070 123 456">
+                            <input type="tel" id="coPhone" required autocomplete="off" data-mk-placeholder="пр. 070 123 456" data-sq-placeholder="p.sh. 070 123 456" data-en-placeholder="e.g. 070 123 456">
                         </div>
                     </div>
                     <div class="checkout__field">
                         <label data-mk="Е-пошта" data-sq="E-mail" data-en="Email">Е-пошта</label>
-                        <input type="email" id="coEmail" data-mk-placeholder="пр. ime@primer.mk" data-sq-placeholder="p.sh. emri@shembull.mk" data-en-placeholder="e.g. name@example.com">
+                        <input type="email" id="coEmail" autocomplete="off" data-mk-placeholder="пр. ime@primer.mk" data-sq-placeholder="p.sh. emri@shembull.mk" data-en-placeholder="e.g. name@example.com">
                     </div>
                     <div class="checkout__row">
                         <div class="checkout__field">
                             <label data-mk="Град *" data-sq="Qyteti *" data-en="City *">Град *</label>
-                            <input type="text" id="coCity" required data-mk-placeholder="пр. Скопје" data-sq-placeholder="p.sh. Shkup" data-en-placeholder="e.g. Skopje">
+                            <input type="text" id="coCity" required autocomplete="off" data-mk-placeholder="пр. Скопје" data-sq-placeholder="p.sh. Shkup" data-en-placeholder="e.g. Skopje">
                         </div>
                         <div class="checkout__field">
                             <label data-mk="Адреса (улица и број) *" data-sq="Adresa (rruga dhe numri) *" data-en="Address (street and number) *">Адреса (улица и број) *</label>
-                            <input type="text" id="coAddress" required data-mk-placeholder="пр. ул. Македонија бр. 5" data-sq-placeholder="p.sh. rr. Maqedonia nr. 5" data-en-placeholder="e.g. 5 Makedonija St.">
+                            <input type="text" id="coAddress" required autocomplete="off" data-mk-placeholder="пр. ул. Македонија бр. 5" data-sq-placeholder="p.sh. rr. Maqedonia nr. 5" data-en-placeholder="e.g. 5 Makedonija St.">
                         </div>
                     </div>
                     <div class="checkout__field">
                         <label data-mk="Забелешка (опционално)" data-sq="Shënim (opsionale)" data-en="Note (optional)">Забелешка (опционално)</label>
-                        <textarea id="coNote" data-mk-placeholder="пр. Оставете ја пратката кај соседите" data-sq-placeholder="p.sh. Lëreni parcelën te fqinjët" data-en-placeholder="e.g. Leave the package with the neighbors"></textarea>
+                        <textarea id="coNote" autocomplete="off" data-mk-placeholder="пр. Оставете ја пратката кај соседите" data-sq-placeholder="p.sh. Lëreni parcelën te fqinjët" data-en-placeholder="e.g. Leave the package with the neighbors"></textarea>
                     </div>
                     <label class="checkout__field">
                         <span data-mk="Начин на плаќање:" data-sq="Mënyra e pagesës:" data-en="Payment method:">Начин на плаќање:</span>
