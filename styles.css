@@ -8243,6 +8243,12 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
    да бидат видливи на темната позадина на менито
    ======================================== */
 @media (max-width: 860px) {
+    /* „Влошки" горе, баланчето ПОД него (наместо до страна — беше flex row) */
+    .navbar__dd {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+    }
     .navbar__links .navbar__dd-trigger {
         color: #ffffff;
         font-weight: 700 !important;
