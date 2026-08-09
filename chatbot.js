@@ -420,26 +420,27 @@
       answer: function () {
         const discounted = getDiscountedProducts();
         if (!discounted.length) {
-          return t(
+          return { text: t(
             '🎯 Моментално немаме активни попусти. Сите производи се по редовна цена. Проверете повторно или контактирајте нè за специјални понуди: info@calivita.mk 📩',
             '🎯 Aktualisht nuk kemi zbritje aktive. Të gjitha produktet janë me çmim të rregullt. Kontrolloni përsëri ose na kontaktoni për oferta speciale: info@calivita.mk 📩',
-            '🎯 We currently have no active discounts. All products are at regular price. Check again or contact us for special offers: info@calivita.mk 📩');
+            '🎯 We currently have no active discounts. All products are at regular price. Check again or contact us for special offers: info@calivita.mk 📩'), chips: [] };
         }
-        var lines = [t('🏷️ **Производи на попуст:**', '🏷️ **Produkte me zbritje:**', '🏷️ **Discounted products:**'), ''];
+        var html = '<div class="b-rec"><div class="b-rec__title">' + esc(t('🏷️ Производи на попуст', '🏷️ Produkte me zbritje', '🏷️ Discounted products')) + '</div><div class="b-thumbs">';
         discounted.forEach(function (m) {
-          var line = '• **' + m.name + '** — 💰 ' + m.price.toLocaleString('mk-MK') + ' ден.';
-          if (m.oldPrice > 0) {
-            line += ' ~~' + m.oldPrice.toLocaleString('mk-MK') + ' ден.~~';
+          var discBadge = m.discountPct > 0 ? '<div class="b-thumb__discount">-' + m.discountPct + '%</div>' : '';
+          var priceHtml = m.price ? m.price.toLocaleString('mk-MK') + ' ден.' : '';
+          if (m.oldPrice > 0 && m.price) {
+            priceHtml = '<span class="b-thumb__price-old">' + m.oldPrice.toLocaleString('mk-MK') + ' ден.</span> ' + m.price.toLocaleString('mk-MK') + ' ден.';
           }
-          line += '  🏷️ **−' + m.discountPct + '%**';
-          lines.push(line);
+          html += '<div class="b-thumb" data-model="' + esc(m.slug) + '">'
+            + '<div class="b-thumb__img"><img src="' + imgPath(m.slug) + '" alt="' + esc(m.name) + '" loading="lazy" data-zoom="' + esc(m.slug) + '">' + discBadge + '</div>'
+            + '<div class="b-thumb__info">'
+            + '<div class="b-thumb__name">' + esc(m.name) + '</div>'
+            + '<div class="b-thumb__price">' + priceHtml + '</div>'
+            + '</div></div>';
         });
-        lines.push('');
-        lines.push(t(
-          'Напиши ми го името на моделот (пр. „' + discounted[0].name + '") за детали и онлајн нарачка! 🛒',
-          'Më shkruaj emrin e modelit (p.sh. „' + discounted[0].name + '") për detaje dhe porosi online! 🛒',
-          'Write me the model name (e.g. "' + discounted[0].name + '") for details and online ordering! 🛒'));
-        return lines.join('\n');
+        html += '</div><div class="b-rec__hint">' + esc(t('Кликни на сликичка за детали и додавање во кошничка.', 'Kliko foton për detaje dhe shtim në shportë.', 'Click a thumbnail for details and adding to cart.')) + '</div></div>';
+        return { html: html, chips: [] };
       }
     },
     {
@@ -1000,7 +1001,8 @@
     // 1.8) Прашање за попуст/акција → провери Supabase и врати листа (пред општите намери)
     if (isDiscountQuery(n)) {
       const discInt = INTENTS[0]; // discounts е прв во низата
-      return { text: discInt.answer(n), chips: [] };
+      const discRes = discInt.answer(n);
+      return (discRes && typeof discRes === 'object') ? discRes : { text: discRes };
     }
     // 2) Потоа — општи намери
     let best = null, bestScore = 0;
