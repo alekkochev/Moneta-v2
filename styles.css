@@ -4652,22 +4652,11 @@ textarea {
     letter-spacing: 0.02em;
     text-decoration: none;
     white-space: nowrap;
-    transition: color var(--transition), background var(--transition), box-shadow .3s;
+    transition: color var(--transition), background var(--transition);
 }
 .navbar__akcija:hover {
     text-decoration: underline;
     background: rgba(17, 17, 17, 0.06);
-}
-/* Неонски пулсирачки ефект кога има активни попусти */
-.navbar__akcija--active {
-    color: #EC1752 !important;
-    background: rgba(236,23,82,.08) !important;
-    animation: navAkcijaPulse 1.6s ease-in-out infinite;
-    box-shadow: 0 0 12px rgba(236,23,82,.35), 0 0 24px rgba(236,23,82,.15);
-}
-@keyframes navAkcijaPulse {
-    0%,100%{box-shadow:0 0 8px rgba(236,23,82,.25),0 0 18px rgba(236,23,82,.1);}
-    50%{box-shadow:0 0 18px rgba(236,23,82,.55),0 0 36px rgba(236,23,82,.25),0 0 54px rgba(236,23,82,.1);}
 }
 @media (max-width: 860px) {
     .navbar__coupon-item {
@@ -4678,13 +4667,6 @@ textarea {
         justify-content: center;
         padding: 12px;
         font-size: 15px;
-    }
-    .navbar__akcija--active {
-        box-shadow: 0 0 14px rgba(236,23,82,.4), 0 0 28px rgba(236,23,82,.2);
-    }
-    @keyframes navAkcijaPulse {
-        0%,100%{box-shadow:0 0 8px rgba(236,23,82,.25),0 0 18px rgba(236,23,82,.1);}
-        50%{box-shadow:0 0 20px rgba(236,23,82,.6),0 0 40px rgba(236,23,82,.3);}
     }
 }
 .navbar__search-btn,
