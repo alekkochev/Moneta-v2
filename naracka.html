@@ -258,6 +258,54 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
             background-color: rgba(236, 23, 82, 0.07) !important;
             box-shadow: 0 0 0 3px rgba(236, 23, 82, 0.12) !important;
         }
+
+        /* Потврда на нарачка — анимација на зелената штикла */
+        .checkout__success {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            min-height: 240px;
+            cursor: pointer;
+        }
+        .checkout__success::before { display: none !important; }
+        .success-badge {
+            color: #fff;
+            background: #2ecc71;
+            border-radius: 50%;
+            width: 88px;
+            height: 88px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 14px 28px rgba(46, 204, 113, 0.38);
+            opacity: 0;
+            transform: translateY(-80px) scale(0.3);
+            animation: success-drop 0.85s cubic-bezier(0.22, 0.9, 0.32, 1.35) forwards;
+        }
+        @keyframes success-drop {
+            0%   { opacity: 0; transform: translateY(-80px) scale(0.3); }
+            70%  { opacity: 1; transform: translateY(8px) scale(1.12); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .success-title {
+            font-size: clamp(24px, 3.4vw, 40px);
+            line-height: 1.25;
+            margin: 0;
+            color: #EC1752;
+            animation: success-title-green 0.5s ease 0.7s forwards;
+        }
+        @keyframes success-title-green {
+            to { color: #2ecc71; }
+        }
+        .checkout__success.is-leaving {
+            animation: success-fadeout 0.45s ease forwards;
+        }
+        @keyframes success-fadeout {
+            to { opacity: 0; transform: translateY(12px) scale(0.97); }
+        }
     </style>
 
     <!-- ===== SCRIPTS ===== -->
@@ -486,16 +534,40 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
                 const orderEmail = window.MONETA_ORDER_EMAIL || 'nudalsmudals@gmail.com';
                 window.location.href = 'mailto:' + orderEmail + '?subject=' + encodeURIComponent('Нарачка - МОНЕТА - ' + name) + '&body=' + encodeURIComponent(body);
 
-                // Потврда
+                // Потврда — само штикла + наслов, 5 сек, клик → почетна (#kategorii)
                 const checkoutInner = document.querySelector('.checkout__inner');
                 if (checkoutInner) {
                     checkoutInner.innerHTML = `
-                        <div class="checkout__frame checkout__success" style="grid-column:1/-1;max-width:560px;margin:0 auto;">
-                            <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                            <h3 data-mk="Нарачката е испратена!" data-sq="Porosia u dërgua!" data-en="Order sent!">Нарачката е испратена!</h3>
-                            <p data-mk="Ви благодариме! Вашата нарачка е испратена на info@calivita.mk." data-sq="Faleminderit! Porosia juaj u dërgua në info@calivita.mk." data-en="Thank you! Your order was sent to info@calivita.mk.">Ви благодариме! Вашата нарачка е испратена на info@calivita.mk.</p>
-                            <a href="./index.html#kategorii" class="hero__cta hero__cta--primary" data-mk="Назад кон почетна" data-sq="Kthehu te kryefaqja" data-en="Back to home">Назад кон почетна</a>
+                        <div class="checkout__frame checkout__success" id="orderSuccessCard" style="grid-column:1/-1;max-width:560px;margin:0 auto;" role="status" aria-live="polite">
+                            <span class="success-badge" aria-hidden="true">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            </span>
+                            <h3 class="success-title" data-mk="Нарачката е испратена!" data-sq="Porosia u dërgua!" data-en="Order sent!">Нарачката е испратена!</h3>
                         </div>`;
+                    const card = document.getElementById('orderSuccessCard');
+                    if (card) {
+                        const goHome = () => { window.location.href = './index.html#kategorii'; };
+                        const dismiss = () => {
+                            if (card.dataset.leaving) return;
+                            card.dataset.leaving = '1';
+                            card.classList.add('is-leaving');
+                            setTimeout(goHome, 450);
+                        };
+                        // клик на картичката → исчезни
+                        card.addEventListener('click', (e) => { e.stopPropagation(); dismiss(); });
+                        // клик надвор од картичката → исчезни
+                        document.addEventListener('click', (e) => {
+                            if (!card.contains(e.target)) dismiss();
+                        });
+                        // автоматски по 5 секунди
+                        setTimeout(dismiss, 5000);
+                        // јазик на насловот
+                        const curLang = document.documentElement.lang;
+                        card.querySelectorAll('[data-mk][data-en]').forEach((el) => {
+                            const t = el.getAttribute('data-' + curLang);
+                            if (t) el.textContent = t;
+                        });
+                    }
                 }
                 try { localStorage.removeItem('moneta_cart'); } catch (err) { /* ignore */ }
             });
