@@ -62,49 +62,26 @@ serve(async (req) => {
       return json({ error: "No order recipients configured" }, 500);
     }
 
-    const items = Array.isArray(body.items) ? body.items : [];
-    const itemLines = items.map((it: any, i: number) => {
-      const price = Number(it.price) || 0;
-      const qty = Number(it.qty) || 0;
-      let sizes = "";
-      if (it.sizes && typeof it.sizes === "object") {
-        sizes = Object.entries(it.sizes)
-          .filter(([, q]) => Number(q) > 0)
-          .map(([s, q]) => `${s} × ${q}`)
-          .join(", ");
-      }
-      return `${i + 1}. ${it.name || it.slug || "?"}${sizes ? " (" + sizes + ")" : ""} — ${qty} × ${price} = ${qty * price} ден.`;
-    }).join("\n");
-
-    const delivery = Number(body.delivery) || 0;
-    const total = Number(body.total) || 0;
     const invNo = makeInvoiceNumber(new Date());
 
+    // Кратка потврда во мејлот; сите детали се во приложената испратница (PDF).
     const text =
-      "НОВА НАРАЧКА — МОНЕТА (www.vloski.mk)\n" +
+      "Нова нарачка — МОНЕТА (www.vloski.mk)\n" +
       "========================================\n\n" +
-      "Фактура: " + invNo + "\n" +
-      "Име: " + (body.name || "-") + "\n" +
-      "Телефон: " + (body.phone || "-") + "\n" +
-      "Е-пошта: " + (body.email || "-") + "\n" +
-      "Град: " + (body.city || "-") + "\n" +
-      "Адреса: " + (body.address || "-") + "\n" +
-      (body.note ? "Забелешка: " + body.note + "\n" : "") +
-      "Плаќање: " + (body.payment || "-") + "\n" +
-      "Маркетинг известувања: " + (body.marketing_consent ? "ДА" : "НЕ") + "\n\n" +
-      "--- ПРОИЗВОДИ ---\n" +
-      (itemLines || "(празна нарачка)") + "\n\n" +
-      "Достава: " + (delivery === 0 ? "БЕСПЛАТНА" : delivery + " ден.") + "\n" +
-      "ВКУПНО: " + total + " ден.\n\n" +
-      "PDF фактурата е прикачена на овој мејл.";
+      "Почитувани,\n\n" +
+      "Успешно е направена нарачка од МОНЕТА (www.vloski.mk).\n" +
+      "Сите детали за нарачката се наоѓаат во приложената испратница (PDF).\n\n" +
+      "Испратница: " + invNo + "\n" +
+      "Купувач: " + (body.name || "-") + "\n" +
+      "Телефон: " + (body.phone || "-") + "\n";
 
-    // PDF фактурата ја генерира прелистувачот (invoice-pdf.js) и ја праќа како base64
+    // PDF испратницата ја генерира прелистувачот (invoice-pdf.js) и ја праќа како base64
     const pdfBase64 = String(body.pdfBase64 || "");
 
     const emailPayload: any = {
       from: SENDER_EMAIL,
       to: ORDER_EMAILS,
-      subject: `🛒 Фактура ${invNo} — Нова нарачка — МОНЕТА`,
+      subject: `🛒 Испратница ${invNo} — Нова нарачка — МОНЕТА`,
       text,
     };
     if (pdfBase64) {
