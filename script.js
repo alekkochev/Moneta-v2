@@ -1587,7 +1587,7 @@ if (compareToggleBtn && compareModelsSection) {
                     <div class="compare-phead-info">
                         <h4 class="compare-phead-title">${p1.name[lang]}</h4>
                         <span class="compare-phead-price">${p1.price}</span>
-                        <a href="${p1.link}" class="compare-phead-link">${lang === 'en' ? 'View Details →' : 'Погледни модел →'}</a>
+                        <a href="${p1.link}" class="compare-phead-link">${lang === 'en' ? 'View Details' : 'Погледни модел'}</a>
                     </div>
                 </div>
                 <div class="compare-product-card-head">
@@ -1595,7 +1595,7 @@ if (compareToggleBtn && compareModelsSection) {
                     <div class="compare-phead-info">
                         <h4 class="compare-phead-title">${p2.name[lang]}</h4>
                         <span class="compare-phead-price">${p2.price}</span>
-                        <a href="${p2.link}" class="compare-phead-link">${lang === 'en' ? 'View Details →' : 'Погледни модел →'}</a>
+                        <a href="${p2.link}" class="compare-phead-link">${lang === 'en' ? 'View Details' : 'Погледни модел'}</a>
                     </div>
                 </div>
             </div>
@@ -1821,7 +1821,7 @@ if (compareToggleBtn && compareModelsSection) {
         html += '</tr>';
 
         html += '<tr><td class="compare-table__label">' + (lang === 'en' ? 'Details' : 'Детали') + '</td>';
-        models.forEach((m) => { html += '<td><a href="' + m.link + '" class="compare-link-btn">' + (lang === 'en' ? 'View Model →' : 'Види модел →') + '</a></td>'; });
+        models.forEach((m) => { html += '<td><a href="' + m.link + '" class="compare-link-btn">' + (lang === 'en' ? 'View Model' : 'Види модел') + '</a></td>'; });
         html += '</tr>';
 
         html += '</tbody></table></div>';
@@ -2848,7 +2848,7 @@ console.log('%c Вебсајт во развој 💪', 'color:#6B6B76;font-size
                 <div class="freeship-popup__text">
                     <strong>${isEn ? 'Only ' + remaining.toLocaleString('mk-MK') + ' MKD to FREE delivery!' : 'Само уште ' + remaining.toLocaleString('mk-MK') + ' ден. до БЕСПЛАТНА достава!'}</strong>
                     <span>${isEn ? 'Add one more insole and the delivery is on us.' : 'Додадете уште една влошка и доставата е на нас.'}</span>
-                    <a href="${base}index.html#kategorii" class="freeship-popup__btn">${isEn ? 'See insoles →' : 'Види ги влошките →'}</a>
+                    <a href="${base}index.html#kategorii" class="freeship-popup__btn">${isEn ? 'See insoles' : 'Види ги влошките'}</a>
                 </div>
                 <button type="button" class="freeship-popup__close" aria-label="Затвори">×</button>
             </div>`;
@@ -3250,10 +3250,10 @@ console.log('%c Вебсајт во развој 💪', 'color:#6B6B76;font-size
         if (prevBtn) prevBtn.style.visibility = current === 1 ? 'hidden' : 'visible';
         if (nextBtn) {
             nextBtn.style.visibility = 'visible';
-            nextBtn.dataset.mk = 'Следно →';
-            nextBtn.dataset.en = 'Next →';
-            nextBtn.dataset.sq = 'Tjetra →';
-            nextBtn.textContent = lang() === 'en' ? 'Next →' : (lang() === 'sq' ? 'Tjetra →' : 'Следно →');
+            nextBtn.dataset.mk = 'Следно';
+            nextBtn.dataset.en = 'Next';
+            nextBtn.dataset.sq = 'Tjetra';
+            nextBtn.textContent = lang() === 'en' ? 'Next' : (lang() === 'sq' ? 'Tjetra' : 'Следно');
         }
         steps.forEach((s) => {
             const val = answers[s.dataset.step];
@@ -3291,7 +3291,7 @@ console.log('%c Вебсајт во развој 💪', 'color:#6B6B76;font-size
             if (isDuckMode) {
                 // За деца има само еден модел (DUCK) — нема квиз прашања, само инфо + линк
                 const duckNote = isEn ? '🎒 For kids there is only one insole — meet <strong>MONETA Duck</strong>!' : (isSq ? '🎒 Për fëmijë ekziston vetëm një taban — njihuni me <strong>MONETA Duck</strong>!' : '🎒 За деца постои само една влошка — запознајте ја <strong>МОНЕТА Duck</strong>!');
-                const duckView = isEn ? 'View →' : (isSq ? 'Shiko →' : 'Види →');
+                const duckView = isEn ? 'View' : (isSq ? 'Shiko' : 'Види');
                 const duckIcn = (sq, en, mk) => isEn ? en : (isSq ? sq : mk);
                 grid.innerHTML = `
                     <p class="quiz-result__note">${duckNote}</p>
@@ -3320,7 +3320,7 @@ console.log('%c Вебсајт во развој 💪', 'color:#6B6B76;font-size
                         const label = isEn ? en : (isSq ? sq : mk);
                         return `<img src="images/icons/${file}" alt="${label}" title="${label}" width="22" height="22" loading="lazy">`;
                     }).join('')}</div>
-                    <em>${isEn ? 'View →' : (isSq ? 'Shiko →' : 'Види →')}</em>
+                    <em>${isEn ? 'View' : (isSq ? 'Shiko' : 'Види')}</em>
                 </a>`).join('');
             }
         }
@@ -3774,7 +3774,7 @@ window.MonetaData = {
             const data = await res.json().catch(() => ({}));
             if (res.ok && data.ok) {
                 const link = '<a href="' + KARGO_URL + '" target="_blank" rel="noopener" style="color:#7ce38b;text-decoration:underline;font-weight:700;">' +
-                    (isEn ? 'Track on Kargo Express →' : 'Следете ја пратката на Карго Експрес →') + '</a>';
+                    (isEn ? 'Track on Kargo Express' : 'Следете ја пратката на Карго Експрес') + '</a>';
                 setFeedback('success',
                     'Вашето барање е испратено! Кодот за следење ќе го добиете на вашата е-пошта. ' + link,
                     'Your request has been sent! You will receive the tracking code on your email. ' + link);
@@ -3908,7 +3908,7 @@ window.MonetaData = {
                 '<h3>' + t('Чекајте!', 'Prisni!', 'Wait!') + '</h3>' +
                 '<p class="moneta-exit__title">' + t('Бесплатна достава', 'Transport falas', 'Free delivery') + '</p>' +
                 '<p class="moneta-exit__sub">' + t('За нарачки над 1.000 ден. — низ цела Македонија.', 'Për porosi mbi 1.000 den. — në të gjithë Maqedoninë.', 'For orders over 1,000 MKD — across North Macedonia.') + '</p>' +
-                '<a href="' + BASE + 'index.html#kategorii" class="moneta-exit__btn">' + t('Види ги влошките →', 'Shiko tabanat →', 'See the insoles →') + '</a>' +
+                '<a href="' + BASE + 'index.html#kategorii" class="moneta-exit__btn">' + t('Види ги влошките', 'Shiko tabanat', 'See the insoles') + '</a>' +
             '</div>';
         document.body.appendChild(wrap);
         requestAnimationFrame(() => wrap.classList.add('is-open'));

@@ -60,7 +60,7 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
     <link href="./vendor/aos.css" rel="stylesheet" media="print" onload="this.media='all'" />
     <noscript><link rel="stylesheet" href="./vendor/aos.css" /></noscript>
     <link rel="icon" type="image/svg+xml" href="./images/favicon/favicon.svg" />
-    <link rel="stylesheet" href="./styles.css?v=20260808" />
+    <link rel="stylesheet" href="./styles.css?v=20260811" />
 </head>
 <body class="page-sistem">
 
@@ -262,7 +262,7 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
 
     <!-- ===== SCRIPTS ===== -->
     <script src="./vendor/aos.js" defer></script>
-    <script src="./script.js?v=20260811" defer></script>
+    <script src="./script.js?v=20260812" defer></script>
     <script src="./invoice-pdf.js?v=20260811" defer></script>
     <script>
         // ===== CHECKOUT LOGIC (нарачка) =====
@@ -290,7 +290,7 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
                         <div class="checkout__empty">
                             <h3 data-mk="Вашата кошничка е празна" data-sq="Shporta juaj është bosh" data-en="Your cart is empty">Вашата кошничка е празна</h3>
                             <p data-mk="Нема производи за нарачка." data-sq="Nuk ka produkte për porosi." data-en="There are no products to order.">Нема производи за нарачка.</p>
-                            <a href="./index.html#kategorii" class="hero__cta hero__cta--primary" data-mk="Истражи ги влошките →" data-sq="Eksploro tabanat →" data-en="Explore Insoles →">Истражи ги влошките →</a>
+                            <a href="./index.html#kategorii" class="hero__cta hero__cta--primary" data-mk="Истражи ги влошките" data-sq="Eksploro tabanat" data-en="Explore Insoles">Истражи ги влошките</a>
                         </div>`;
                     return;
                 }
@@ -343,7 +343,7 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
 
             renderSummary();
             window.MonetaCartOnChange = renderSummary;
-            // Промена на јазик → пререндерирање на резимето
+            // Промена на јазикпререндерирање на резимето
             window.MonetaLangCallbacks = window.MonetaLangCallbacks || [];
             window.MonetaLangCallbacks.push(() => renderSummary());
 
