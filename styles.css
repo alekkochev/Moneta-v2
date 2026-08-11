@@ -7875,7 +7875,15 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
 .grid-3 { grid-template-columns: repeat(3, 1fr); }
 .grid-4 { grid-template-columns: repeat(4, 1fr); }
 @media (max-width: 900px) { .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 560px) { .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); gap: 12px; } }
+/* Само column-gap на мобилен — row-gap-от останува кај главните картички (40px),
+   за преполовеното копче долу да не се преклопува со следниот ред. */
+@media (max-width: 560px) { .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); column-gap: 12px; } }
+/* Категориски мрежи (главни 6 + подменија + поврзани производи) на мобилен/таблет:
+   доволен row-gap за преполовеното копче (висина ~24px) да не допира/преклопува
+   со следниот ред — 52px (првичната дизајн-вредност). */
+@media (max-width: 860px) {
+    .categories__grid { row-gap: 52px; }
+}
 .card__desc { color: rgba(255,255,255,.9); font-size: 13.5px; line-height: 1.5; text-align: center; margin: 0; }
 .section-pad { padding-top: 70px; }
 .spec-list { list-style: none; margin: 0; padding: 0; text-align: left; display: inline-block; }
