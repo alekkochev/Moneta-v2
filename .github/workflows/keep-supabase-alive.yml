@@ -1,0 +1,28 @@
+name: Keep Supabase Alive
+
+on:
+  schedule:
+    # Секој ден во 06:00 UTC — Supabase го замрзнува free проектот
+    # по 7 дена без активност, па редовниот ping го одржува активен.
+    - cron: '0 6 * * *'
+  workflow_dispatch: # рачно пуштање
+
+jobs:
+  ping-supabase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase REST API
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+            "https://${{ secrets.SUPABASE_PROJECT_REF }}.supabase.co/rest/v1/products?select=id&limit=1")
+          echo "Supabase ping status: $response"
+          # 200 = OK, 404/empty = има податоци/нема, ама барањето е регистрирано како активност
+          if [ "$response" != "200" ] && [ "$response" != "404" ]; then
+            echo "Unexpected status: $response"
+            exit 1
+          fi
+
+      - name: Log timestamp
+        run: echo "Keep-alive ping done at $(date -u)"
