@@ -3067,7 +3067,7 @@ console.log('%c Вебсајт во развој 💪', 'color:#6B6B76;font-size
         renderNavBadges();
         renderFreeShip(cart);
         maybeShowFreeShipPopup(cart);
-        showCartToast(item.nameMk, item.slug);
+        if (window.monetaShowCartToast) window.monetaShowCartToast(item.nameMk, item.slug);
         if (window.MonetaCartOnChange) window.MonetaCartOnChange(cart);
     };
 
@@ -4060,7 +4060,7 @@ window.MonetaData = {
         ];
     }
 
-    // ===== CART ADD TOAST =====
+    // ===== CART ADD TOAST (exposed globally for addPendingToCart) =====
     function showCartToast(itemName, itemSlug) {
         const old = document.getElementById('monetaCartToast');
         if (old) { old.classList.remove('is-visible'); setTimeout(() => old.remove(), 400); }
@@ -4081,6 +4081,7 @@ window.MonetaData = {
         const close = () => { toast.classList.remove('is-visible'); setTimeout(() => toast.remove(), 400); };
         setTimeout(close, 4500);
     }
+    window.monetaShowCartToast = showCartToast;
 
     function showSalesToast() {
         if (!CONFIG.sales || salesShown >= 4) return;
