@@ -1039,7 +1039,7 @@
 
   // CSS (инјектирано)
   const CSS = [
-    '#monetaBotBtn{position:fixed;bottom:22px;right:22px;z-index:9990;width:60px;height:60px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,#EC1752,#C4123F);color:#fff;box-shadow:0 10px 26px rgba(236,23,82,.4);display:flex;align-items:center;justify-content:center;transition:transform .18s ease;}',
+    '#monetaBotBtn{position:fixed;bottom:22px;right:22px;z-index:9990;width:60px;height:60px;border-radius:50%;border:2px solid #EC1752;cursor:pointer;background:#ffffff;color:#EC1752;box-shadow:0 10px 26px rgba(236,23,82,.25);display:flex;align-items:center;justify-content:center;transition:transform .18s ease;}',
     '#monetaBotBtn:hover{transform:scale(1.08);}',
     '#monetaBotBtn svg{width:26px;height:26px;}',
     '#monetaBotBtn.is-open{transform:rotate(90deg);}',
