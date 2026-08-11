@@ -3570,6 +3570,24 @@ window.MonetaData = {
         return (old > price && old > 0) ? Math.round((old - price) / old * 100) : 0;
     };
 
+    // Вкупна залиха на производ (збир на qty по сите големини)
+    const totalQtyFor = (slug) => {
+        const sizes = window.MonetaData.sizes[slug] || {};
+        return Object.values(sizes).reduce((a, b) => a + (Number(b) || 0), 0);
+    };
+
+    // Има ли воопшто податоци за залиха за овој производ?
+    const hasStockData = (slug) => {
+        const sizes = window.MonetaData.sizes[slug];
+        return !!sizes && Object.keys(sizes).length > 0;
+    };
+
+    // Текст „Нема на залиха" според јазик
+    const stockOutText = () => {
+        const lang = document.documentElement.lang;
+        return lang === 'en' ? 'Out of stock' : (lang === 'sq' ? 'Mbaruar' : 'Нема на залиха');
+    };
+
     const apply = () => {
         // ---- Модел-страници: цена, стара цена, значка, залиха ----
         document.querySelectorAll('.size-selector[data-model]').forEach((sel) => {
@@ -3651,6 +3669,26 @@ window.MonetaData = {
                     btn.tabIndex = 0;
                 }
             });
+
+            // Продукт-ниво: нема залиха НА НИТУ ЕДНА големина → „Нема на залиха"
+            const modelLayout = sel.closest('.model-layout');
+            if (modelLayout && hasStockData(slug) && totalQtyFor(slug) <= 0) {
+                modelLayout.classList.add('model-layout--out-of-stock');
+                if (cart) cart.classList.add('model-cart--out-of-stock');
+                let badge = modelLayout.querySelector('.model-out-stock-badge');
+                if (!badge) {
+                    badge = document.createElement('div');
+                    badge.className = 'model-out-stock-badge';
+                    (cart || priceEl || sel).insertAdjacentElement('afterend', badge);
+                }
+                badge.textContent = stockOutText();
+                badge.style.display = '';
+            } else if (modelLayout) {
+                modelLayout.classList.remove('model-layout--out-of-stock');
+                if (cart) cart.classList.remove('model-cart--out-of-stock');
+                const badge = modelLayout.querySelector('.model-out-stock-badge');
+                if (badge) badge.remove();
+            }
         });
 
         // ---- Картички: значка за попуст ----
@@ -3680,6 +3718,36 @@ window.MonetaData = {
                 badge.textContent = showPct + '%';
             } else if (badge) {
                 badge.remove();
+            }
+        });
+
+        // ---- Залиха на картички: производ без залиха → сив + некликабилен ----
+        document.querySelectorAll('.card').forEach((card) => {
+            const link = card.matches('a[href*="modeli/"]') ? card : card.querySelector('a[href*="modeli/"]');
+            if (!link) return;
+            const m = (link.getAttribute('href') || '').match(/modeli\/([^\/]+)\.html/);
+            if (!m) return;
+            const slug = m[1];
+            if (!hasStockData(slug)) return; // нема податоци за залиха → не ја менувај
+            const totalQty = totalQtyFor(slug);
+            if (totalQty <= 0) {
+                card.classList.add('card--out-of-stock');
+                let stockBadge = card.querySelector('.card__stock-badge');
+                if (!stockBadge) {
+                    stockBadge = document.createElement('span');
+                    stockBadge.className = 'card__stock-badge';
+                    card.appendChild(stockBadge);
+                }
+                stockBadge.textContent = stockOutText();
+                // отстрани ја попуст-значката кога е без залиха
+                const promo = card.querySelector('.promo-badge--card');
+                if (promo) promo.style.display = 'none';
+            } else {
+                card.classList.remove('card--out-of-stock');
+                const stockBadge = card.querySelector('.card__stock-badge');
+                if (stockBadge) stockBadge.remove();
+                const promo = card.querySelector('.promo-badge--card');
+                if (promo) promo.style.display = '';
             }
         });
 

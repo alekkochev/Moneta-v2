@@ -7823,12 +7823,64 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
     color: var(--pink);
     box-shadow: 0 4px 14px rgba(236, 23, 82, 0.12);
 }
+
+/* ========================================
+   ПРОИЗВОД БЕЗ ЗАЛИХА (qty=0 на сите големини)
+   Картичка → сива, некликабилна
+   Модел страница → копчето „Додади" исклучено + значка „Нема на залиха"
+   ======================================== */
+.card--out-of-stock {
+    opacity: 0.6;
+    filter: grayscale(0.95);
+    pointer-events: none;
+    cursor: not-allowed;
+}
+.card--out-of-stock .card__link {
+    background: #C0BDB8 !important;
+    color: #fff !important;
+    box-shadow: none !important;
+}
+.card--out-of-stock .card__overlay {
+    background: rgba(22, 16, 26, 0.35);
+}
+.card__stock-badge {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 6;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: #EC1752;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+.model-cart--out-of-stock {
+    pointer-events: none;
+    opacity: 0.65;
+}
+.model-out-stock-badge {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 8px 18px;
+    border-radius: 999px;
+    background: #F0EEED;
+    color: #8a8784;
+    font-weight: 800;
+    font-size: 13px;
+}
+.model-layout--out-of-stock .size-selector {
+    opacity: 0.55;
+    pointer-events: none;
+}
 .size-selector__hint {
     font-size: 11px;
     color: var(--muted);
     margin-top: 6px;
-    min-height: 16px;
-}
+    min-height: 16px;}
 .size-selector__hint.error { color: #E53E3E; }
 .size-selector__hint.success { color: #10B981; }
 @media (max-width: 480px) {
