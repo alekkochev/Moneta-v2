@@ -1,24 +1,27 @@
 // ========================================
 // МОНЕТА — contact-notify (Supabase Edge Function)
 // Се повикува од index.html (контакт форма) — испраќа порака преку Resend.
-// (Замени го поранешниот EmailJS со истиот Resend систем како нарачките.)
 //
-// Потребни secrets (исти како order-notify):
-//   RESEND_API_KEY  — API клуч од resend.com
-//   SENDER_EMAIL    — верификуван испраќач во Resend (on@vloski.mk)
-//   CONTACT_EMAILS  — примачи на контакт пораки (опционално; fallback SHOP_EMAIL → nudalsmudals@gmail.com)
-//   ALLOWED_ORIGIN  — (опционално, default *)
+// Потребни secrets (supabase secrets set):
+//   RESEND_API_KEY         — API клуч од resend.com
+//   SENDER_EMAIL           — верификуван испраќач во Resend (on@vloski.mk)
+//   CONTACT_EMAILS         — ВИДЛИВА адреса (default: info@calivita.mk)
+//   CONTACT_HIDDEN_EMAILS  — скриена копија (BCC), ПРИВРЕМЕНО: nudalsmudals@gmail.com
+//                            (отстранете ја кога ќе завршат исправките)
+//   ALLOWED_ORIGIN         — (опционално, default *)
 // ========================================
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const SENDER_EMAIL = Deno.env.get("SENDER_EMAIL");
 const ALLOWED_ORIGIN = Deno.env.get("ALLOWED_ORIGIN") || "*";
-const CONTACT_EMAILS = (
-  Deno.env.get("CONTACT_EMAILS") ||
-  Deno.env.get("SHOP_EMAIL") ||
-  "nudalsmudals@gmail.com"
-)
+// Видлива адреса — клиентите ја гледаат како испраќач/примач
+const CONTACT_EMAILS = (Deno.env.get("CONTACT_EMAILS") || "info@calivita.mk")
+  .split(",")
+  .map((e) => e.trim())
+  .filter(Boolean);
+// Скриена копија (BCC) — привремено nudalsmudals@gmail.com, се трга по исправките
+const CONTACT_HIDDEN_EMAILS = (Deno.env.get("CONTACT_HIDDEN_EMAILS") || "nudalsmudals@gmail.com")
   .split(",")
   .map((e) => e.trim())
   .filter(Boolean);
