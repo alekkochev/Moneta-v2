@@ -1651,7 +1651,8 @@ a {
     }
 
     .categories__grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
     }
 
     .card--sport,
@@ -6587,7 +6588,7 @@ p { color: var(--ink-700); }
     .hero h1 { font-size: clamp(38px, 12vw, 56px); }
     .hero__subtitle-dark { font-size: 16px; }
     .hero__cta { width: 100%; }
-    .categories__grid,
+    .categories__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .features__grid { grid-template-columns: 1fr; }
     .review-card { flex-basis: 86vw; }
     .kontakt__form,
@@ -7744,7 +7745,7 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
 .grid-3 { grid-template-columns: repeat(3, 1fr); }
 .grid-4 { grid-template-columns: repeat(4, 1fr); }
 @media (max-width: 900px) { .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 560px) { .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+@media (max-width: 560px) { .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); gap: 12px; } }
 .card__desc { color: rgba(255,255,255,.9); font-size: 13.5px; line-height: 1.5; text-align: center; margin: 0; }
 .section-pad { padding-top: 70px; }
 .spec-list { list-style: none; margin: 0; padding: 0; text-align: left; display: inline-block; }
