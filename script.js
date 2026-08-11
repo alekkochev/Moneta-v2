@@ -3061,6 +3061,24 @@ console.log('%c Вебсајт во развој 💪', 'color:#6B6B76;font-size
         }
         delete pending[slug];
         trackAdded(slug, item.nameMk);
+        // Следење (GA4 + Meta Pixel): додадено во кошничка
+        try {
+            if (typeof gtag === 'function') {
+                gtag('event', 'add_to_cart', {
+                    currency: 'MKD',
+                    value: item.price * item.qty,
+                    items: [{ item_id: item.code || item.slug, item_name: item.nameMk, quantity: item.qty, price: item.price }]
+                });
+            }
+            if (typeof fbq === 'function') {
+                fbq('track', 'AddToCart', {
+                    content_ids: [item.code || item.slug],
+                    content_type: 'product',
+                    value: item.price * item.qty,
+                    currency: 'MKD'
+                });
+            }
+        } catch (err) { console.warn('AddToCart tracking error:', err); }
         setCart(cart);
         renderModelQty();
         renderNavBadges();

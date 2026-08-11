@@ -17,7 +17,7 @@ const walk = (dir) => {
 };
 walk(root);
 
-const NEW_VERSION = '20260811';
+const NEW_VERSION = '20260812';
 let scriptBumped = 0;
 let styleBumped = 0;
 

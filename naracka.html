@@ -60,7 +60,7 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
     <link href="./vendor/aos.css" rel="stylesheet" media="print" onload="this.media='all'" />
     <noscript><link rel="stylesheet" href="./vendor/aos.css" /></noscript>
     <link rel="icon" type="image/svg+xml" href="./images/favicon/favicon.svg" />
-    <link rel="stylesheet" href="./styles.css?v=20260811" />
+    <link rel="stylesheet" href="./styles.css?v=20260812" />
 </head>
 <body class="page-sistem">
 
@@ -311,7 +311,7 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
     <!-- ===== SCRIPTS ===== -->
     <script src="./vendor/aos.js" defer></script>
     <script src="./chatbot.js?v=14" defer></script>
-    <script src="./script.js?v=20260811" defer></script>
+    <script src="./script.js?v=20260812" defer></script>
     <script src="./invoice-pdf.js?v=20260811" defer></script>
     <script>
         // ===== CHECKOUT LOGIC (нарачка) =====
@@ -533,6 +533,31 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
                 body += 'ВКУПНО: ' + (total + delivery) + ' ден.\n';
 
                 const orderEmail = window.MONETA_ORDER_EMAIL || 'nudalsmudals@gmail.com';
+                // Следење (GA4 + Meta Pixel): успешна нарачка
+                try {
+                    const tItems = items.map((it) => ({
+                        item_id: it.code || it.slug,
+                        item_name: it.nameMk,
+                        quantity: it.qty,
+                        price: it.price || 0
+                    }));
+                    if (typeof gtag === 'function') {
+                        gtag('event', 'purchase', {
+                            currency: 'MKD',
+                            value: total + delivery,
+                            transaction_id: 'OR-' + Date.now(),
+                            items: tItems
+                        });
+                    }
+                    if (typeof fbq === 'function') {
+                        fbq('track', 'Purchase', {
+                            value: total + delivery,
+                            currency: 'MKD',
+                            content_ids: items.map((it) => it.code || it.slug),
+                            content_type: 'product'
+                        });
+                    }
+                } catch (err) { console.warn('Purchase tracking error:', err); }
                 window.location.href = 'mailto:' + orderEmail + '?subject=' + encodeURIComponent('Нарачка - МОНЕТА - ' + name) + '&body=' + encodeURIComponent(body);
 
                 // Потврда — само штикла + наслов, 5 сек, клик → почетна (#kategorii)
