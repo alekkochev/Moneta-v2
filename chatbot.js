@@ -94,9 +94,9 @@
 
   const INFO = {
     delivery: t(
-      '🚚 Достава за 48 часа низ цела Македонија. Трошок: 160 ден. — БЕСПЛАТНА за нарачки над 1.000 ден. Испораката ја врши партнерска курирска служба.',
-      '🚚 Dorëzim brenda 48 orëve në të gjithë Maqedoninë. Kostoja: 160 den. — FALAS për porosi mbi 1.000 den. Dorëzimin e kryen shërbimi kurier partner.',
-      '🚚 Delivery within 48 hours across Macedonia. Cost: 160 MKD — FREE for orders over 1,000 MKD. Delivered by our partner courier service.'),
+      '🚚 Достава за 48 часа низ цела Македонија. Трошок: 160 ден. — БЕСПЛАТНА за нарачки над 2.000 ден. Испораката ја врши партнерска курирска служба.',
+      '🚚 Dorëzim brenda 48 orëve në të gjithë Maqedoninë. Kostoja: 160 den. — FALAS për porosi mbi 2.000 den. Dorëzimin e kryen shërbimi kurier partner.',
+      '🚚 Delivery within 48 hours across Macedonia. Cost: 160 MKD — FREE for orders over 2,000 MKD. Delivered by our partner courier service.'),
     payment: t(
       '💵 Плаќање при преземање (готово) — плаќате кога ќе ја примите пратката од курирот.',
       '💵 Pagesë në dorëzim (para në dorë) — paguani kur e merrni parcelën nga kurieri.',

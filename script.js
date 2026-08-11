@@ -2793,8 +2793,8 @@ console.log('%c Вебсајт во развој 💪', 'color:#6B6B76;font-size
     };
     const totalQty = (cart) => Object.keys(cart).reduce((sum, k) => sum + (cart[k].qty || 0), 0);
 
-    // ==== Бесплатна достава (1000+ ден.) + Достава за 48ч ====
-    const FREE_SHIP_THRESHOLD = 1000;
+    // ==== Бесплатна достава (2000+ ден.) + Достава за 48ч ====
+    const FREE_SHIP_THRESHOLD = 2000;
     const subtotal = (cart) => Object.keys(cart).reduce((s, k) => s + (cart[k].qty || 0) * (cart[k].price || 0), 0);
 
     const renderFreeShip = (cart) => {
@@ -2825,7 +2825,7 @@ console.log('%c Вебсајт во развој 💪', 'color:#6B6B76;font-size
         });
     };
 
-    // Мотивациски popup — ИСКЛУЧИВО на cart.html, кога сметката е НАД 500 ден. (а под 1000)
+    // Мотивациски popup — ИСКЛУЧИВО на cart.html, кога сметката е НАД 500 ден. (а под 2000)
     const maybeShowFreeShipPopup = (cart) => {
         if (!/cart\.html/.test(window.location.pathname)) return;
         if (window.__freeshipPopupShown) return;
@@ -3588,6 +3588,9 @@ window.MonetaData = {
         return lang === 'en' ? 'Out of stock' : (lang === 'sq' ? 'Mbaruar' : 'Нема на залиха');
     };
 
+    // Праг на ниска залиха — кога qty е ≤ 3, големината се оневозможува (сива)
+    const LOW_STOCK_THRESHOLD = 3;
+
     const apply = () => {
         // ---- Модел-страници: цена, стара цена, значка, залиха ----
         document.querySelectorAll('.size-selector[data-model]').forEach((sel) => {
@@ -3655,11 +3658,11 @@ window.MonetaData = {
                 if (prod.code) cart.dataset.code = prod.code;
             }
 
-            // залиха: оневозможи големини со 0 (само ако има податоци од Supabase)
+            // залиха: оневозможи големини со qty ≤ 3 (ниска залиха → сива големина)
             sel.querySelectorAll('.size-btn').forEach((btn) => {
                 const qty = sizes[btn.dataset.size];
                 if (qty === undefined) return;
-                if (qty <= 0) {
+                if (qty <= LOW_STOCK_THRESHOLD) {
                     btn.classList.add('size-btn--disabled');
                     btn.setAttribute('aria-disabled', 'true');
                     btn.tabIndex = -1;
@@ -3937,9 +3940,9 @@ window.MonetaData = {
         bar.innerHTML =
             '<span class="moneta-promo-bar__text">' +
             t(
-                '🎉 Попусти до −20% на избрани модели · Бесплатна достава над 1.000 ден.',
-                '🎉 Zbritje deri −20% te modelet e zgjedhura · Transport falas mbi 1.000 den.',
-                '🎉 Up to −20% off selected models · Free delivery over 1,000 MKD'
+                '🎉 Попусти до −20% на избрани модели · Бесплатна достава над 2.000 ден.',
+                '🎉 Zbritje deri −20% te modelet e zgjedhura · Transport falas mbi 2.000 den.',
+                '🎉 Up to −20% off selected models · Free delivery over 2,000 MKD'
             ) +
             '</span>' +
             '<button type="button" class="moneta-promo-bar__close" aria-label="Затвори">×</button>';
@@ -4078,7 +4081,7 @@ window.MonetaData = {
                 '<div class="moneta-exit__emoji">🦶</div>' +
                 '<h3>' + t('Чекајте!', 'Prisni!', 'Wait!') + '</h3>' +
                 '<p class="moneta-exit__title">' + t('Бесплатна достава', 'Transport falas', 'Free delivery') + '</p>' +
-                '<p class="moneta-exit__sub">' + t('За нарачки над 1.000 ден. — низ цела Македонија.', 'Për porosi mbi 1.000 den. — në të gjithë Maqedoninë.', 'For orders over 1,000 MKD — across North Macedonia.') + '</p>' +
+                '<p class="moneta-exit__sub">' + t('За нарачки над 2.000 ден. — низ цела Македонија.', 'Për porosi mbi 2.000 den. — në të gjithë Maqedoninë.', 'For orders over 2,000 MKD — across North Macedonia.') + '</p>' +
                 '<a href="' + BASE + 'index.html#kategorii" class="moneta-exit__btn">' + t('Види ги влошките', 'Shiko tabanat', 'See the insoles') + '</a>' +
             '</div>';
         document.body.appendChild(wrap);
