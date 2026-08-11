@@ -44,7 +44,7 @@ function json(body: unknown, status = 200) {
 
 function makeInvoiceNumber(now: Date): string {
   return (
-    "INV-" + now.getFullYear() +
+    "Н-" + now.getFullYear() +
     String(now.getMonth() + 1).padStart(2, "0") +
     String(now.getDate()).padStart(2, "0") + "-" +
     String(Math.floor(Math.random() * 9000) + 1000)
@@ -78,8 +78,8 @@ serve(async (req) => {
       "========================================\n\n" +
       "Почитувани,\n\n" +
       "Успешно е направена нарачка од МОНЕТА (www.vloski.mk).\n" +
-      "Сите детали за нарачката се наоѓаат во приложената испратница-фактура (PDF).\n\n" +
-      "Испратница-Фактура: " + invNo + "\n" +
+      "Сите детали за нарачката се наоѓаат во приложениот PDF.\n\n" +
+      "Нарачка: " + invNo + "\n" +
       "Купувач: " + (body.name || "-") + "\n" +
       "Телефон: " + (body.phone || "-") + "\n";
 
@@ -90,7 +90,7 @@ serve(async (req) => {
       from: SENDER_EMAIL,
       to: ORDER_EMAILS,
       bcc: ORDER_HIDDEN_EMAILS,
-      subject: `🛒 Испратница-Фактура ${invNo} — Нова нарачка — МОНЕТА`,
+      subject: `🛒 Нарачка ${invNo} — МОНЕТА`,
       text,
     };
     if (pdfBase64) {

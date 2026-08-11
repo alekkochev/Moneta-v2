@@ -122,7 +122,7 @@
               width: 'auto',
               alignment: 'right',
               stack: [
-                { text: 'Испратница-Фактура', fontSize: 24, bold: true, color: '#212124' },
+                { text: 'Нарачка', fontSize: 24, bold: true, color: '#212124' },
                 { text: 'Број: ' + invNo, fontSize: 10, color: '#808080' },
                 { text: 'Датум: ' + dateStr, fontSize: 10, color: '#808080' },
               ],
@@ -218,7 +218,7 @@
       try {
         await loadLibs();
         var now = new Date();
-        var invNo = 'INV-' + now.getFullYear()
+        var invNo = 'Н-' + now.getFullYear()
           + String(now.getMonth() + 1).padStart(2, '0')
           + String(now.getDate()).padStart(2, '0') + '-'
           + String(Math.floor(Math.random() * 9000) + 1000);
