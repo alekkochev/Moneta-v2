@@ -3602,10 +3602,10 @@ window.addEventListener('resize', syncCardLinkGap, { passive: true });
 // (Supabase Dashboard → Settings → API → Project URL)
 // ========================================
 window.MONETA_SUPABASE_URL = 'https://wkpkrnjrtpywuzemirbw.supabase.co';
-// Е-пошта на продавницата (за mailto fallback) — за тестирање стави nudalsmudals@gmail.com
-window.MONETA_SHOP_EMAIL = 'nudalsmudals@gmail.com';
-// Е-пошта за НАРАЧКИ — тестова фаза, подоцна ќе се смени со клиентска е-пошта
-window.MONETA_ORDER_EMAIL = 'nudalsmudals@gmail.com';
+// Е-пошта на продавницата (mailto fallback) — видлива адреса
+window.MONETA_SHOP_EMAIL = 'info@calivita.mk';
+// Е-пошта за НАРАЧКИ (mailto fallback) — видлива адреса
+window.MONETA_ORDER_EMAIL = 'info@calivita.mk';
 // Анон (јавен) клуч од Supabase — за читање производи/залиха/нарачки
 window.MONETA_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndrcGtybmpydHB5d3V6ZW1pcmJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU5NjkwOTksImV4cCI6MjEwMTU0NTA5OX0.nkeKFm2qQYXEsHY6kkJxqfsOxiSEEQJzLOmnrdMMg8I';
 

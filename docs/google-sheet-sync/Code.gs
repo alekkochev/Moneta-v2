@@ -11,7 +11,7 @@
  *                                             што сте ги избришале во sheet-от)
  *
  * Потребни се 2 таба во sheet-от:
- *   „Производи"  — колони: slug | name_mk | name_en | name_sq | price |
+ *   „Производи"  — колони: slug | name_mk | name_en | price |
  *                          old_price | discount | image | active | sort_order
  *   „Залиха"     — колони: slug | size | qty        (slug = производ)
  *
@@ -105,7 +105,6 @@ function upsertProduct_(p, slugMap) {
     slug: p.slug,
     name_mk: p.name_mk || "",
     name_en: p.name_en || "",
-    name_sq: p.name_sq || "",
     price: parseFloat(p.price) || 0,
     old_price: parseFloat(p.old_price) || 0,
     discount: parseFloat(p.discount) || 0,

@@ -11,11 +11,15 @@
 
 ### Поставување (еднаш, ~10 минути)
 
+> 💡 **Веќе има готови датотеки** со сите производи и залиха пополнети:
+> `docs/google-sheet-sync/Производи.csv` и `docs/google-sheet-sync/Залиха.csv`.
+> Целосниот чекор-по-чекор водич за сопственикот: `docs/google-sheet-sync/SETUP-GUIDE.md`.
+
 1. Отворете [sheets.new](https://sheets.new) (логирани во вашиот Google налог)
 2. Преименувајте ги табовите долу во: **`Производи`** и **`Залиха`**
 3. Во првиот таб („Производи“) напишете ги колоните во првиот ред, точно вака:
 
-   `slug | name_mk | name_en | name_sq | price | old_price | discount | image | active | sort_order`
+   `slug | name_mk | name_en | price | old_price | discount | image | active | sort_order`
 
 4. Во вториот таб („Залиха“) колоните:
 
@@ -24,6 +28,7 @@
    - **slug** = краткиот код на производот (на пр. `active-gel`)
    - **size** = големина (на пр. `39-40`)
    - **qty** = колку пари има
+   (или уште полесно: **Датотека → Import → Upload** → внесете ги готовите CSV-а)
 5. Отворете **Extensions → Apps Script** → избришете го старото → залепете го кодот од `docs/google-sheet-sync/Code.gs` → Save
 6. На врвот на кодот внесете го **SERVICE_ROLE_KEY**:
    - Supabase Dashboard → **Settings → API** → *service_role* (клучот `eyJ...`) → копирајте

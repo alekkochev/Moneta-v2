@@ -60,7 +60,7 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
     <link href="./vendor/aos.css" rel="stylesheet" media="print" onload="this.media='all'" />
     <noscript><link rel="stylesheet" href="./vendor/aos.css" /></noscript>
     <link rel="icon" type="image/svg+xml" href="./images/favicon/favicon.svg" />
-    <link rel="stylesheet" href="./styles.css?v=20260816" />
+    <link rel="stylesheet" href="./styles.css?v=20260818" />
 </head>
 <body class="page-sistem">
 
@@ -311,7 +311,7 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
     <!-- ===== SCRIPTS ===== -->
     <script src="./vendor/aos.js" defer></script>
     <script src="./chatbot.js?v=14" defer></script>
-    <script src="./script.js?v=20260816" defer></script>
+    <script src="./script.js?v=20260818" defer></script>
     <script src="./invoice-pdf.js?v=20260811" defer></script>
     <script>
         // ===== CHECKOUT LOGIC (нарачка) =====
@@ -532,7 +532,7 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
                 body += '\nДостава: ' + (delivery === 0 ? 'БЕСПЛАТНА' : delivery + ' ден.') + '\n';
                 body += 'ВКУПНО: ' + (total + delivery) + ' ден.\n';
 
-                const orderEmail = window.MONETA_ORDER_EMAIL || 'nudalsmudals@gmail.com';
+                const orderEmail = window.MONETA_ORDER_EMAIL || 'info@calivita.mk';
                 // Следење (GA4 + Meta Pixel): успешна нарачка
                 try {
                     const tItems = items.map((it) => ({

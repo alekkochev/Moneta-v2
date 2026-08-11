@@ -2207,7 +2207,7 @@ a {
    ======================================== */
 .back-to-top {
     position: fixed;
-    bottom: 30px;
+    bottom: 98px; /* подигнато над AI асистентот (monetaBotBtn) за да не го покрива */
     right: 30px;
     width: 48px;
     height: 48px;
@@ -2245,7 +2245,7 @@ a {
 
 @media (max-width: 560px) {
     .back-to-top {
-        bottom: 20px;
+        bottom: 88px; /* над AI асистентот */
         right: 20px;
         width: 42px;
         height: 42px;
@@ -7602,6 +7602,8 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
     padding: 10px 20px;
     border-radius: 999px;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.14);
+    white-space: nowrap;
+    max-width: 100%;
 }
 
 /* ========================================
@@ -7657,6 +7659,19 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
     margin-top: auto;
     position: relative;
     z-index: 4;
+    white-space: nowrap;
+}
+/* На мали екрани копчето да се прилагоди — долгите имиња (на пр. „Hunter Outdoor")
+   да не се превиткуваат и да не излегуваат од картичката. */
+@media (max-width: 480px) {
+    .categories__grid:not(.grid-3) .card--sport .card__link,
+    .categories__grid:not(.grid-3) .card--image .card__link,
+    .categories__grid.grid-3 .card--sport .card__link,
+    .categories__grid.grid-3 .card--image .card__link {
+        padding: 8px 12px;
+        font-size: 12.5px;
+        line-height: 1.2;
+    }
 }
 
 /* Отстранување на „MONETA" балончето од модел-сликата (сите производи) */

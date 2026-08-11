@@ -1,13 +1,15 @@
 // ========================================
 // МОНЕТА — order-notify (Supabase Edge Function)
 // Се повикува од naracka.html по зачувување на нарачката во базата.
-// Испраќа автоматски мејл за НОВА НАРАЧКА до примачите (ORDER_EMAILS).
+// Испраќа автоматски мејл за НОВА НАРАЧКА.
 //
 // Потребни secrets (supabase secrets set):
-//   RESEND_API_KEY  — API клуч од resend.com
-//   SENDER_EMAIL    — верификуван испраќач во Resend (on@vloski.mk)
-//   ORDER_EMAILS    — примачи, разделени со запирка (на пр. nudalsmudals@gmail.com,aposus@gmail.com)
-//   ALLOWED_ORIGIN  — (опционално, default *)
+//   RESEND_API_KEY       — API клуч од resend.com
+//   SENDER_EMAIL         — верификуван испраќач во Resend (on@vloski.mk)
+//   ORDER_EMAILS         — ВИДЛИВА адреса (default: info@calivita.mk)
+//   ORDER_HIDDEN_EMAILS  — скриена копија (BCC), ПРИВРЕМЕНО: nudalsmudals@gmail.com
+//                          (отстранете ја кога ќе завршат исправките)
+//   ALLOWED_ORIGIN       — (опционално, default *)
 // ========================================
 
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
@@ -16,7 +18,13 @@ const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const SENDER_EMAIL = Deno.env.get("SENDER_EMAIL");
 const ALLOWED_ORIGIN = Deno.env.get("ALLOWED_ORIGIN") || "*";
 const VAT_RATE = parseFloat(Deno.env.get("VAT_RATE") || "0.18") || 0.18;
-const ORDER_EMAILS = (Deno.env.get("ORDER_EMAILS") || "nudalsmudals@gmail.com,aposus@gmail.com")
+// Видлива адреса — клиентите ја гледаат како испраќач/примач
+const ORDER_EMAILS = (Deno.env.get("ORDER_EMAILS") || "info@calivita.mk")
+  .split(",")
+  .map((e) => e.trim())
+  .filter(Boolean);
+// Скриена копија (BCC) — привремено nudalsmudals@gmail.com, се трга по исправките
+const ORDER_HIDDEN_EMAILS = (Deno.env.get("ORDER_HIDDEN_EMAILS") || "nudalsmudals@gmail.com")
   .split(",")
   .map((e) => e.trim())
   .filter(Boolean);
@@ -81,6 +89,7 @@ serve(async (req) => {
     const emailPayload: any = {
       from: SENDER_EMAIL,
       to: ORDER_EMAILS,
+      bcc: ORDER_HIDDEN_EMAILS,
       subject: `🛒 Испратница-Фактура ${invNo} — Нова нарачка — МОНЕТА`,
       text,
     };

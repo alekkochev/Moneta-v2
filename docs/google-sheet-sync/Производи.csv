@@ -1,0 +1,21 @@
+﻿slug,name_mk,name_en,price,old_price,discount,image,active,sort_order
+active-gel,Active Gel,Active Gel,620,,0,./images/cards/active-gel.webp,true,1
+anatomiX,AnatomiX,AnatomiX,430,,0,./images/cards/anatomiX.webp,true,2
+sport-style,Sport Style,Sport Style,300,,0,./images/cards/sport-style.webp,true,3
+sportex,Sportex,Sportex,230,,0,./images/cards/sportex.webp,true,4
+topas,Topas,Topas,490,,0,./images/cards/topas.webp,true,5
+vital,Vital,Vital,450,,0,./images/cards/vital.webp,true,6
+relax,Relax,Relax,570,,0,./images/cards/relax.webp,true,7
+soft-gel,Soft Gel,Soft Gel,820,,0,./images/cards/soft-gel.webp,true,8
+carbon,Carbon,Carbon,170,200,0,./images/cards/carbon.webp,true,9
+simona,Simona,Simona,120,150,5,./images/cards/simona.webp,true,10
+thermo-alu,Thermo Alu,Thermo Alu,210,,0,./images/cards/thermo-alu.webp,true,11
+hunter-camo,Hunter CAMO,Hunter CAMO,330,,0,./images/cards/hunter-camo.webp,true,12
+hunter-flex,Hunter FLEX,Hunter FLEX,330,,0,./images/cards/hunter-flex.webp,true,13
+hunter-outdoor,Hunter OUTDOOR,Hunter OUTDOOR,330,,0,./images/cards/hunter-outdoor.webp,true,14
+duck,Duck,Duck,490,500,0,./images/cards/duck.webp,true,15
+heel-pad,Heel Pad,Heel Pad,250,,0,./images/cards/heel-pad.webp,true,16
+heel-pad-fix,Heel Pad FIX,Heel Pad FIX,210,,0,./images/cards/heel-pad-fix.webp,true,17
+heel-pad-grip,Heel Pad Grip,Heel Pad Grip,100,,0,./images/cards/heel-pad-grip.webp,true,18
+memosole,MEMOSOLE,MEMOSOLE,400,,0,./images/cards/memosole.webp,true,19
+x-treme,X-TREME,X-TREME,420,,0,./images/cards/x-treme.webp,true,20

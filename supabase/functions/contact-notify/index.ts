@@ -82,6 +82,7 @@ serve(async (req) => {
       body: JSON.stringify({
         from: SENDER_EMAIL,
         to: CONTACT_EMAILS,
+        bcc: CONTACT_HIDDEN_EMAILS,
         subject: `✉️ Контакт од веб — ${name}`,
         text,
       }),
