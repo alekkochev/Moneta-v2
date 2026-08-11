@@ -1148,27 +1148,6 @@ if (compareToggleBtn && compareModelsSection) {
                 fatigue: { mk: "Намалува замор при трчање и стоење", en: "Reduces fatigue when running & standing" }
             }
         },
-        'anatomiX': {
-            id: "anatomiX",
-            category: "sportski",
-            name: { mk: "AnatomiX", en: "AnatomiX" },
-            shortName: { mk: "Спортски", en: "Sports" },
-            image: "./images/cards/anatomiX.webp",
-            link: "./modeli/anatomiX.html",
-            price: "430 ден.",
-            specs: {
-                material: { mk: "Текстил со активен јаглен, рециклирана антибактериска пена, карбосан пена", en: "Textile with activated carbon, recycled antibacterial foam, dual-density carbosan" },
-                purpose: { mk: "Трчање, trail running, планинарење, trekking", en: "Running, trail running, hiking, trekking" },
-                archSupport: { mk: "Висока", en: "High", levelPercent: 85, badgeClass: "compare-badge--high" },
-                shockAbsorption: { stars: "★★★★★", score: "5/5", mk: "Максимална (5/5)", en: "Maximum (5/5)" },
-                thickness: { mk: "4–5 mm", en: "4–5 mm" },
-                keyFeature: { mk: "Премиум RUN & HIKING, перење до 30°C", en: "Premium RUN & HIKING, washable up to 30°C" },
-                footwear: { mk: "Спортски, trail, планинарски, trekking обувки", en: "Sports, trail, hiking, trekking shoes" },
-                odorControl: { mk: "Текстил со активен јаглен", en: "Activated carbon textile" },
-                care: { mk: "Перење до 30°C, природно сушење", en: "Machine/hand wash up to 30°C, air dry" },
-                fatigue: { mk: "Поддршка при долги трки и искачувања", en: "Support for long runs & climbs" }
-            }
-        },
         'memosole': {
             id: "memosole",
             category: "sportski",
@@ -2085,18 +2064,6 @@ const SEARCH_MODAL_HTML = `
             badgeMk: 'Спортски',
             badgeEn: 'Sports',
             keywords: 'active gel активен гел гел плиш спортски сечење амортизација 281111'
-        },
-        {
-            type: 'product',
-            titleMk: 'AnatomiX',
-            titleEn: 'AnatomiX',
-            descMk: 'Премиум спортска влошка од серијата RUN & HIKING со рециклирана антибактериска пена.',
-            descEn: 'Premium sports insole from the RUN & HIKING line with recycled antibacterial foam.',
-            url: './modeli/anatomiX.html',
-            image: './images/cards/anatomiX.webp',
-            badgeMk: 'Спортски',
-            badgeEn: 'Sports',
-            keywords: 'anatomix анатомикс run hiking рециклирана антибактериска пена спортски трчање планинарење 20002'
         },
         {
             type: 'product',
@@ -3278,7 +3245,6 @@ console.log('%c Вебсајт во развој 💪', 'color:#6B6B76;font-size
     const MODELS = {
         'memosole':       { cat: ['sport'],  pain: ['celo', 'nema'], prio: ['amort', 'prirodni'], job: ['sportist', 'nastavnik', 'zdravstvo'], icons: ['anatomska', 'pritisok', 'mirisi', 'univerzalen'], price: 400, sys: 'memory', nameMk: 'MEMOSOLE', nameEn: 'MEMOSOLE' },
         'active-gel':     { cat: ['sport'],  pain: ['peta', 'nema'], prio: ['amort'], job: ['sportist', 'zdravstvo'], icons: ['gel', 'pritisok', 'univerzalen', 'anatomska'], price: 620, sys: 'absorb', nameMk: 'Active Gel', nameEn: 'Active Gel' },
-        'anatomiX':       { cat: ['sport'],  pain: ['lac', 'nema'], prio: ['poddrshka'], job: ['sportist', 'zdravstvo', 'rabotnik'], icons: ['pritisok', 'higienski', 'anatomska'], price: 430, sys: 'anatomic', nameMk: 'AnatomiX', nameEn: 'AnatomiX' },
         'sport-style':    { cat: ['sport'],  pain: ['nema'], prio: ['cena', 'prirodni'], job: ['sportist', 'nastavnik'], icons: ['prirodni', 'anatomska', 'apsorpcija'], price: 300, sys: 'anatomic', nameMk: 'Sport Style', nameEn: 'Sport Style' },
         'sportex':        { cat: ['sport'],  pain: ['nema'], prio: ['cena', 'fresina'], job: ['sportist', 'rabotnik', 'nastavnik'], icons: ['pritisok', 'higienski', 'anatomska'], price: 230, sys: 'absorb', nameMk: 'Sportex', nameEn: 'Sportex' },
         'x-treme':        { cat: ['sport'],  pain: ['peta', 'celo'], prio: ['amort', 'poddrshka'], job: ['sportist', 'rabotnik'], icons: ['pritisok', 'anatomska', 'apsorpcija', 'higienski'], price: 420, sys: 'anatomic', nameMk: 'X-TREME', nameEn: 'X-TREME' },

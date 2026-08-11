@@ -17,17 +17,19 @@ const walk = (dir) => {
 };
 walk(root);
 
-const NEW_VERSION = '20260818';
+const NEW_VERSION = '20260819';
 let scriptBumped = 0;
 let styleBumped = 0;
 
 htmlFiles.forEach((fp) => {
   let html = fs.readFileSync(fp, 'utf8');
   const before = html;
-  // script.js?v=XXXXX → script.js?v=20260811
+  // script.js?v=XXXXX → script.js?v=20260819
   html = html.replace(/script\.js\?v=[\d]+/g, `script.js?v=${NEW_VERSION}`);
-  // styles.css?v=XXXXX → styles.css?v=20260811
+  // styles.css?v=XXXXX → styles.css?v=20260819
   html = html.replace(/styles\.css\?v=[\d]+/g, `styles.css?v=${NEW_VERSION}`);
+  // chatbot.js?v=XX → chatbot.js?v=XX+1 (исто така се кешира)
+  html = html.replace(/chatbot\.js\?v=(\d+)/g, (m, v) => `chatbot.js?v=${Number(v) + 1}`);
   if (html !== before) {
     fs.writeFileSync(fp, html, 'utf8');
     if (html.includes(`script.js?v=${NEW_VERSION}`) && before.includes('script.js?v=')) scriptBumped++;
