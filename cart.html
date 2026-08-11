@@ -60,7 +60,7 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
     <link href="./vendor/aos.css" rel="stylesheet" media="print" onload="this.media='all'" />
     <noscript><link rel="stylesheet" href="./vendor/aos.css" /></noscript>
     <link rel="icon" type="image/svg+xml" href="./images/favicon/favicon.svg" />
-    <link rel="stylesheet" href="./styles.css?v=20260812" />
+    <link rel="stylesheet" href="./styles.css?v=20260814" />
 </head>
 <body class="page-sistem">
 
@@ -198,7 +198,7 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
     <!-- ===== SCRIPTS ===== -->
     <script src="./vendor/aos.js" defer></script>
     <script src="./chatbot.js?v=14" defer></script>
-    <script src="./script.js?v=20260812" defer></script>
+    <script src="./script.js?v=20260814" defer></script>
     <script>
         // ===== CART PAGE RENDER (prototype) =====
         document.addEventListener('DOMContentLoaded', () => {
@@ -216,6 +216,53 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
             const ik = (slug, size) => slug + '|' + size;
             let inactiveState = loadInactive();
             const isInactive = (slug, size) => !!inactiveState[ik(slug, size)];
+
+            // Максимална количина = залихата од Supabase за (slug, големина).
+            // null = податоците уште не се вчитани / нема мапирање → без ограничување.
+            const stockFor = (slug, size) => {
+                const sizes = (window.MonetaData && window.MonetaData.sizes)
+                    ? (window.MonetaData.sizes[slug] || {})
+                    : {};
+                if (Object.keys(sizes).length === 0) return null;
+                const cart = window.MonetaCart ? window.MonetaCart.getCart() : {};
+                const item = cart[slug] || {};
+                // Во кошничката големината е приказен текст („Женски 35–41"),
+                // а во Supabase е клуч (z35-41) → преку sizeKeys го наоѓаме клучот.
+                const key = (item.sizeKeys && item.sizeKeys[size]) || size;
+                if (!(key in sizes)) return null; // непознато мапирање → без ограничување
+                const q = Number(sizes[key]);
+                return isFinite(q) ? Math.max(0, q) : 0;
+            };
+            // Бројки во drop-down-от: 1-10, но не повеќе од залихата (ако е позната)
+            const qtyOptions = (maxQty) => {
+                const max = (maxQty === null || maxQty <= 0) ? 10 : Math.min(10, maxQty);
+                return Array.from({ length: Math.max(1, max) }, (_, i) => i + 1);
+            };
+            // Затвори ги сите отворени количински менија
+            const closeAllQtyMenus = () => {
+                container.querySelectorAll('[data-qty-menu]').forEach((m) => { m.hidden = true; });
+            };
+            // Примени количина со СТРОГО правило: не може повеќе од залихата
+            const applyQty = (size, raw) => {
+                let itemEl = null;
+                container.querySelectorAll('.cart__item').forEach((el) => {
+                    if (el.dataset.size === size) itemEl = el;
+                });
+                if (!itemEl) return;
+                const slug = itemEl.dataset.cartItem;
+                const menu = itemEl.querySelector('[data-qty-menu]');
+                const maxQty = menu ? Number(menu.dataset.max) : 0;
+                let val = Math.round(Number(raw) || 0);
+                if (maxQty > 0 && val > maxQty) val = maxQty; // строго ограничување
+                if (val < 1) val = 1;
+                window.MonetaCart.setSizeQty(slug, size, val);
+            };
+            // Клик надвор од менито → затвори го
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('[data-qty-menu]') && !e.target.closest('[data-qty-open]')) {
+                    closeAllQtyMenus();
+                }
+            });
 
             const render = () => {
                 const cart = window.MonetaCart.getCart();
@@ -246,6 +293,7 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
 
                 container.innerHTML = lines.map((l) => {
                     const inact = isInactive(l.slug, l.size);
+                    const maxQty = stockFor(l.slug, l.size);
                     return `
                     <div class="cart__item${inact ? ' is-inactive' : ''}" data-cart-item="${l.slug}" data-size="${l.size}">
                         <button type="button" class="cart__check${inact ? ' is-unchecked' : ' is-checked'}" data-cart-check data-size="${l.size}" aria-label="${isEn() ? 'Active' : 'Активен'}" title="${isEn() ? 'Click to deactivate' : 'Кликни за деактивирање'}">
@@ -261,7 +309,29 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
                             <a href="./modeli/${l.slug}.html" class="cart__item-name">${isEn() ? l.nameEn : l.nameMk} — ${isEn() ? 'Size' : 'Бр.'} ${l.size || (isEn() ? 'Universal' : 'Универзална')}</a>
                             <div class="cart__item-code">${isEn() ? 'Code' : 'Код'}: ${l.code}</div>
                             <div class="cart__item-price">${fmt(l.price)} / ${isEn() ? 'pair' : 'пар'}</div>
-                            <div class="cart__line-qty">${isEn() ? 'Quantity' : 'Количина'}: ${l.qty}</div>
+                            <div class="cart__line-qty">
+                                <span class="cart__qty-label">${isEn() ? 'Quantity' : 'Количина'}:</span>
+                                <button type="button" class="cart__qty-btn" data-qty-open data-size="${l.size}" title="${isEn() ? 'Change quantity' : 'Промени количина'}"${inact ? ' disabled' : ''}>
+                                    <span data-qty-value>${l.qty}</span>
+                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                                </button>
+                                <div class="cart__qty-menu" data-qty-menu data-size="${l.size}" data-max="${maxQty === null ? '' : maxQty}" hidden>
+                                    <div class="cart__qty-menu__head">
+                                        <span>${isEn() ? 'Quantity' : 'Количина'}</span>
+                                        ${maxQty !== null ? `<span class="cart__qty-menu__stock">${maxQty > 0 ? (isEn() ? 'In stock: ' : 'На залиха: ') + maxQty : (isEn() ? 'Out of stock' : 'Нема на залиха')}</span>` : ''}
+                                    </div>
+                                    <div class="cart__qty-grid">
+                                        ${qtyOptions(maxQty).map((n) => `
+                                            <button type="button" class="cart__qty-opt${n === l.qty ? ' is-current' : ''}" data-qty-opt data-size="${l.size}" data-val="${n}">${n}</button>
+                                        `).join('')}
+                                    </div>
+                                    <div class="cart__qty-custom">
+                                        <input type="number" min="1" max="${maxQty || 99}" inputmode="numeric" placeholder="${isEn() ? 'Custom…' : 'Друга…'}" data-qty-input data-size="${l.size}">
+                                        <button type="button" class="cart__qty-ok" data-qty-ok data-size="${l.size}">OK</button>
+                                    </div>
+                                    ${maxQty !== null && maxQty > 0 ? `<div class="cart__qty-hint">${isEn() ? 'Max ' : 'Максимум '}${maxQty} ${isEn() ? 'pairs in stock' : 'пара на залиха'}</div>` : ''}
+                                </div>
+                            </div>
                         </div>
                         <div class="cart__item-right">
                             <span class="cart__line-total">${fmt(l.qty * (l.price || 0))}</span>
@@ -312,6 +382,47 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
                         render();
                     });
                 });
+                // Количина: edit копче → отвори/затвори drop-down
+                container.querySelectorAll('[data-qty-open]').forEach((btn) => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const menu = btn.parentElement.querySelector('[data-qty-menu]');
+                        if (!menu) return;
+                        const wasHidden = menu.hidden;
+                        closeAllQtyMenus();
+                        menu.hidden = !wasHidden;
+                        if (!menu.hidden) {
+                            const input = menu.querySelector('[data-qty-input]');
+                            if (input) setTimeout(() => input.focus(), 0);
+                        }
+                    });
+                });
+                // Бројка од drop-down-от (1-10 или до залихата)
+                container.querySelectorAll('[data-qty-opt]').forEach((opt) => {
+                    opt.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        applyQty(opt.dataset.size, opt.dataset.val);
+                    });
+                });
+                // OK на сопствено внесената бројка
+                container.querySelectorAll('[data-qty-ok]').forEach((ok) => {
+                    ok.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const menu = ok.closest('[data-qty-menu]');
+                        const input = menu ? menu.querySelector('[data-qty-input]') : null;
+                        applyQty(ok.dataset.size, input ? input.value : '');
+                    });
+                });
+                // Enter во полето → примени
+                container.querySelectorAll('[data-qty-input]').forEach((input) => {
+                    input.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            applyQty(input.dataset.size, input.value);
+                        }
+                    });
+                });
                 renderHistory();
             };
 
@@ -343,6 +454,10 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
             // Промена на јазикпререндерирање на динамичките содржини
             window.MonetaLangCallbacks = window.MonetaLangCallbacks || [];
             window.MonetaLangCallbacks.push(() => render());
+            // Кога ќе се вчита залихата од Supabase → пререндерирај за да се примени max
+            if (window.MonetaData && window.MonetaData.ready) {
+                window.MonetaData.ready.then(() => render());
+            }
 
             render();
         });

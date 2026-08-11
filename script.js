@@ -3049,6 +3049,22 @@ console.log('%c Вебсајт во развој 💪', 'color:#6B6B76;font-size
             qty: 0
         };
         item.sizes = item.sizes || {};
+        // Мапирање: приказен текст на големина → клуч од залихата (на пр. „Женски 35–41" → z35-41).
+        // Се користи во cart.html за да се најде максималната количина од Supabase за таа големина.
+        // Внимание: „Додади" копчето е во .model-cart, а големините во посебен .size-selector —
+        // затоа ги бараме сите .size-btn на страницата што припаѓаат на овој модел.
+        if (ctl && !item.sizeKeys) {
+            const slugAttr = ctl.getAttribute('data-model');
+            const labelMap = {};
+            document.querySelectorAll('.size-btn').forEach((b) => {
+                const sel = b.closest('[data-model]');
+                if (sel && sel.getAttribute('data-model') === slugAttr) {
+                    const t = b.textContent.trim();
+                    if (t && b.dataset.size) labelMap[t] = b.dataset.size;
+                }
+            });
+            if (Object.keys(labelMap).length) item.sizeKeys = labelMap;
+        }
         Object.entries(toAdd).forEach(([sz, q]) => {
             item.sizes[sz] = (item.sizes[sz] || 0) + q;
             item.size = sz;
@@ -3093,6 +3109,33 @@ console.log('%c Вебсајт во развој 💪', 'color:#6B6B76;font-size
         const item = cart[slug];
         if (!item) return;
         delete item.sizes[size];
+        item.qty = Object.values(item.sizes || {}).reduce((a, b) => a + (b || 0), 0);
+        if (item.qty === 0) {
+            delete cart[slug];
+        } else {
+            cart[slug] = item;
+        }
+        setCart(cart);
+        renderModelQty();
+        renderNavBadges();
+        renderFreeShip(cart);
+        maybeShowFreeShipPopup(cart);
+        if (window.MonetaCartOnChange) window.MonetaCartOnChange(cart);
+    };
+
+    // Постави ТОЧНА количина за конкретна големина (се користи од cart.html —
+    // edit копчето со drop-down). Вредноста се заокружува; 0 = отстрани ја големината.
+    const setSizeQty = (slug, size, qty) => {
+        const cart = getCart();
+        const item = cart[slug];
+        if (!item) return;
+        const val = Math.max(0, Math.round(Number(qty) || 0));
+        if (val === 0) {
+            delete item.sizes[size];
+        } else {
+            item.sizes[size] = val;
+            item.size = size;
+        }
         item.qty = Object.values(item.sizes || {}).reduce((a, b) => a + (b || 0), 0);
         if (item.qty === 0) {
             delete cart[slug];
@@ -3193,7 +3236,7 @@ console.log('%c Вебсајт во развој 💪', 'color:#6B6B76;font-size
     maybeShowFreeShipPopup(getCart());
 
     // Јавно API за cart.html
-    window.MonetaCart = { getCart: getCart, setCart: setCart, totalQty: totalQty, subtotal: subtotal, updateModel: updateModel, removeItem: removeItem, removeSize: removeSize, renderModelQty: renderModelQty, renderNavBadges: renderNavBadges, renderFreeShip: renderFreeShip, getViewed: getViewed, getRecentlyAdded: getRecentlyAdded, FREE_SHIP_THRESHOLD: FREE_SHIP_THRESHOLD };
+    window.MonetaCart = { getCart: getCart, setCart: setCart, totalQty: totalQty, subtotal: subtotal, updateModel: updateModel, removeItem: removeItem, removeSize: removeSize, setSizeQty: setSizeQty, renderModelQty: renderModelQty, renderNavBadges: renderNavBadges, renderFreeShip: renderFreeShip, getViewed: getViewed, getRecentlyAdded: getRecentlyAdded, FREE_SHIP_THRESHOLD: FREE_SHIP_THRESHOLD };
 })();
 
 // ========================================
