@@ -3067,6 +3067,7 @@ console.log('%c Вебсајт во развој 💪', 'color:#6B6B76;font-size
         renderNavBadges();
         renderFreeShip(cart);
         maybeShowFreeShipPopup(cart);
+        showCartToast(item.nameMk, item.slug);
         if (window.MonetaCartOnChange) window.MonetaCartOnChange(cart);
     };
 
@@ -4057,6 +4058,28 @@ window.MonetaData = {
             { name: 'MEMOSOLE', price: 400, slug: 'memosole' },
             { name: 'Vital', price: 450, slug: 'vital' },
         ];
+    }
+
+    // ===== CART ADD TOAST =====
+    function showCartToast(itemName, itemSlug) {
+        const old = document.getElementById('monetaCartToast');
+        if (old) { old.classList.remove('is-visible'); setTimeout(() => old.remove(), 400); }
+        const toast = document.createElement('div');
+        toast.id = 'monetaCartToast';
+        toast.className = 'moneta-cart-toast';
+        toast.innerHTML =
+            '<div class="moneta-cart-toast__icon">' +
+                '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' +
+            '</div>' +
+            '<div class="moneta-cart-toast__body">' +
+                '<p class="moneta-cart-toast__title">' + t('Додадено во кошничка', 'U shtua në shportë', 'Added to cart') + '</p>' +
+                '<p class="moneta-cart-toast__name">' + (itemName || '') + '</p>' +
+            '</div>' +
+            '<a class="moneta-cart-toast__btn" href="' + BASE + 'cart.html">' + t('Кон кошничка', 'Te shporta', 'View cart') + '</a>';
+        document.body.appendChild(toast);
+        requestAnimationFrame(() => toast.classList.add('is-visible'));
+        const close = () => { toast.classList.remove('is-visible'); setTimeout(() => toast.remove(), 400); };
+        setTimeout(close, 4500);
     }
 
     function showSalesToast() {
