@@ -8942,10 +8942,10 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
     gap: 6px;
     padding: 7px 16px;
     border-radius: 30px;
-    background: rgba(255,255,255,0.10);
-    backdrop-filter: blur(6px);
-    border: 1px solid rgba(255,255,255,0.25);
-    color: rgba(255,255,255,0.85);
+    background: rgba(236,23,82,0.30);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(236,23,82,0.35);
+    color: #4a4a4a;
     font-size: 12px;
     font-weight: 800;
     letter-spacing: 0.04em;
