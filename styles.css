@@ -1520,8 +1520,17 @@ a {
         text-align: left;
         gap: 20px;
     }
+    .footer__contact {
+        max-width: none;
+        margin-bottom: 18px;
+        padding-left: 0;
+    }
     .footer__brand {
         align-items: flex-start;
+        text-align: left;
+        padding-left: 0;
+    }
+    .footer__tagline {
         text-align: left;
     }
     .footer__right {
@@ -9076,14 +9085,15 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
     .forum-hero { padding: 120px 16px 40px; }
     .forum-hero h1 { white-space: normal; font-size: clamp(24px, 6vw, 34px); }
     .forum-hero__inner { padding: 0 16px; }
-    .forum-layout { grid-template-columns: 1fr; padding: 10px 16px 40px; }
+    .forum-layout { grid-template-columns: 1fr; padding: 10px 12px 40px; overflow-x: hidden; max-width: 100vw; }
     .forum-sidebar { position: static; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .forum-sidebar__stats { grid-column: 1 / -1; }
     .forum-row { grid-template-columns: 1fr 40px 40px 80px; gap: 4px; padding: 8px 6px; }
-    .forum-row__title { font-size: 13px; }
+    .forum-row__title { font-size: 13px; word-break: break-word; }
     .forum-row__stats span { font-size: 12px; }
     .forum-row__last span { font-size: 11px; }
     .forum-comment-form { padding: 12px; }
+    .forum-main { overflow: hidden; }
 }
 @media (max-width: 500px) {
     .forum-hero { padding: 110px 12px 32px; }
