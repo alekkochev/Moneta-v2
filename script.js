@@ -4201,13 +4201,13 @@ window.MonetaData = {
         let reviews = [];
         let currentIdx = 0;
 
-        // ⭐ кликање
+        // ⭐ кликање — користи inline style за да го прескокне CDN кешот
         if (starsRow) {
             starsRow.querySelectorAll('.model-reviews__star').forEach((star, i) => {
                 star.addEventListener('click', () => {
                     rating = i + 1;
                     starsRow.querySelectorAll('.model-reviews__star').forEach((s, j) => {
-                        s.classList.toggle('is-active', j < rating);
+                        s.style.color = j < rating ? '#f59e0b' : '#d1d5db';
                     });
                 });
             });
@@ -4293,6 +4293,28 @@ window.MonetaData = {
                     try {
                         await fetch(sbUrl + '/rest/v1/product_reviews', { method: 'POST', headers: sbHeaders, body: JSON.stringify(review) });
                     } catch (e) { console.warn('Review save error:', e); }
+
+                    // Извести info@calivita.mk за новата рецензија
+                    try {
+                        await fetch(sbUrl + '/functions/v1/order-notify', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                name: 'Нова рецензија',
+                                phone: '',
+                                email: 'info@calivita.mk',
+                                city: '',
+                                address: '',
+                                note: 'Рецензија за ' + slug + '\nОценка: ' + rating + '/5\nИме: ' + name + '\nЕ-пошта: ' + (email || '(не е внесена)') + '\nКоментар: ' + comment,
+                                items: [],
+                                total: 0,
+                                delivery: 0,
+                                payment: 'Review notification',
+                                marketing_consent: false,
+                                pdfBase64: ''
+                            })
+                        });
+                    } catch (e) { console.warn('Review notify error:', e); }
                 }
 
                 // Додади локално
@@ -4303,8 +4325,9 @@ window.MonetaData = {
 
                 // Ресетирај
                 rating = 0;
-                if (starsRow) starsRow.querySelectorAll('.model-reviews__star').forEach(s => s.classList.remove('is-active'));
+                if (starsRow) starsRow.querySelectorAll('.model-reviews__star').forEach(s => { s.style.color = '#d1d5db'; });
                 if (nameInput) nameInput.value = '';
+                if (emailInput) emailInput.value = '';
                 if (emailInput) emailInput.value = '';
                 if (commentInput) commentInput.value = '';
                 if (feedbackEl) { feedbackEl.className = 'model-reviews__feedback is-success'; feedbackEl.textContent = 'Ви благодариме! Рецензијата е објавена.'; }
