@@ -8895,20 +8895,25 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
    ======================================== */
 .forum-hero {
     padding: 140px 24px 50px;
-    background: linear-gradient(180deg, rgba(253,242,245,0.85) 0%, rgba(255,255,255,0.92) 100%), url('./images/hero-foot-insole.webp') center 30% / cover no-repeat;
+    background: linear-gradient(135deg, #EC1752 0%, #C4123F 100%);
     text-align: center;
     position: relative;
+    overflow: hidden;
 }
-.forum-hero::after {
+.forum-hero::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: rgba(255,255,255,0.55);
-    pointer-events: none;
+    background: url('./images/hero-foot-insole.webp') center 30% / cover no-repeat;
+    opacity: 0.12;
+    filter: blur(2px);
+    transform: scale(1.1);
 }
 .forum-hero__inner {
     max-width: 800px;
     margin: 0 auto;
+    position: relative;
+    z-index: 1;
 }
 .forum-hero__badge {
     display: inline-flex;
@@ -8916,9 +8921,9 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
     gap: 6px;
     padding: 7px 16px;
     border-radius: 30px;
-    background: rgba(236, 23, 82, 0.08);
-    border: 1px solid rgba(236, 23, 82, 0.18);
-    color: var(--pink);
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff;
     font-size: 12px;
     font-weight: 800;
     letter-spacing: 0.04em;
@@ -8928,7 +8933,7 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
 .forum-hero h1 {
     font-size: clamp(30px, 4vw, 48px);
     font-weight: 800;
-    color: var(--ink);
+    color: #fff;
     margin-bottom: 12px;
     line-height: 1.15;
     white-space: nowrap;
@@ -9047,6 +9052,12 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
 .fs-latest-item:last-child { border-bottom: none; }
 .fs-latest-item strong { color: var(--ink-950); }
 .fs-latest-item small { display: block; color: #999; margin-top: 2px; }
+
+/* Forum page background — feet on grass (замени forum-bg.webp со твојата слика) */
+.page-forum .forum-layout {
+    background: linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.88) 100%), url('./images/forum-bg.webp') center / cover no-repeat;
+    background-attachment: fixed;
+}
 
 @media (max-width: 860px) {
     .forum-layout { grid-template-columns: 1fr; }
