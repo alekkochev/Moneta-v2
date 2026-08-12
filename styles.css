@@ -8895,13 +8895,15 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
    ======================================== */
 .forum-hero {
     padding: 150px 24px 60px;
-    background: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 100%), url('./images/forum-hero.webp') center 40% / cover no-repeat;
+    background: linear-gradient(135deg, #C4123F 0%, #EC1752 50%, #C4123F 100%), url('./images/hero-foot-insole.webp') center 40% / cover no-repeat;
+    background-blend-mode: multiply;
     text-align: center;
     position: relative;
 }
 .forum-hero__inner {
-    max-width: 800px;
+    max-width: var(--wrap, 1240px);
     margin: 0 auto;
+    padding: 0 var(--gutter, 32px);
     position: relative;
     z-index: 1;
 }
@@ -8942,9 +8944,9 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
    FORUM — thread list layout (IT.mk style)
    ======================================== */
 .forum-layout {
-    max-width: 1040px;
-    margin: 0 0 0 0;
-    padding: 10px 32px 50px 32px;
+    max-width: var(--wrap, 1240px);
+    margin: 0 auto;
+    padding: 10px var(--gutter, 32px) 50px;
     background: #fff;
     display: grid;
     grid-template-columns: minmax(0, 1fr) 260px;
