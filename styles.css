@@ -8944,11 +8944,11 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
 .forum-layout {
     max-width: 1040px;
     margin: 0 auto;
-    padding: 10px 24px 50px;
+    padding: 10px 24px 50px 40px;
     background: #fff;
     display: grid;
     grid-template-columns: 1fr 260px;
-    gap: 28px;
+    gap: 36px;
     align-items: start;
 }
 .forum-main { min-width: 0; }
@@ -9052,7 +9052,7 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
 }
 
 @media (max-width: 860px) {
-    .forum-layout { grid-template-columns: 1fr; }
+    .forum-layout { grid-template-columns: 1fr; padding: 10px 24px 50px; }
     .forum-sidebar { position: static; }
     .forum-hero h1 { white-space: normal; }
     .forum-row { grid-template-columns: 1fr 40px 40px 80px; gap: 4px; padding: 8px 10px; }
