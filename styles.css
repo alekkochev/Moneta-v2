@@ -7052,12 +7052,9 @@ p { color: var(--ink-700); }
     margin-top: var(--space-4);
 }
 .model-layout__media {
-    position: sticky;
-    top: 116px;
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
-    /* align-self: stretch е default со align-items:stretch на parent */
 }
 .hero-img {
     position: relative;
