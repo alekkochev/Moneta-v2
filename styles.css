@@ -8895,8 +8895,8 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
    ======================================== */
 .forum-hero {
     padding: 150px 24px 60px;
-    background: linear-gradient(135deg, #C4123F 0%, #EC1752 50%, #C4123F 100%), url('./images/hero-foot-insole.webp') center 40% / cover no-repeat;
-    background-blend-mode: multiply;
+    background: linear-gradient(135deg, rgba(196,18,63,0.35) 0%, rgba(236,23,82,0.35) 50%, rgba(196,18,63,0.35) 100%), url('./images/hero-foot-insole.webp') center 40% / cover no-repeat;
+    background-blend-mode: overlay;
     text-align: center;
     position: relative;
 }
@@ -9053,18 +9053,29 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
     background-attachment: fixed;
 }
 
+/* Forum mobile */
 @media (max-width: 860px) {
-    .forum-layout { grid-template-columns: 1fr; padding: 10px 24px 50px; }
-    .forum-sidebar { position: static; }
-    .forum-hero h1 { white-space: normal; }
-    .forum-row { grid-template-columns: 1fr 40px 40px 80px; gap: 4px; padding: 8px 10px; }
+    .forum-hero { padding: 120px 16px 40px; }
+    .forum-hero h1 { white-space: normal; font-size: clamp(24px, 6vw, 34px); }
+    .forum-hero__inner { padding: 0 16px; }
+    .forum-layout { grid-template-columns: 1fr; padding: 10px 16px 40px; }
+    .forum-sidebar { position: static; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .forum-sidebar__stats { grid-column: 1 / -1; }
+    .forum-row { grid-template-columns: 1fr 40px 40px 80px; gap: 4px; padding: 8px 6px; }
     .forum-row__title { font-size: 13px; }
     .forum-row__stats span { font-size: 12px; }
     .forum-row__last span { font-size: 11px; }
+    .forum-comment-form { padding: 12px; }
 }
 @media (max-width: 500px) {
-    .forum-row { grid-template-columns: 1fr; gap: 2px; }
+    .forum-hero { padding: 110px 12px 32px; }
+    .forum-hero h1 { font-size: clamp(20px, 7vw, 28px); }
+    .forum-layout { padding: 6px 10px 32px; gap: 20px; }
+    .forum-sidebar { grid-template-columns: 1fr; }
+    .forum-row { grid-template-columns: 1fr; gap: 2px; padding: 8px 4px; }
     .forum-row__stats, .forum-row__last { display: none; }
+    .forum-section-title { font-size: 11px; margin: 14px 0 8px; }
+    .forum-thread-view__back { width: 100%; text-align: center; }
 }
 
 /* ========================================
