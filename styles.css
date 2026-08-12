@@ -8932,208 +8932,156 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
     line-height: 1.55;
 }
 
-/* Q&A Section */
-.forum-qa-section {
-    padding: 20px 24px 80px;
+/* ========================================
+   FORUM THREADS — minimal, chat-style
+   ======================================== */
+.forum-threads {
+    padding: 10px 24px 40px;
     background: #fff;
 }
-.forum-qa__inner {
-    max-width: 860px;
+.forum-threads__inner {
+    max-width: 760px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 18px;
 }
-
-/* Q&A Item Card */
-.forum-qa__item {
+.f-thread {
+    border-left: 2px solid rgba(236, 23, 82, 0.12);
+    padding-left: 14px;
     display: flex;
-    gap: 16px;
-    padding: 24px;
-    border-radius: 20px;
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    background: #fff;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
-    transition: all 0.25s ease;
-}
-.forum-qa__item:hover {
-    border-color: rgba(236, 23, 82, 0.2);
-    box-shadow: 0 8px 28px rgba(236, 23, 82, 0.06);
-    transform: translateY(-2px);
-}
-
-.forum-qa__avatar {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: var(--pink);
-    color: #fff;
-    font-weight: 800;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    letter-spacing: 0.5px;
-}
-
-.forum-qa__content {
-    flex: 1;
-    min-width: 0;
-}
-
-.forum-qa__meta {
-    display: flex;
-    align-items: center;
+    flex-direction: column;
     gap: 8px;
-    margin-bottom: 8px;
+}
+.f-thread__post {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 10px;
+    padding: 6px 0;
+}
+.f-thread__user {
     font-size: 13px;
-    color: var(--muted);
-}
-.forum-qa__meta strong {
-    color: var(--ink);
     font-weight: 700;
+    color: var(--ink-950, #17171C);
 }
-.forum-qa__meta time {
-    font-size: 12px;
+.f-thread__time {
+    font-size: 11px;
     color: #999;
+    white-space: nowrap;
 }
-
-.forum-qa__question {
-    font-size: 17px;
-    font-weight: 700;
-    color: var(--ink);
-    margin: 0 0 6px;
-    line-height: 1.35;
-}
-
-.forum-qa__text {
-    font-size: 14.5px;
-    color: var(--muted);
-    line-height: 1.6;
-    margin: 0 0 14px;
-}
-
-.forum-qa__answer {
-    background: #FDF8F7;
-    border: 1px solid rgba(236, 23, 82, 0.10);
-    border-radius: 14px;
-    padding: 16px 18px;
-}
-.forum-qa__answer-label {
-    font-size: 11.5px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--pink);
-    margin-bottom: 6px;
-}
-.forum-qa__answer p {
+.f-thread__text {
     font-size: 14px;
-    color: var(--ink);
-    line-height: 1.6;
-    margin: 0;
+    color: #444;
+    line-height: 1.5;
+    width: 100%;
+    margin: 2px 0 0;
+}
+.f-thread__post--reply {
+    padding-left: 16px;
+    border-left: 1px solid #f0e8e5;
+}
+.f-thread__post--reply .f-thread__user {
+    color: #555;
+    font-weight: 600;
+    font-size: 12.5px;
 }
 
-/* CTA Banner */
-.forum-cta {
-    padding: 64px 24px;
-    background: linear-gradient(135deg, #FDF2F5 0%, #FFF 60%);
-    border-top: 1px solid rgba(236, 23, 82, 0.10);
-    text-align: center;
-}
-.forum-cta__inner {
-    max-width: 600px;
-    margin: 0 auto;
-}
-.forum-cta h2 {
-    font-size: clamp(24px, 3.5vw, 34px);
-    font-weight: 800;
-    color: var(--ink);
-    margin-bottom: 12px;
-}
-.forum-cta p {
-    font-size: 15px;
-    color: var(--muted);
-    margin-bottom: 26px;
-}
-.forum-cta__btns {
+/* Mini CTA bar */
+.forum-mini-cta {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 14px;
-    flex-wrap: wrap;
+    padding: 16px 24px;
+    background: rgba(236, 23, 82, 0.04);
+    border-top: 1px solid rgba(236, 23, 82, 0.08);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
 }
-.forum-cta__btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 14px 28px;
-    border-radius: 50px;
+.forum-mini-cta a {
+    color: var(--pink);
     font-weight: 700;
-    font-size: 15px;
+    font-size: 13px;
     text-decoration: none;
-    transition: all 0.25s ease;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: rgba(236, 23, 82, 0.06);
+    transition: all 0.2s;
 }
-.forum-cta__btn--primary {
+.forum-mini-cta a:hover {
     background: var(--pink);
     color: #fff;
-    box-shadow: 0 6px 20px rgba(236, 23, 82, 0.3);
 }
-.forum-cta__btn--primary:hover {
-    background: #d4144a;
-    transform: translateY(-2px);
-    box-shadow: 0 10px 28px rgba(236, 23, 82, 0.4);
-}
-.forum-cta__btn--secondary {
-    background: #fff;
-    color: var(--ink);
-    border: 1.5px solid rgba(0, 0, 0, 0.12);
-}
-.forum-cta__btn--secondary:hover {
-    border-color: var(--pink);
-    color: var(--pink);
-    transform: translateY(-2px);
+
+@media (max-width: 640px) {
+    .forum-threads { padding: 6px 12px 32px; }
+    .forum-threads__inner { gap: 14px; }
+    .f-thread { padding-left: 10px; }
+    .f-thread__text { font-size: 13px; }
+    .forum-mini-cta { flex-direction: column; gap: 8px; text-align: center; }
 }
 
 /* ========================================
-   AKCIJA PAGE — compact promo cards (50% reduced)
+   AKCIJA — minimalist promo
    ======================================== */
-.akcija-compact .forum-qa__item {
-    padding: 14px 18px;
+.akcija-freeship {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     gap: 10px;
-    border-radius: 16px;
-}
-.akcija-compact .forum-qa__avatar {
-    width: 36px;
-    height: 36px;
-    font-size: 12px;
-}
-.akcija-compact .forum-qa__question {
-    font-size: 15px;
-    margin-bottom: 4px;
-}
-.akcija-compact .forum-qa__text {
+    padding: 12px 24px;
+    background: rgba(236, 23, 82, 0.06);
+    border-bottom: 1px solid rgba(236, 23, 82, 0.10);
     font-size: 13px;
+    color: var(--ink-700);
+    flex-wrap: wrap;
+}
+.akcija-freeship strong { color: var(--ink-950); font-weight: 700; }
+.akcija-freeship span:last-child { color: var(--pink); font-weight: 600; font-size: 12px; }
+
+.akcija-promo { padding: 20px 24px 60px; background: #fff; }
+.akcija-promo__inner { max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+
+.akcija-cat h3 {
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--pink);
     margin-bottom: 10px;
-    line-height: 1.45;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(236, 23, 82, 0.12);
 }
-.akcija-compact .forum-qa__answer {
-    padding: 12px 14px;
-    border-radius: 12px;
+
+.akcija-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.15s;
 }
-.akcija-compact .forum-qa__answer p {
-    font-size: 12.5px;
+.akcija-item:hover { background: rgba(236, 23, 82, 0.04); }
+.akcija-item__name { font-size: 14px; font-weight: 700; color: var(--ink-950); min-width: 100px; }
+.akcija-item__badge {
+    font-size: 11px;
+    font-weight: 800;
+    background: var(--pink);
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
 }
-.akcija-compact .forum-qa__meta {
-    font-size: 12px;
-    margin-bottom: 4px;
-}
-.akcija-compact .forum-qa__meta strong {
-    font-size: 13px;
-}
-.akcija-compact .forum-cta__btn--primary {
-    padding: 10px 18px;
-    font-size: 13px;
+.akcija-item__info { font-size: 12.5px; color: var(--muted); flex: 1; }
+.akcija-item__arrow { color: var(--pink); font-weight: 700; font-size: 16px; }
+
+@media (max-width: 540px) {
+    .akcija-item { flex-wrap: wrap; gap: 4px 8px; }
+    .akcija-item__name { min-width: auto; }
+    .akcija-item__info { width: 100%; }
+    .akcija-freeship { text-align: center; }
 }
