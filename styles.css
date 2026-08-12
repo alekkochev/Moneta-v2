@@ -8944,7 +8944,7 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
 .forum-layout {
     max-width: 1040px;
     margin: 0 auto;
-    padding: 10px 24px 50px 40px;
+    padding: 10px 24px 50px 80px;
     background: #fff;
     display: grid;
     grid-template-columns: 1fr 260px;
