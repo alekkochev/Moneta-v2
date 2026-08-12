@@ -4038,11 +4038,15 @@ window.MonetaData = {
     let salesShown = 0;
     let salesTimer = null;
 
+    // Производи што повеќе не се продаваат — нема да се прикажуваат во попапи
+    const DISCONTINUED = new Set(['sportex']);
+
     function productPool() {
         const pool = [];
         if (window.MonetaData && Object.keys(window.MonetaData.products).length) {
             Object.values(window.MonetaData.products).forEach((p) => {
                 if (p.active === false) return;
+                if (DISCONTINUED.has(p.slug)) return;
                 pool.push({
                     name: isEn() ? (p.name_en || p.slug) : (p.name_mk || p.slug),
                     price: p.price || 0,
