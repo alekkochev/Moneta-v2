@@ -1516,13 +1516,31 @@ a {
     }
     .footer__inner {
         flex-direction: column;
+        align-items: stretch;
+        text-align: left;
+        gap: 20px;
+    }
+    .footer__brand {
+        align-items: flex-start;
+        text-align: left;
+    }
+    .footer__right {
         align-items: center;
         text-align: center;
-        gap: 20px;
+    }
+    .footer__links {
+        justify-content: center;
+    }
+    .footer__legal-links {
+        justify-content: center;
     }
     .footer__social {
         flex-direction: column;
         gap: 10px;
+    }
+    .footer__contact {
+        max-width: none;
+        margin-bottom: 18px;
     }
 }
 
