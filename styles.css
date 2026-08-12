@@ -8955,8 +8955,8 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
 .forum-hero h1 {
     font-size: clamp(30px, 4vw, 48px);
     font-weight: 800;
-    color: #fff;
-    text-shadow: 0 2px 12px rgba(0,0,0,0.35);
+    color: #EC1752;
+    text-shadow: none;
     margin-bottom: 12px;
     line-height: 1.15;
     white-space: nowrap;
