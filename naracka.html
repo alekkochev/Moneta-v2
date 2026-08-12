@@ -514,6 +514,20 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
                     } catch (err) { console.warn('Supabase order save error:', err); }
                 }
 
+                // ===== Зачувај реална нарачка за социјалниот попап =====
+                if (items.length > 0 && city) {
+                    const firstItem = items[0];
+                    try {
+                        sessionStorage.setItem('moneta_real_purchase', JSON.stringify({
+                            name: name.split(' ')[0] + '.',
+                            city: city,
+                            productName: isEn() ? firstItem.nameEn : firstItem.nameMk,
+                            slug: firstItem.slug,
+                            productPrice: firstItem.price || 0
+                        }));
+                    } catch (e) { /* ignore */ }
+                }
+
                 let body = 'НОВА НАРАЧКА - МОНЕТА\n========================\n\n';
                 body += 'Име: ' + name + '\n';
                 body += 'Телефон: ' + phone + '\n';

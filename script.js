@@ -4037,16 +4037,28 @@ window.MonetaData = {
 
     let salesShown = 0;
     let salesTimer = null;
+    const MAX_SALES_POPUPS = 2;               // најмногу 2 пати по посетител
+    const SALES_INTERVAL_MIN = 120000;         // 2 мин
+    const SALES_INTERVAL_MAX = 180000;         // 3 мин
+
+    // Сезонски филтер: не прикажувај зимски влошки лете и обратно
+    const WINTER_SLUGS = new Set(['thermo-alu']);
+    const SUMMER_SLUGS = new Set(['carbon', 'simona']);
 
     // Производи што повеќе не се продаваат — нема да се прикажуваат во попапи
     const DISCONTINUED = new Set(['sportex']);
 
     function productPool() {
         const pool = [];
+        const month = new Date().getMonth() + 1; // 1–12
+        const isSummer = month >= 5 && month <= 9;
+        const isWinter = month >= 11 || month <= 2;
         if (window.MonetaData && Object.keys(window.MonetaData.products).length) {
             Object.values(window.MonetaData.products).forEach((p) => {
                 if (p.active === false) return;
                 if (DISCONTINUED.has(p.slug)) return;
+                if (isSummer && WINTER_SLUGS.has(p.slug)) return;
+                if (isWinter && SUMMER_SLUGS.has(p.slug)) return;
                 pool.push({
                     name: isEn() ? (p.name_en || p.slug) : (p.name_mk || p.slug),
                     price: p.price || 0,
@@ -4087,18 +4099,7 @@ window.MonetaData = {
     }
     window.monetaShowCartToast = showCartToast;
 
-    function showSalesToast() {
-        if (!CONFIG.sales || salesShown >= 4) return;
-        const pool = productPool();
-        if (!pool.length) return;
-        const prod = pool[Math.floor(Math.random() * pool.length)];
-        const city = CITIES[Math.floor(Math.random() * CITIES.length)];
-        const name = NAMES[Math.floor(Math.random() * NAMES.length)];
-
-        const lang = isEn() ? 'en' : (isSq() ? 'sq' : 'mk');
-        const variants = TIME_ACTIONS[lang] || TIME_ACTIONS.mk;
-        const va = variants[Math.floor(Math.random() * variants.length)];
-
+    function buildSalesToast(prod, city, name, va) {
         const old = document.getElementById('monetaSalesToast');
         if (old) old.remove();
         const toast = document.createElement('div');
@@ -4119,10 +4120,60 @@ window.MonetaData = {
             if (e.target.closest('.moneta-sales-toast__close')) return;
             window.location.href = BASE + 'modeli/' + prod.slug + '.html';
         });
-        salesShown++;
         setTimeout(close, 7000);
-        salesTimer = setTimeout(showSalesToast, 35000 + Math.random() * 15000);
     }
+
+    function showSalesToast() {
+        if (!CONFIG.sales || salesShown >= MAX_SALES_POPUPS) return;
+
+        // Прво провери дали има реална нарачка зачувана од naracka.html
+        let realData = null;
+        try {
+            const raw = sessionStorage.getItem('moneta_real_purchase');
+            if (raw) {
+                realData = JSON.parse(raw);
+                sessionStorage.removeItem('moneta_real_purchase');
+            }
+        } catch (e) { /* ignore */ }
+
+        let prod, city, name;
+        if (realData && realData.slug) {
+            prod = { name: realData.productName, price: realData.productPrice, slug: realData.slug };
+            city = realData.city || 'Скопје';
+            name = realData.name || 'Клиент';
+        } else {
+            const pool = productPool();
+            if (!pool.length) return;
+            prod = pool[Math.floor(Math.random() * pool.length)];
+            city = CITIES[Math.floor(Math.random() * CITIES.length)];
+            name = NAMES[Math.floor(Math.random() * NAMES.length)];
+        }
+
+        const lang = isEn() ? 'en' : (isSq() ? 'sq' : 'mk');
+        const variants = TIME_ACTIONS[lang] || TIME_ACTIONS.mk;
+        const va = variants[Math.floor(Math.random() * variants.length)];
+
+        buildSalesToast(prod, city, name, va);
+        salesShown++;
+        salesTimer = setTimeout(showSalesToast, SALES_INTERVAL_MIN + Math.random() * (SALES_INTERVAL_MAX - SALES_INTERVAL_MIN));
+    }
+
+    // Реална нарачка — се повикува од naracka.html кога некој ќе купи
+    // Го зачувува во sessionStorage, па првиот следен попап ќе ја прикаже
+    window.MonetaShowRealPurchase = function (data) {
+        if (!data || !data.slug) return;
+        try { sessionStorage.setItem('moneta_real_purchase', JSON.stringify(data)); } catch (e) { /* ignore */ }
+        // Ако нема активен тајмер, прикажи веднаш
+        if (!salesTimer) {
+            const prod = { name: data.productName || data.slug, price: data.productPrice || 0, slug: data.slug };
+            const lang = isEn() ? 'en' : (isSq() ? 'sq' : 'mk');
+            const va = (lang === 'en') ? { action: 'just ordered', time: 'just now' }
+                : (lang === 'sq') ? { action: 'sapo porositi', time: 'tani' }
+                : { action: 'штотуку нарача', time: 'пред малку' };
+            buildSalesToast(prod, data.city || 'Скопје', data.name || 'Клиент', va);
+            salesTimer = setTimeout(showSalesToast, SALES_INTERVAL_MIN + Math.random() * (SALES_INTERVAL_MAX - SALES_INTERVAL_MIN));
+        }
+    };
 
     // ---------- 3) Exit-intent popup ----------
     function showExitPopup() {
