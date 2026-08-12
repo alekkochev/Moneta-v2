@@ -4175,7 +4175,155 @@ window.MonetaData = {
         }
     };
 
-    // ---------- 3) Exit-intent popup ----------
+    // ---------- 3) Product Reviews (Supabase save/load + карусел) ----------
+    function initProductReviews() {
+        const container = document.querySelector('.model-reviews');
+        if (!container) return;
+        const slug = container.dataset.productSlug;
+        if (!slug) return;
+        const sbUrl = String(window.MONETA_SUPABASE_URL || '').replace(/\/+$/, '');
+        const sbKey = window.MONETA_ANON_KEY || '';
+        const sbHeaders = sbKey ? { apikey: sbKey, Authorization: 'Bearer ' + sbKey, 'Content-Type': 'application/json', Prefer: 'return=representation' } : null;
+
+        const form = container.querySelector('.model-reviews__form');
+        const starsRow = container.querySelector('.model-reviews__stars-row');
+        const nameInput = container.querySelector('[data-review-name]');
+        const emailInput = container.querySelector('[data-review-email]');
+        const commentInput = container.querySelector('[data-review-comment]');
+        const submitBtn = container.querySelector('.model-reviews__submit');
+        const feedbackEl = container.querySelector('.model-reviews__feedback');
+        const carousel = container.querySelector('.model-reviews__carousel');
+        const countEl = container.querySelector('.model-reviews__list-count');
+        const prevBtn = container.querySelector('.model-reviews__arrow--prev');
+        const nextBtn = container.querySelector('.model-reviews__arrow--next');
+
+        let rating = 0;
+        let reviews = [];
+        let currentIdx = 0;
+
+        // ⭐ кликање
+        if (starsRow) {
+            starsRow.querySelectorAll('.model-reviews__star').forEach((star, i) => {
+                star.addEventListener('click', () => {
+                    rating = i + 1;
+                    starsRow.querySelectorAll('.model-reviews__star').forEach((s, j) => {
+                        s.classList.toggle('is-active', j < rating);
+                    });
+                });
+            });
+        }
+
+        // Вчитување рецензии од Supabase
+        async function loadReviews() {
+            if (!sbUrl || !sbKey) {
+                reviews = [];
+            } else {
+                try {
+                    const res = await fetch(sbUrl + '/rest/v1/product_reviews?product_slug=eq.' + encodeURIComponent(slug) + '&order=created_at.desc&limit=20', { headers: sbHeaders });
+                    if (res.ok) reviews = await res.json();
+                    else reviews = [];
+                } catch (e) { reviews = []; }
+            }
+            currentIdx = 0;
+            renderReviews();
+        }
+
+        function renderReviews() {
+            if (countEl) countEl.textContent = '(' + reviews.length + ')';
+            if (prevBtn) prevBtn.disabled = reviews.length <= 1;
+            if (nextBtn) nextBtn.disabled = reviews.length <= 1;
+
+            if (!carousel) return;
+            if (reviews.length === 0) {
+                carousel.innerHTML = '<div class="model-reviews__empty" data-mk="Нема рецензии за овој производ. Бидете први!" data-sq="Nuk ka recensione për këtë produkt. Bëhuni i pari!" data-en="No reviews yet. Be the first!">Нема рецензии за овој производ. Бидете први!</div>';
+                return;
+            }
+
+            const r = reviews[currentIdx] || reviews[0];
+            const initials = (r.name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+            const starsHtml = '★'.repeat(r.rating || 0) + '☆'.repeat(5 - (r.rating || 0));
+
+            const isEn = document.documentElement.lang === 'en';
+            const isSq = document.documentElement.lang === 'sq';
+            const t = (mk, sq, en) => isEn ? en : (isSq ? sq : mk);
+
+            carousel.innerHTML =
+                '<div class="model-reviews__card">' +
+                    '<div class="model-reviews__card-stars">' + starsHtml + '</div>' +
+                    '<p class="model-reviews__card-text">' + (r.comment || '') + '</p>' +
+                    '<div class="model-reviews__card-author">' +
+                        '<span class="model-reviews__card-avatar">' + initials + '</span>' +
+                        '<strong>' + (r.name || '') + '</strong>' +
+                        '<span>·</span>' +
+                        '<span>' + (r.created_at ? new Date(r.created_at).toLocaleDateString(isEn ? 'en-US' : 'mk-MK', { month: 'short', day: 'numeric' }) : '') + '</span>' +
+                    '</div>' +
+                '</div>';
+        }
+
+        function prevReview() {
+            if (reviews.length <= 1) return;
+            currentIdx = (currentIdx - 1 + reviews.length) % reviews.length;
+            renderReviews();
+        }
+        function nextReview() {
+            if (reviews.length <= 1) return;
+            currentIdx = (currentIdx + 1) % reviews.length;
+            renderReviews();
+        }
+        if (prevBtn) prevBtn.addEventListener('click', prevReview);
+        if (nextBtn) nextBtn.addEventListener('click', nextReview);
+
+        // Испрати рецензија
+        if (submitBtn && form) {
+            submitBtn.addEventListener('click', async () => {
+                const name = (nameInput ? nameInput.value.trim() : '');
+                const email = (emailInput ? emailInput.value.trim() : '');
+                const comment = (commentInput ? commentInput.value.trim() : '');
+
+                if (rating < 1) { if (feedbackEl) { feedbackEl.className = 'model-reviews__feedback is-error'; feedbackEl.textContent = 'Изберете оценка 1–5'; } return; }
+                if (!name) { if (feedbackEl) { feedbackEl.className = 'model-reviews__feedback is-error'; feedbackEl.textContent = 'Внесете име'; } return; }
+                if (!comment || comment.length < 8) { if (feedbackEl) { feedbackEl.className = 'model-reviews__feedback is-error'; feedbackEl.textContent = 'Внесете коментар (најмалку 8 знаци)'; } return; }
+
+                submitBtn.disabled = true;
+                if (feedbackEl) { feedbackEl.className = 'model-reviews__feedback'; feedbackEl.textContent = 'Се испраќа...'; }
+
+                const review = { product_slug: slug, rating, name, email, comment, created_at: new Date().toISOString() };
+
+                if (sbUrl && sbKey) {
+                    try {
+                        await fetch(sbUrl + '/rest/v1/product_reviews', { method: 'POST', headers: sbHeaders, body: JSON.stringify(review) });
+                    } catch (e) { console.warn('Review save error:', e); }
+                }
+
+                // Додади локално
+                reviews.unshift(review);
+                currentIdx = 0;
+                renderReviews();
+                if (countEl) countEl.textContent = '(' + reviews.length + ')';
+
+                // Ресетирај
+                rating = 0;
+                if (starsRow) starsRow.querySelectorAll('.model-reviews__star').forEach(s => s.classList.remove('is-active'));
+                if (nameInput) nameInput.value = '';
+                if (emailInput) emailInput.value = '';
+                if (commentInput) commentInput.value = '';
+                if (feedbackEl) { feedbackEl.className = 'model-reviews__feedback is-success'; feedbackEl.textContent = 'Ви благодариме! Рецензијата е објавена.'; }
+                submitBtn.disabled = false;
+
+                setTimeout(() => { if (feedbackEl) { feedbackEl.className = 'model-reviews__feedback'; feedbackEl.textContent = ''; } }, 4000);
+            });
+        }
+
+        // Освежи при промена на јазик
+        if (window.MonetaOnLangChange) window.MonetaOnLangChange(() => renderReviews());
+
+        loadReviews();
+    }
+
+    // Пушти reviews систем на модел страниците
+    if (document.querySelector('.model-reviews')) initProductReviews();
+
+    // ---------- 4) Exit-intent popup ----------
     function showExitPopup() {
         const wrap = document.createElement('div');
         wrap.id = 'monetaExitPopup';

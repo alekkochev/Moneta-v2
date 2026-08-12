@@ -2133,6 +2133,220 @@ a {
 }
 
 /* ========================================
+   PRODUCT REVIEWS (модел страници)
+   Форма + карусел со рецензии под FAQ акордеонот
+   ======================================== */
+.model-reviews {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid rgba(23, 23, 28, 0.08);
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+}
+
+.model-reviews__title {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--ink-950);
+    margin-bottom: 14px;
+}
+
+/* —— Review Form —— */
+.model-reviews__form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.model-reviews__stars-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.model-reviews__star {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #d1d5db;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    transition: color 0.15s ease, transform 0.15s ease;
+}
+.model-reviews__star:hover,
+.model-reviews__star.is-active {
+    color: #f59e0b;
+    transform: scale(1.15);
+}
+
+.model-reviews__field {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 12px;
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    color: var(--ink-950);
+    background: #fff;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+.model-reviews__field:focus {
+    border-color: var(--pink);
+    box-shadow: 0 0 0 3px rgba(236, 23, 82, 0.08);
+}
+
+.model-reviews__field--textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.model-reviews__submit {
+    align-self: flex-start;
+    min-height: 40px;
+    padding: 0 22px;
+    border: none;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--brand), var(--brand-600));
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 400;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(236, 23, 82, 0.22);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.model-reviews__submit:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 26px rgba(236, 23, 82, 0.30);
+}
+.model-reviews__submit:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.model-reviews__feedback {
+    font-size: 12.5px;
+    font-weight: 600;
+    min-height: 18px;
+}
+.model-reviews__feedback.is-success { color: #10B981; }
+.model-reviews__feedback.is-error { color: #E53E3E; }
+
+/* —— Reviews Display —— */
+.model-reviews__list { position: relative; }
+
+.model-reviews__list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+.model-reviews__list-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--ink-950);
+}
+.model-reviews__list-count {
+    font-size: 12px;
+    color: var(--muted);
+    margin-left: 6px;
+    font-weight: 600;
+}
+
+/* Карусел стрелки (◄ ►) — горе десно */
+.model-reviews__arrows {
+    display: flex;
+    gap: 6px;
+}
+.model-reviews__arrow {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    background: #fff;
+    color: var(--ink-700);
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+.model-reviews__arrow:hover {
+    background: var(--pink);
+    border-color: var(--pink);
+    color: #fff;
+}
+.model-reviews__arrow:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.model-reviews__carousel {
+    overflow: hidden;
+    position: relative;
+    min-height: 60px;
+}
+
+.model-reviews__card {
+    padding: 14px 0;
+    animation: reviewFadeIn 0.3s ease;
+}
+@keyframes reviewFadeIn {
+    from { opacity: 0; transform: translateX(8px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.model-reviews__card-stars {
+    color: #f59e0b;
+    font-size: 14px;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+}
+
+.model-reviews__card-text {
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--ink-700);
+    margin-bottom: 8px;
+}
+
+.model-reviews__card-author {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--muted);
+}
+.model-reviews__card-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--brand);
+    color: #fff;
+    font-weight: 800;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.model-reviews__empty {
+    text-align: center;
+    padding: 20px 0;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+/* ========================================
    FAQ ACCORDION
    ======================================== */
 .faq-section {
