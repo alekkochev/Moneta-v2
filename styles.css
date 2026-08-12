@@ -9048,6 +9048,7 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
 .fs-latest-item small { display: block; color: #999; margin-top: 2px; }
 
 /* Forum page background — feet on grass (замени forum-bg.webp со твојата слика) */
+.page-forum { overflow-x: hidden; }
 .page-forum .forum-layout {
     background: linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.88) 100%), url('./images/forum-bg.webp') center / cover no-repeat;
     background-attachment: fixed;
@@ -9055,27 +9056,37 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
 
 /* Forum mobile */
 @media (max-width: 860px) {
-    .forum-hero { padding: 120px 16px 40px; }
-    .forum-hero h1 { white-space: normal; font-size: clamp(24px, 6vw, 34px); }
-    .forum-hero__inner { padding: 0 16px; }
-    .forum-layout { grid-template-columns: 1fr; padding: 10px 16px 40px; }
-    .forum-sidebar { position: static; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .forum-sidebar__stats { grid-column: 1 / -1; }
-    .forum-row { grid-template-columns: 1fr 40px 40px 80px; gap: 4px; padding: 8px 6px; }
-    .forum-row__title { font-size: 13px; }
-    .forum-row__stats span { font-size: 12px; }
-    .forum-row__last span { font-size: 11px; }
-    .forum-comment-form { padding: 12px; }
+    .forum-hero { padding: 110px 0 32px; }
+    .forum-hero__inner { padding: 0 12px; max-width: 100%; }
+    .forum-hero h1 { white-space: normal; font-size: clamp(22px, 5.5vw, 30px); line-height: 1.2; word-break: break-word; }
+    .forum-hero__badge { font-size: 11px; padding: 5px 12px; }
+    .forum-layout { grid-template-columns: 1fr; padding: 8px 0 32px; max-width: 100%; }
+    .forum-main { padding: 0 8px; }
+    .forum-sidebar { position: static; padding: 0 8px; }
+    .forum-section-title { font-size: 11px; margin: 16px 0 6px; }
+    .forum-row { grid-template-columns: 1fr 36px 36px 70px; gap: 2px; padding: 7px 4px; }
+    .forum-row__title { font-size: 12.5px; word-break: break-word; hyphens: auto; }
+    .forum-row__meta { font-size: 10.5px; }
+    .forum-row__stats span { font-size: 11px; }
+    .forum-row__stats small { font-size: 9px; }
+    .forum-row__last span { font-size: 10.5px; }
+    .forum-row__last small { font-size: 9px; }
+    .forum-comment-form { padding: 10px; }
+    .forum-comment-form input, .forum-comment-form textarea { font-size: 16px; }
 }
-@media (max-width: 500px) {
-    .forum-hero { padding: 110px 12px 32px; }
-    .forum-hero h1 { font-size: clamp(20px, 7vw, 28px); }
-    .forum-layout { padding: 6px 10px 32px; gap: 20px; }
-    .forum-sidebar { grid-template-columns: 1fr; }
-    .forum-row { grid-template-columns: 1fr; gap: 2px; padding: 8px 4px; }
+@media (max-width: 480px) {
+    .forum-hero { padding: 100px 0 24px; }
+    .forum-hero h1 { font-size: clamp(19px, 6vw, 26px); }
+    .forum-layout { padding: 4px 0 24px; gap: 14px; }
+    .forum-main { padding: 0 4px; }
+    .forum-row { grid-template-columns: 1fr; gap: 1px; padding: 6px 4px; border-bottom: 1px solid #f5f0ee; }
     .forum-row__stats, .forum-row__last { display: none; }
-    .forum-section-title { font-size: 11px; margin: 14px 0 8px; }
-    .forum-thread-view__back { width: 100%; text-align: center; }
+    .forum-row__title { font-size: 13px; }
+    .forum-pinned .forum-row { border-left-width: 2px; }
+    .forum-section-title { font-size: 10px; margin: 12px 0 4px; }
+    .forum-thread-view__back { width: 100%; text-align: center; font-size: 12px; }
+    .forum-comment-form h4 { font-size: 13px; }
+    .forum-comment-form button { width: 100%; }
 }
 
 /* ========================================
