@@ -6665,7 +6665,7 @@ p { color: var(--ink-700); }
         right: 14px;
         left: 14px;
         border-radius: var(--radius-xl);
-        background: rgba(21,22,29,0.96);
+        background: rgba(21,22,29,0.86);
         box-shadow: var(--shadow-lg);
         backdrop-filter: blur(18px);
     }
