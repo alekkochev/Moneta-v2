@@ -2103,6 +2103,18 @@ const SEARCH_MODAL_HTML = `
         },
         {
             type: 'product',
+            titleMk: 'SnakeX',
+            titleEn: 'SnakeX',
+            descMk: 'Премиум спортска влошка RUN & HIKING со активен јаглен, рециклирана пена и двојна густина.',
+            descEn: 'Premium RUN & HIKING sports insole with activated charcoal, recycled foam and dual density.',
+            url: './modeli/snakex.html',
+            image: './images/cards/snakex.png',
+            badgeMk: 'Спортски',
+            badgeEn: 'Sports',
+            keywords: 'snakex снейкс премиум спортска run hiking активен јаглен рециклирана пена двојна густина 281130'
+        },
+        {
+            type: 'product',
             titleMk: 'Heel Pad',
             titleEn: 'Heel Pad',
             descMk: 'Кожна влошка за пета со карбосан перниче и самолеплив слој за стабилно прилегање.',
