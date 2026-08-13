@@ -3594,11 +3594,16 @@ window.MonetaData = {
 
     const discountOf = (prod) => {
         // discount колона: 0 = нема попуст, 1-99 = % попуст
-        // discount_until: временска рамка (ако помине, попустот не важи)
+        // discount_from / discount_until: календар на попустот
+        //   - discount_from: кога почнува (ако стои во иднина, попустот уште не важи)
+        //   - discount_until: кога завршува (ако помине, попустот веќе не важи)
         const discRaw = Number(prod.discount) || 0;
         if (discRaw <= 0 || discRaw >= 100) return 0;
+        const now = Date.now();
+        const from = prod.discount_from ? new Date(prod.discount_from).getTime() : 0;
+        if (from && now < from) return 0;
         const until = prod.discount_until ? new Date(prod.discount_until).getTime() : 0;
-        if (until && Date.now() > until) return 0;
+        if (until && now > until) return 0;
         return discRaw;
     };
 
