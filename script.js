@@ -4501,7 +4501,9 @@ window.MonetaData = {
 
         const render = () => {
             carousel.querySelectorAll('.review-card--dynamic').forEach(el => el.remove());
-            reviews.slice(0, visibleCount()).forEach(r => carousel.insertAdjacentHTML('beforeend', cardHtml(r)));
+            // Најновите рецензии (по дата/време) први во каруселот — пред статичните картички
+            const html = reviews.slice(0, visibleCount()).map(cardHtml).join('');
+            carousel.insertAdjacentHTML('afterbegin', html);
             ensureMoreControls();
         };
 
@@ -4510,7 +4512,11 @@ window.MonetaData = {
             fetch(sbUrl + '/rest/v1/product_reviews?select=*&order=created_at.desc&limit=200', { headers: { apikey: sbKey, Authorization: 'Bearer ' + sbKey } })
                 .then(res => res.ok ? res.json() : [])
                 .catch(() => [])
-                .then(data => { reviews = Array.isArray(data) ? data : []; render(); });
+                .then(data => {
+                    reviews = Array.isArray(data) ? data : [];
+                    reviews.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+                    render();
+                });
         };
 
         if (window.MonetaOnLangChange) window.MonetaOnLangChange(() => render());
