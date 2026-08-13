@@ -3803,6 +3803,8 @@ window.MonetaData = {
     function applyAkcijaPage() {
         const promoInner = document.querySelector('.akcija-promo__inner');
         if (!promoInner) return;
+        const section = promoInner.closest('.akcija-promo');
+        if (section) section.style.display = ''; // покажи ја секцијата дури кога податоците се спремни
         const prods = Object.values(window.MonetaData.products || {});
         const discounted = prods.filter(p => discountOf(p) > 0);
         const isEn = document.documentElement.lang === 'en';
