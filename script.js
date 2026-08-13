@@ -4114,10 +4114,17 @@ window.MonetaData = {
                 if (DISCONTINUED.has(p.slug)) return;
                 if (isSummer && WINTER_SLUGS.has(p.slug)) return;
                 if (isWinter && SUMMER_SLUGS.has(p.slug)) return;
+                // Нема залиха (qty=0 на сите големини) → не прикажувај во попап
+                const sz = window.MonetaData.sizes[p.slug];
+                if (sz && Object.keys(sz).length > 0) {
+                    const total = Object.values(sz).reduce((a, b) => a + (Number(b) || 0), 0);
+                    if (total <= 0) return;
+                }
                 pool.push({
                     name: isEn() ? (p.name_en || p.slug) : (p.name_mk || p.slug),
                     price: p.price || 0,
                     slug: p.slug,
+                    img: String((p.image || p.thumbnail) || '').replace(/^\.\//, ''),
                 });
             });
         }
@@ -4157,11 +4164,18 @@ window.MonetaData = {
     function buildSalesToast(prod, city, name, va) {
         const old = document.getElementById('monetaSalesToast');
         if (old) old.remove();
+        // Вистинска слика од базата (или fallback .webp), ако нема — скриј ја сликата
+        let img = prod.img;
+        if (!img) {
+            const p = window.MonetaData && window.MonetaData.products ? window.MonetaData.products[prod.slug] : null;
+            if (p) img = String((p.image || p.thumbnail) || '').replace(/^\.\//, '');
+        }
+        if (!img) img = 'images/cards/' + prod.slug + '.webp';
         const toast = document.createElement('div');
         toast.id = 'monetaSalesToast';
         toast.className = 'moneta-sales-toast';
         toast.innerHTML =
-            '<img class="moneta-sales-toast__img" src="' + BASE + 'images/cards/' + prod.slug + '.webp" alt="" loading="lazy">' +
+            '<img class="moneta-sales-toast__img" src="' + BASE + img + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">' +
             '<div class="moneta-sales-toast__body">' +
                 '<p class="moneta-sales-toast__title">' + name + ' · ' + city + '</p>' +
                 '<p class="moneta-sales-toast__text">' + va.action + ' ' + prod.name + ' · ' + prod.price + ' ' + t('ден.', 'den.', 'MKD') + ' · ' + va.time + '</p>' +
