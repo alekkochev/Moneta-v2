@@ -3626,11 +3626,7 @@ window.MonetaData = {
         if (pct > 0) {
             return { base: base, price: Math.round(base * (1 - pct / 100)), pct: pct };
         }
-        // backward compat: old_price колона (ако стои стара цена > цена)
-        const old = prod.old_price ? Number(prod.old_price) : 0;
-        if (old > base && base > 0) {
-            return { base: base, price: base, pct: Math.round((old - base) / old * 100), legacyOld: old };
-        }
+        // САМО discount колоната од Supabase важи за попуст (нема legacy old_price)
         return { base: base, price: base, pct: 0 };
     };
 
@@ -4404,6 +4400,123 @@ window.MonetaData = {
 
     // Пушти reviews систем на модел страниците
     if (document.querySelector('.model-reviews')) initProductReviews();
+
+    // ---------- 3b) Homepage „Искуства од нашите корисници" — сите рецензии од Supabase ----------
+    // Секоја рецензија оставена на производ автоматски се прикажува овде.
+    // Каруселот прикажува први 16 картички (6 статични + 10 најнови).
+    // За повеќе од 16 → dropdown копче ги листа останатите.
+    function initHomeReviews() {
+        const carousel = document.getElementById('reviewsCarousel');
+        if (!carousel) return;
+        const wrapper = carousel.closest('.reviews__carousel-wrapper') || carousel.parentElement;
+        const sbUrl = String(window.MONETA_SUPABASE_URL || '').replace(/\/+$/, '');
+        const sbKey = window.MONETA_ANON_KEY || '';
+
+        const MAX_IN_CAROUSEL = 16;
+        const STATIC_CARDS = carousel.querySelectorAll('.review-card').length;
+
+        const langOf = () => {
+            const l = document.documentElement.lang;
+            return l === 'en' ? 'en' : (l === 'sq' ? 'sq' : 'mk');
+        };
+        const t = (mk, sq, en) => {
+            const l = langOf();
+            return l === 'en' ? en : (l === 'sq' ? sq : mk);
+        };
+        const productName = (slug) => {
+            const p = window.MonetaData.products[slug];
+            if (!p) return slug;
+            return langOf() === 'en' ? (p.name_en || slug) : (p.name_mk || slug);
+        };
+        const initialsOf = (name) => (name || '?').split(' ').filter(Boolean).map(w => w[0]).join('').slice(0, 2).toUpperCase();
+        const starsOf = (r) => '★'.repeat(Math.min(5, Math.max(0, Number(r.rating) || 0))) + '☆'.repeat(Math.max(0, 5 - (Number(r.rating) || 0)));
+
+        const cardHtml = (r) => {
+            const name = r.name || t('Купувач', 'Blerës', 'Customer');
+            const date = r.created_at ? new Date(r.created_at).toLocaleDateString(langOf() === 'en' ? 'en-US' : 'mk-MK', { month: 'short', day: 'numeric' }) : '';
+            return '<div class="review-card review-card--dynamic">' +
+                '<div class="review-card__header">' +
+                    '<div class="review-card__rating">' +
+                        '<span class="stars">' + starsOf(r) + '</span>' +
+                        '<span class="verified-tag">✓ ' + t('Потврден купувач', 'Blerës i verifikuar', 'Verified buyer') + '</span>' +
+                    '</div>' +
+                    '<span class="product-tag">' + productName(r.product_slug) + '</span>' +
+                '</div>' +
+                '<h4 class="review-card__title">„' + productName(r.product_slug) + '“</h4>' +
+                '<p class="review-card__text">' + (r.comment || '') + '</p>' +
+                '<div class="review-card__author">' +
+                    '<div class="review-card__avatar">' + initialsOf(r.name) + '</div>' +
+                    '<div class="review-card__info"><strong>' + name + '</strong><span>' + date + '</span></div>' +
+                '</div>' +
+            '</div>';
+        };
+
+        const listItemHtml = (r) => {
+            const date = r.created_at ? new Date(r.created_at).toLocaleDateString(langOf() === 'en' ? 'en-US' : 'mk-MK', { month: 'short', day: 'numeric' }) : '';
+            return '<div class="reviews-all__item">' +
+                '<div class="reviews-all__top"><span class="stars">' + starsOf(r) + '</span>' +
+                '<span class="product-tag">' + productName(r.product_slug) + '</span>' +
+                '<strong>' + (r.name || '') + '</strong>' +
+                '<span class="reviews-all__date">' + date + '</span></div>' +
+                '<p>' + (r.comment || '') + '</p>' +
+            '</div>';
+        };
+
+        let reviews = [];
+        const visibleCount = () => Math.max(0, MAX_IN_CAROUSEL - STATIC_CARDS);
+        const moreBtnText = () => t('Останати рецензии', 'Recensione të tjera', 'More reviews') + ' (' + Math.max(0, reviews.length - visibleCount()) + ')';
+
+        const ensureMoreControls = () => {
+            let moreBtn = document.getElementById('reviewsMoreBtn');
+            const hasMore = reviews.length > visibleCount();
+            if (hasMore) {
+                if (!moreBtn) {
+                    moreBtn = document.createElement('button');
+                    moreBtn.type = 'button';
+                    moreBtn.id = 'reviewsMoreBtn';
+                    moreBtn.className = 'reviews__more-btn';
+                    moreBtn.setAttribute('aria-expanded', 'false');
+                    wrapper.insertAdjacentElement('afterend', moreBtn);
+                    const panel = document.createElement('div');
+                    panel.id = 'reviewsAllPanel';
+                    panel.className = 'reviews-all-panel';
+                    panel.style.display = 'none';
+                    moreBtn.insertAdjacentElement('afterend', panel);
+                    moreBtn.addEventListener('click', () => {
+                        const open = panel.style.display === 'none';
+                        panel.style.display = open ? '' : 'none';
+                        moreBtn.setAttribute('aria-expanded', String(open));
+                        moreBtn.textContent = open ? t('Сокриј ги рецензиите', 'Fshih recensionet', 'Hide reviews') : moreBtnText();
+                    });
+                }
+                moreBtn.textContent = moreBtnText();
+                const panel = document.getElementById('reviewsAllPanel');
+                if (panel) panel.innerHTML = reviews.slice(visibleCount()).map(listItemHtml).join('');
+            } else {
+                if (moreBtn) moreBtn.remove();
+                const panel = document.getElementById('reviewsAllPanel');
+                if (panel) panel.remove();
+            }
+        };
+
+        const render = () => {
+            carousel.querySelectorAll('.review-card--dynamic').forEach(el => el.remove());
+            reviews.slice(0, visibleCount()).forEach(r => carousel.insertAdjacentHTML('beforeend', cardHtml(r)));
+            ensureMoreControls();
+        };
+
+        const load = () => {
+            if (!sbUrl || !sbKey) { reviews = []; render(); return; }
+            fetch(sbUrl + '/rest/v1/product_reviews?select=*&order=created_at.desc&limit=200', { headers: { apikey: sbKey, Authorization: 'Bearer ' + sbKey } })
+                .then(res => res.ok ? res.json() : [])
+                .catch(() => [])
+                .then(data => { reviews = Array.isArray(data) ? data : []; render(); });
+        };
+
+        if (window.MonetaOnLangChange) window.MonetaOnLangChange(() => render());
+        (window.MonetaData.ready || Promise.resolve()).then(load);
+    }
+    if (document.getElementById('reviewsCarousel')) initHomeReviews();
 
     // ---------- 4) Exit-intent popup ----------
     function showExitPopup() {

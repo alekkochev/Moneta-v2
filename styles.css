@@ -2004,6 +2004,67 @@ a {
     display: none; /* Chrome, Safari */
 }
 
+/* Домашна страна: dropdown за останати рецензии (повеќе од 16) */
+.reviews__more-btn {
+    display: block;
+    margin: 26px auto 0;
+    padding: 12px 28px;
+    border: 2px solid var(--pink);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--pink);
+    font-weight: 800;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all .25s ease;
+}
+.reviews__more-btn:hover {
+    background: var(--pink);
+    color: #fff;
+}
+.reviews-all-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 460px;
+    overflow-y: auto;
+    margin: 18px auto 0;
+    padding: 18px;
+    border: 1px solid rgba(23, 23, 28, 0.08);
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+.reviews-all__item {
+    padding: 12px 14px;
+    border: 1px solid rgba(23, 23, 28, 0.06);
+    border-radius: 12px;
+    background: #FBFBFD;
+}
+.reviews-all__top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+}
+.reviews-all__top .stars { color: #f59e0b; letter-spacing: 1px; }
+.reviews-all__top .product-tag {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: rgba(236, 23, 82, 0.1);
+    color: var(--pink);
+    font-weight: 700;
+}
+.reviews-all__date { color: var(--muted, #6B6B76); font-size: 12px; }
+.reviews-all__item p {
+    margin: 0;
+    font-size: 13.5px;
+    color: var(--ink, #201F26);
+    line-height: 1.55;
+}
+
 .review-card {
     flex: 0 0 380px;
     scroll-snap-align: start;
