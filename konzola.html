@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="mk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>МОНЕТА Конзола</title>
+<style>
+:root{
+  --bg:#0f1117; --panel:#161a24; --panel2:#1d2230; --line:#2a3040;
+  --ink:#e8ebf3; --muted:#9aa3b5; --pink:#EC1752; --pink2:#ff4d7d;
+  --green:#22c55e; --amber:#f59e0b; --red:#ef4444; --blue:#3b82f6;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;min-height:100vh}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit;background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 10px;font-size:13px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--pink)}
+.btn{background:var(--pink);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-weight:700;font-size:13px}
+.btn:hover{background:var(--pink2)}
+.btn--ghost{background:transparent;border:1px solid var(--line);color:var(--muted)}
+.btn--ghost:hover{border-color:var(--pink);color:var(--ink)}
+.btn--danger{background:transparent;border:1px solid var(--red);color:var(--red)}
+.btn--danger:hover{background:var(--red);color:#fff}
+.btn--sm{padding:5px 10px;font-size:12px;border-radius:6px}
+.hidden{display:none!important}
+/* ---------- login ---------- */
+#loginView{min-height:100vh;display:flex;align-items:center;justify-content:center}
+.login-card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:38px 34px;width:min(400px,92vw);text-align:center}
+.login-card h1{font-size:20px;margin-bottom:6px}
+.login-card p{color:var(--muted);margin-bottom:22px}
+.login-card input{width:100%;text-align:center;font-size:15px;padding:12px}
+.login-card .btn{width:100%;margin-top:12px;padding:12px}
+.err{color:var(--red);margin-top:12px;font-size:13px;min-height:18px}
+/* ---------- app ---------- */
+.topbar{display:flex;align-items:center;gap:16px;padding:14px 22px;background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+.topbar h1{font-size:16px;letter-spacing:.4px}
+.topbar h1 span{color:var(--pink)}
+.topbar .spacer{flex:1}
+.tabs{display:flex;gap:8px}
+.tab{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:8px 16px;font-weight:700}
+.tab.is-active{background:var(--pink);border-color:var(--pink);color:#fff}
+main{padding:22px;max-width:1280px;margin:0 auto}
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+.toolbar input[type=search]{width:min(320px,60vw)}
+.spacer{flex:1}
+/* ---------- product grid ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+.pcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.pcard.is-inactive{opacity:.55}
+.pcard__img{height:150px;background:var(--panel2);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.pcard__img img{max-height:100%;max-width:100%;object-fit:contain;padding:8px}
+.pcard__body{padding:14px;display:flex;flex-direction:column;gap:8px;flex:1}
+.pcard__name{font-weight:800;font-size:14px}
+.pcard__slug{color:var(--muted);font-size:11px}
+.pcard__price{font-size:15px;font-weight:800}
+.badge{display:inline-block;background:var(--pink);color:#fff;border-radius:999px;padding:2px 9px;font-size:11px;font-weight:800;margin-left:6px}
+.badge--off{background:var(--amber);color:#111}
+.pcard__meta{color:var(--muted);font-size:12px}
+.pcard__camp{font-size:11.5px;color:var(--green);background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-radius:8px;padding:6px 8px}
+.pcard__camp--off{color:var(--muted);background:transparent;border-color:var(--line)}
+.pcard__btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto}
+.pcard__btns button{flex:1;min-width:60px;background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:7px;padding:6px 4px;font-size:11.5px;font-weight:700}
+.pcard__btns button:hover{border-color:var(--pink);color:var(--pink)}
+.pcard__btns .danger{color:var(--red)}
+.pcard__btns .danger:hover{border-color:var(--red);background:var(--red);color:#fff}
+/* ---------- table ---------- */
+table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);font-size:13px;vertical-align:middle}
+th{background:var(--panel2);font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
+tr:last-child td{border-bottom:none}
+.thumb{width:46px;height:46px;border-radius:8px;object-fit:contain;background:#fff;padding:3px}
+td .btn--sm{margin-right:4px}
+/* ---------- campaign ---------- */
+.camp-row{display:grid;grid-template-columns:1.4fr .7fr 1.1fr 1.1fr auto;gap:10px;align-items:center;padding:10px 12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;margin-bottom:10px}
+.camp-row .name{font-weight:700}
+.camp-row .slug{color:var(--muted);font-size:11px}
+.camp-dt{display:flex;gap:6px}
+.camp-dt input{width:100%}
+/* ---------- stock ---------- */
+.size-row{display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;padding:8px 12px;background:var(--panel);border:1px solid var(--line);border-radius:10px;margin-bottom:8px}
+.size-row .sname{font-weight:800;min-width:70px}
+.size-row input{width:110px}
+/* ---------- modal ---------- */
+#modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:flex-start;justify-content:center;z-index:50;padding:30px 14px;overflow:auto}
+.modal-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;width:min(640px,96vw);padding:24px}
+.modal-card h2{margin-bottom:18px;font-size:17px}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fgrid .full{grid-column:1/-1}
+label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted);font-weight:700}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--green);color:#fff;padding:12px 22px;border-radius:999px;font-weight:700;z-index:60;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+.toast.is-err{background:var(--red)}
+.toast.is-load{background:var(--blue)}
+@media (max-width:760px){
+  .fgrid{grid-template-columns:1fr}
+  .camp-row{grid-template-columns:1fr;padding:14px}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== НАЈАВА ===== -->
+<div id="loginView">
+  <div class="login-card">
+    <h1>🔐 МОНЕТА <span style="color:var(--pink)">Конзола</span></h1>
+    <p>Внеси ја лозинката за управување со производите, залихите и кампањите.</p>
+    <input type="password" id="loginPass" placeholder="Лозинка" autocomplete="current-password">
+    <button class="btn" id="loginBtn">Најава</button>
+    <div class="err" id="loginErr"></div>
+  </div>
+</div>
+
+<!-- ===== АПЛИКАЦИЈА ===== -->
+<div id="appView" class="hidden">
+  <div class="topbar">
+    <h1>🛠️ МОНЕТА <span>Конзола</span></h1>
+    <div class="tabs">
+      <button class="tab is-active" data-tab="proizvodi">📦 Производи</button>
+      <button class="tab" data-tab="kampanji">📅 Кампањи</button>
+      <button class="tab" data-tab="zaliha">🔢 Залиха</button>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn btn--ghost btn--sm" id="refreshBtn">🔄 Освежи</button>
+    <button class="btn btn--ghost btn--sm" id="logoutBtn">Излез</button>
+  </div>
+
+  <main>
+    <!-- ===== ПРОИЗВОДИ ===== -->
+    <section id="tab-proizvodi">
+      <div class="toolbar">
+        <input type="search" id="searchInput" placeholder="🔍 Пребарај производ...">
+        <button class="btn btn--ghost btn--sm" id="viewGridBtn">🖼️ Мрежа</button>
+        <button class="btn btn--ghost btn--sm" id="viewTableBtn">☰ Табела</button>
+        <div class="spacer"></div>
+        <button class="btn" id="addProductBtn">➕ Нов производ</button>
+      </div>
+      <div id="productsView"></div>
+    </section>
+
+    <!-- ===== КАМПАЊИ ===== -->
+    <section id="tab-kampanji" class="hidden">
+      <div class="toolbar">
+        <p style="color:var(--muted)">📅 Постави попуст и временска рамка за секој производ. Кога ќе помине „До“ датумот, попустот сам престанува. Празно „Од“ = почнува веднаш, празно „До“ = без крај.</p>
+      </div>
+      <div id="campaignsView"></div>
+    </section>
+
+    <!-- ===== ЗАЛИХА ===== -->
+    <section id="tab-zaliha" class="hidden">
+      <div class="toolbar">
+        <label style="flex-direction:row;align-items:center;gap:10px">
+          <span>Производ:</span>
+          <select id="stockSelect" style="min-width:220px"></select>
+        </label>
+        <div class="spacer"></div>
+        <button class="btn" id="stockSaveBtn">💾 Зачувај залиха</button>
+      </div>
+      <div id="stockView"></div>
+    </section>
+  </main>
+</div>
+
+<!-- ===== МОДАЛ ===== -->
+<div id="modal" class="hidden">
+  <div class="modal-card">
+    <h2 id="modalTitle">Производ</h2>
+    <div class="fgrid">
+      <label>Код (slug) — англиски, без празни места
+        <input id="fSlug" placeholder="npr. x-treme"></label>
+      <label>Редослед (sort_order)
+        <input id="fSort" type="number" placeholder="21"></label>
+      <label>Име (МК)
+        <input id="fNameMk" placeholder="X-TREME"></label>
+      <label>Име (EN)
+        <input id="fNameEn" placeholder="X-TREME"></label>
+      <label>Категорија
+        <select id="fCat">
+          <option value="sportski">sportski</option>
+          <option value="kozni">kozni</option>
+          <option value="letni">letni</option>
+          <option value="zimski">zimski</option>
+          <option value="hunter">hunter</option>
+          <option value="detski">detski</option>
+          <option value="ostanato">ostanato</option>
+        </select></label>
+      <label>Цена (ден.)
+        <input id="fPrice" type="number" placeholder="420"></label>
+      <label>Слика (патека)
+        <input id="fImage" placeholder="./images/cards/x-treme.webp"></label>
+      <label>Попуст %
+        <input id="fDiscount" type="number" min="0" max="99" placeholder="0"></label>
+      <label class="full">Краток опис (МК)
+        <textarea id="fDescMk" rows="2"></textarea></label>
+      <label class="full">Краток опис (EN)
+        <textarea id="fDescEn" rows="2"></textarea></label>
+      <label>Попуст од (датум + време)
+        <span class="camp-dt"><input id="fFromD" type="date"><input id="fFromT" type="time"></span></label>
+      <label>Попуст до (датум + време)
+        <span class="camp-dt"><input id="fUntilD" type="date"><input id="fUntilT" type="time"></span></label>
+      <label style="flex-direction:row;align-items:center;gap:8px;color:var(--ink)">
+        <input id="fActive" type="checkbox" checked style="width:auto"> Активен (се прикажува)</label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn--ghost" id="modalCancel">Откажи</button>
+      <button class="btn" id="modalSave">💾 Зачувај</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = "https://wkpkrnjrtpywuzemirbw.supabase.co/functions/v1/admin-api";
+const ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndrcGtybmpydHB5d3V6ZW1pcmJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU5NjkwOTksImV4cCI6MjEwMTU0NTA5OX0.nkeKFm2qQYXEsHY6kkJxqfsOxiSEEQJzLOmnrdMMg8I";
+let PASSWORD = sessionStorage.getItem("konzola-pass") || "";
+let CACHE = { products: [], sizes: [] };
+let VIEW = "grid";
+let EDITING = null; // slug кој се едитира, null = нов
+
+const $ = (id) => document.getElementById(id);
+const toastEl = document.createElement("div");
+toastEl.className = "toast hidden";
+document.body.appendChild(toastEl);
+let toastTimer = null;
+function toast(msg, type) {
+  toastEl.textContent = msg;
+  toastEl.className = "toast" + (type === "err" ? " is-err" : type === "load" ? " is-load" : "");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.add("hidden"), 2600);
+}
+
+async function api(action, payload = {}) {
+  const res = await fetch(API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "apikey": ANON },
+    body: JSON.stringify({ password: PASSWORD, action, payload })
+  });
+  const data = await res.json().catch(() => ({}));
+  if (res.status === 401 || (data.ok === false && data.error === "unauthorized")) {
+    logout(true);
+    throw new Error("unauthorized");
+  }
+  if (!data.ok) throw new Error(data.error || "Грешка на серверот");
+  return data;
+}
+
+/* ---------- НАЈАВА ---------- */
+function showLogin() { $("appView").classList.add("hidden"); $("loginView").classList.remove("hidden"); }
+function showApp() { $("loginView").classList.add("hidden"); $("appView").classList.remove("hidden"); }
+function logout(silent) {
+  PASSWORD = "";
+  sessionStorage.removeItem("konzola-pass");
+  showLogin();
+  if (!silent) toast("Одјавени сте");
+}
+$("loginBtn").addEventListener("click", async () => {
+  PASSWORD = $("loginPass").value.trim();
+  if (!PASSWORD) { $("loginErr").textContent = "Внеси лозинка"; return; }
+  $("loginErr").textContent = "";
+  try {
+    await api("auth");
+    sessionStorage.setItem("konzola-pass", PASSWORD);
+    $("loginPass").value = "";
+    showApp();
+    await loadAll();
+  } catch (e) {
+    $("loginErr").textContent = e.message === "unauthorized" ? "Погрешна лозинка" : e.message;
+  }
+});
+$("loginPass").addEventListener("keydown", (e) => { if (e.key === "Enter") $("loginBtn").click(); });
+$("logoutBtn").addEventListener("click", () => logout(false));
+
+/* ---------- ТАБОВИ ---------- */
+document.querySelectorAll(".tab").forEach((b) =>
+  b.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach((x) => x.classList.remove("is-active"));
+    b.classList.add("is-active");
+    ["proizvodi", "kampanji", "zaliha"].forEach((t) => $("tab-" + t).classList.add("hidden"));
+    $("tab-" + b.dataset.tab).classList.remove("hidden");
+    if (b.dataset.tab === "zaliha") renderStock();
+  })
+);
+
+/* ---------- ПОДАТОЦИ ---------- */
+async function loadAll() {
+  toast("Се вчитува...", "load");
+  const data = await api("list_all");
+  CACHE.products = data.products || [];
+  CACHE.sizes = data.sizes || [];
+  renderProducts();
+  renderCampaigns();
+  renderStockSelect();
+  toast("Податоците се освежени");
+}
+$("refreshBtn").addEventListener("click", () => loadAll().catch((e) => toast(e.message, "err")));
+
+const prodOf = (slug) => CACHE.products.find((p) => p.slug === slug);
+const stockTotal = (slug) => {
+  const rows = CACHE.sizes.filter((s) => s.product_id === (prodOf(slug) || {}).id);
+  return rows.reduce((a, r) => a + (Number(r.qty) || 0), 0);
+};
+const stockRows = (slug) => CACHE.sizes.filter((s) => s.product_id === (prodOf(slug) || {}).id);
+const imgOf = (p) => {
+  const src = (p.image || p.thumbnail || "").replace(/^\.\//, "").replace(/^images\//, "");
+  return src || ("images/cards/" + p.slug + ".webp");
+};
+
+/* ---------- ДАТУМИ ---------- */
+const pad = (n) => String(n).padStart(2, "0");
+function isoToInputs(iso) {
+  if (!iso) return { date: "", time: "" };
+  const d = new Date(iso);
+  return { date: d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()), time: pad(d.getHours()) + ":" + pad(d.getMinutes()) };
+}
+function inputsToIso(date, time) {
+  if (!date) return null;
+  return new Date(date + "T" + (time || "00:00")).toISOString();
+}
+function fmtDate(iso) {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  return d.toLocaleDateString("mk-MK", { day: "2-digit", month: "2-digit", year: "numeric" }) + " " + d.toLocaleTimeString("mk-MK", { hour: "2-digit", minute: "2-digit" });
+}
+
+/* ---------- ПРОИЗВОДИ: РЕНДЕР ---------- */
+function renderProducts() {
+  const q = ($("searchInput").value || "").toLowerCase();
+  const list = CACHE.products.filter((p) => !q || (p.name_mk + " " + p.name_en + " " + p.slug).toLowerCase().includes(q));
+  const view = $("productsView");
+  if (list.length === 0) { view.innerHTML = '<p style="color:var(--muted);padding:30px 0">Нема пронајдени производи.</p>'; return; }
+
+  if (VIEW === "table") {
+    view.innerHTML = "<table><thead><tr><th></th><th>Производ</th><th>Цена</th><th>Попуст</th><th>Залиха</th><th>Активен</th><th>Кампања</th><th>Акции</th></tr></thead><tbody>" +
+      list.map((p) => {
+        const cam = campaignText(p);
+        return "<tr><td><img class='thumb' src='" + imgOf(p) + "' onerror='this.style.opacity=.2'></td>" +
+          "<td><b>" + p.name_mk + "</b><br><span style='color:var(--muted);font-size:11px'>" + p.slug + "</span></td>" +
+          "<td><b>" + (Number(p.price) || 0) + " ден.</b></td>" +
+          "<td>" + (p.discount > 0 ? "<span class='badge'>-" + p.discount + "%</span>" : "<span class='badge badge--off'>нема</span>") + "</td>" +
+          "<td>" + stockTotal(p.slug) + "</td>" +
+          "<td>" + (p.active ? "✅" : "❌") + "</td>" +
+          "<td style='font-size:11.5px'>" + cam + "</td>" +
+          "<td>" +
+            "<button class='btn btn--ghost btn--sm' data-act='edit' data-slug='" + p.slug + "'>✏️</button>" +
+            "<button class='btn btn--ghost btn--sm' data-act='sizes' data-slug='" + p.slug + "'>🔢</button>" +
+            "<button class='btn btn--danger btn--sm' data-act='del' data-slug='" + p.slug + "'>🗑</button>" +
+          "</td></tr>";
+      }).join("") + "</tbody></table>";
+  } else {
+    view.innerHTML = "<div class='grid'>" + list.map((p) => {
+      const cam = campaignText(p);
+      return "<div class='pcard " + (p.active ? "" : "is-inactive") + "'>" +
+        "<div class='pcard__img'><img src='" + imgOf(p) + "' onerror='this.style.opacity=.2'></div>" +
+        "<div class='pcard__body'>" +
+          "<div class='pcard__name'>" + p.name_mk + " <span class='badge " + (p.active ? "" : "badge--off") + "'>" + (p.active ? "активен" : "скриен") + "</span></div>" +
+          "<div class='pcard__slug'>" + p.slug + " · " + p.category + "</div>" +
+          "<div class='pcard__price'>" + (Number(p.price) || 0) + " ден." + (p.discount > 0 ? "<span class='badge'>-" + p.discount + "%</span>" : "") + "</div>" +
+          "<div class='pcard__meta'>Залиха: <b>" + stockTotal(p.slug) + "</b></div>" +
+          "<div class='pcard__camp " + (cam.startsWith("📅") ? "" : "pcard__camp--off") + "'>" + cam + "</div>" +
+          "<div class='pcard__btns'>" +
+            "<button data-act='edit' data-slug='" + p.slug + "'>✏️ Измени</button>" +
+            "<button data-act='sizes' data-slug='" + p.slug + "'>🔢 Залиха</button>" +
+            "<button class='danger' data-act='del' data-slug='" + p.slug + "'>🗑 Избриши</button>" +
+          "</div>" +
+        "</div></div>";
+    }).join("") + "</div>";
+  }
+
+  view.querySelectorAll("[data-act]").forEach((b) =>
+    b.addEventListener("click", () => {
+      const act = b.dataset.act, slug = b.dataset.slug;
+      if (act === "edit") openEdit(slug);
+      if (act === "sizes") { goStock(slug); }
+      if (act === "del") deleteProduct(slug);
+    })
+  );
+}
+function campaignText(p) {
+  const pct = Number(p.discount) || 0;
+  const from = p.discount_from ? new Date(p.discount_from).getTime() : 0;
+  const until = p.discount_until ? new Date(p.discount_until).getTime() : 0;
+  const now = Date.now();
+  if (pct > 0) {
+    let status = (from && now < from) ? "⏳ претстои" : ((until && now > until) ? "⏰ истечена" : "🟢 активна");
+    return "📅 -" + pct + "% · " + fmtDate(p.discount_from) + " → " + fmtDate(p.discount_until) + " (" + status + ")";
+  }
+  return "Нема кампања";
+}
+$("searchInput").addEventListener("input", renderProducts);
+$("viewGridBtn").addEventListener("click", () => { VIEW = "grid"; renderProducts(); });
+$("viewTableBtn").addEventListener("click", () => { VIEW = "table"; renderProducts(); });
+
+/* ---------- МОДАЛ: ДОДАДИ/ИЗМЕНИ ---------- */
+$("addProductBtn").addEventListener("click", () => openEdit(null));
+function openEdit(slug) {
+  EDITING = slug;
+  const p = slug ? prodOf(slug) : null;
+  $("modalTitle").textContent = p ? "✏️ Измени: " + p.name_mk : "➕ Нов производ";
+  $("fSlug").value = p ? p.slug : "";
+  $("fSlug").disabled = !!p;
+  $("fSort").value = p ? p.sort_order : Math.max(0, ...CACHE.products.map((x) => Number(x.sort_order) || 0)) + 1;
+  $("fNameMk").value = p ? p.name_mk : "";
+  $("fNameEn").value = p ? p.name_en : "";
+  $("fCat").value = p ? p.category : "sportski";
+  $("fPrice").value = p ? p.price : "";
+  $("fImage").value = p ? (p.image || "./images/cards/" + (p.slug) + ".webp") : "";
+  $("fDiscount").value = p ? p.discount : 0;
+  $("fDescMk").value = p ? p.short_desc_mk || "" : "";
+  $("fDescEn").value = p ? p.short_desc_en || "" : "";
+  const from = isoToInputs(p && p.discount_from);
+  const until = isoToInputs(p && p.discount_until);
+  $("fFromD").value = from.date; $("fFromT").value = from.time;
+  $("fUntilD").value = until.date; $("fUntilT").value = until.time;
+  $("fActive").checked = p ? p.active : true;
+  $("modal").classList.remove("hidden");
+}
+$("modalCancel").addEventListener("click", () => $("modal").classList.add("hidden"));
+$("modalSave").addEventListener("click", async () => {
+  try {
+    const slug = $("fSlug").value.trim().toLowerCase().replace(/\s+/g, "-");
+    if (!slug) { toast("Внеси код (slug)", "err"); return; }
+    const product = {
+      slug,
+      name_mk: $("fNameMk").value.trim() || slug,
+      name_en: $("fNameEn").value.trim() || slug,
+      category: $("fCat").value,
+      short_desc_mk: $("fDescMk").value.trim(),
+      short_desc_en: $("fDescEn").value.trim(),
+      price: Number($("fPrice").value) || 0,
+      image: $("fImage").value.trim(),
+      thumbnail: $("fImage").value.trim().replace(/^\.\//, ""),
+      active: $("fActive").checked,
+      sort_order: Number($("fSort").value) || 0,
+      discount: Math.min(99, Math.max(0, Number($("fDiscount").value) || 0)),
+      discount_from: inputsToIso($("fFromD").value, $("fFromT").value),
+      discount_until: inputsToIso($("fUntilD").value, $("fUntilT").value)
+    };
+    toast("Се зачувува...", "load");
+    await api("save_product", { product });
+    $("modal").classList.add("hidden");
+    await loadAll();
+    toast("Производот е зачуван");
+  } catch (e) { toast(e.message, "err"); }
+});
+
+async function deleteProduct(slug) {
+  const p = prodOf(slug);
+  if (!confirm("Сигурно да се избрише " + (p ? p.name_mk : slug) + "?\nЌе се избришат и неговите залихи. Ова не може да се врати.")) return;
+  try {
+    toast("Се брише...", "load");
+    await api("delete_product", { slug });
+    await loadAll();
+    toast("Производот е избришан");
+  } catch (e) { toast(e.message, "err"); }
+}
+
+/* ---------- КАМПАЊИ ---------- */
+function renderCampaigns() {
+  const view = $("campaignsView");
+  view.innerHTML = CACHE.products.map((p) => {
+    const from = isoToInputs(p.discount_from);
+    const until = isoToInputs(p.discount_until);
+    return "<div class='camp-row' data-slug='" + p.slug + "'>" +
+      "<div><div class='name'>" + p.name_mk + "</div><div class='slug'>" + p.slug + " · " + (Number(p.price) || 0) + " ден.</div></div>" +
+      "<label>Попуст %<input type='number' min='0' max='99' class='c-pct' value='" + (Number(p.discount) || 0) + "'></label>" +
+      "<label>Од (празно = веднаш)<span class='camp-dt'><input type='date' class='c-fromd' value='" + from.date + "'><input type='time' class='c-fromt' value='" + from.time + "'></span></label>" +
+      "<label>До (празно = без крај)<span class='camp-dt'><input type='date' class='c-untild' value='" + until.date + "'><input type='time' class='c-untilt' value='" + until.time + "'></span></label>" +
+      "<div style='display:flex;gap:8px'><button class='btn btn--sm' data-save='" + p.slug + "'>💾 Зачувај</button>" +
+      "<button class='btn btn--ghost btn--sm' data-clear='" + p.slug + "' title='Тргни попуст'>✖</button></div>" +
+    "</div>";
+  }).join("");
+
+  view.querySelectorAll("[data-save]").forEach((b) =>
+    b.addEventListener("click", async () => {
+      const row = b.closest(".camp-row");
+      const slug = b.dataset.save;
+      const p = prodOf(slug);
+      if (!p) return;
+      try {
+        const pct = Math.min(99, Math.max(0, Number(row.querySelector(".c-pct").value) || 0));
+        const fromIso = inputsToIso(row.querySelector(".c-fromd").value, row.querySelector(".c-fromt").value);
+        let untilIso = inputsToIso(row.querySelector(".c-untild").value, row.querySelector(".c-untilt").value);
+        // Ако има „до“ датум без време → автоматски до 23:59
+        if (row.querySelector(".c-untild").value && !row.querySelector(".c-untilt").value) {
+          untilIso = inputsToIso(row.querySelector(".c-untild").value, "23:59");
+        }
+        toast("Се зачувува кампањата...", "load");
+        await api("save_product", { product: { ...p, discount: pct, discount_from: fromIso, discount_until: untilIso } });
+        await loadAll();
+        toast("Кампањата е зачувана");
+      } catch (e) { toast(e.message, "err"); }
+    })
+  );
+  view.querySelectorAll("[data-clear]").forEach((b) =>
+    b.addEventListener("click", async () => {
+      const slug = b.dataset.clear;
+      const p = prodOf(slug);
+      if (!p) return;
+      await api("save_product", { product: { ...p, discount: 0, discount_from: null, discount_until: null } });
+      await loadAll();
+      toast("Попустот е тргнат");
+    })
+  );
+}
+
+/* ---------- ЗАЛИХА ---------- */
+function renderStockSelect() {
+  const sel = $("stockSelect");
+  sel.innerHTML = CACHE.products.map((p) => "<option value='" + p.slug + "'>" + p.name_mk + " (" + p.slug + ")</option>").join("");
+  if (CACHE.products.length) renderStock();
+}
+$("stockSelect").addEventListener("change", renderStock);
+function goStock(slug) {
+  document.querySelectorAll(".tab").forEach((x) => x.classList.remove("is-active"));
+  document.querySelector('.tab[data-tab="zaliha"]').classList.add("is-active");
+  ["proizvodi", "kampanji", "zaliha"].forEach((t) => $("tab-" + t).classList.add("hidden"));
+  $("tab-zaliha").classList.remove("hidden");
+  $("stockSelect").value = slug;
+  renderStock();
+}
+function renderStock() {
+  const slug = $("stockSelect").value;
+  const p = prodOf(slug);
+  const view = $("stockView");
+  if (!p) { view.innerHTML = ""; return; }
+  const rows = stockRows(slug);
+  view.innerHTML =
+    "<p style='color:var(--muted);margin-bottom:10px'><b>" + p.name_mk + "</b> — вкупна залиха: <b>" + rows.reduce((a, r) => a + (Number(r.qty) || 0), 0) + "</b> · (qty 0 = сив/нема на залиха)</p>" +
+    "<div id='sizeRows'>" + rows.map((r) =>
+      "<div class='size-row' data-size='" + r.size + "'>" +
+        "<span class='sname'>" + r.size + "</span>" +
+        "<input type='number' min='0' class='s-qty' value='" + r.qty + "'>" +
+        "<button class='btn btn--danger btn--sm' data-rm='" + r.size + "'>🗑</button>" +
+      "</div>").join("") +
+    "</div>" +
+    "<div class='size-row' style='margin-top:14px'>" +
+      "<input class='s-new-name' placeholder='Нова големина (на пр. 35 или m42-45)' style='min-width:140px'>" +
+      "<input type='number' min='0' class='s-new-qty' placeholder='Количина'>" +
+      "<button class='btn btn--sm' id='addSizeBtn'>➕</button>" +
+    "</div>";
+  view.querySelectorAll("[data-rm]").forEach((b) =>
+    b.addEventListener("click", () => b.closest(".size-row").remove())
+  );
+  $("addSizeBtn").addEventListener("click", () => {
+    const name = view.querySelector(".s-new-name").value.trim();
+    const qty = Number(view.querySelector(".s-new-qty").value) || 0;
+    if (!name) return;
+    const div = document.createElement("div");
+    div.className = "size-row";
+    div.dataset.size = name;
+    div.innerHTML = "<span class='sname'>" + name + "</span><input type='number' min='0' class='s-qty' value='" + qty + "'><button class='btn btn--danger btn--sm'>🗑</button>";
+    div.querySelector("button").addEventListener("click", () => div.remove());
+    $("sizeRows").appendChild(div);
+    view.querySelector(".s-new-name").value = "";
+    view.querySelector(".s-new-qty").value = "";
+  });
+}
+$("stockSaveBtn").addEventListener("click", async () => {
+  const slug = $("stockSelect").value;
+  try {
+    const sizes = [];
+    const remove = [];
+    $("stockView").querySelectorAll(".size-row").forEach((r) => {
+      const size = r.querySelector(".sname") ? r.querySelector(".sname").textContent : "";
+      if (!size) return;
+      sizes.push({ size, qty: Number(r.querySelector(".s-qty").value) || 0 });
+    });
+    toast("Се зачувува залихата...", "load");
+    await api("save_sizes", { slug, sizes, remove });
+    await loadAll();
+    toast("Залихата е зачувана");
+  } catch (e) { toast(e.message, "err"); }
+});
+
+/* ---------- СТАРТ ---------- */
+if (PASSWORD) {
+  api("auth").then(() => { showApp(); return loadAll(); }).catch(() => {});
+} else {
+  showLogin();
+}
+</script>
+</body>
+</html>
