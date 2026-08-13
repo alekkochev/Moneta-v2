@@ -4302,6 +4302,15 @@ window.MonetaData = {
             const isSq = document.documentElement.lang === 'sq';
             const t = (mk, sq, en) => isEn ? en : (isSq ? sq : mk);
 
+            // Дата + часовник (часови:минути) САМО ако рецензијата е направена денес
+            const rDate = r.created_at ? new Date(r.created_at) : null;
+            const nowD = new Date();
+            const sameDay = !!rDate && rDate.getFullYear() === nowD.getFullYear() && rDate.getMonth() === nowD.getMonth() && rDate.getDate() === nowD.getDate();
+            const dateTxt = rDate
+                ? rDate.toLocaleDateString(isEn ? 'en-US' : 'mk-MK', { month: 'short', day: 'numeric' }) +
+                  (sameDay ? ' 🕒 ' + String(rDate.getHours()).padStart(2, '0') + ':' + String(rDate.getMinutes()).padStart(2, '0') : '')
+                : '';
+
             carousel.innerHTML =
                 '<div class="model-reviews__card">' +
                     '<div class="model-reviews__card-stars">' + starsHtml + '</div>' +
@@ -4310,7 +4319,7 @@ window.MonetaData = {
                         '<span class="model-reviews__card-avatar">' + initials + '</span>' +
                         '<strong>' + (r.name || '') + '</strong>' +
                         '<span>·</span>' +
-                        '<span>' + (r.created_at ? new Date(r.created_at).toLocaleDateString(isEn ? 'en-US' : 'mk-MK', { month: 'short', day: 'numeric' }) : '') + '</span>' +
+                        '<span>' + dateTxt + '</span>' +
                     '</div>' +
                 '</div>';
         }
@@ -4431,9 +4440,22 @@ window.MonetaData = {
         const initialsOf = (name) => (name || '?').split(' ').filter(Boolean).map(w => w[0]).join('').slice(0, 2).toUpperCase();
         const starsOf = (r) => '★'.repeat(Math.min(5, Math.max(0, Number(r.rating) || 0))) + '☆'.repeat(Math.max(0, 5 - (Number(r.rating) || 0)));
 
+        // Дата + часовник (часови:минути) САМО ако рецензијата е направена денес
+        const dateLabel = (iso) => {
+            if (!iso) return '';
+            const d = new Date(iso);
+            const now = new Date();
+            const sameDay = d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
+            const dateStr = d.toLocaleDateString(langOf() === 'en' ? 'en-US' : 'mk-MK', { month: 'short', day: 'numeric' });
+            if (sameDay) {
+                return dateStr + ' 🕒 ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+            }
+            return dateStr;
+        };
+
         const cardHtml = (r) => {
             const name = r.name || t('Купувач', 'Blerës', 'Customer');
-            const date = r.created_at ? new Date(r.created_at).toLocaleDateString(langOf() === 'en' ? 'en-US' : 'mk-MK', { month: 'short', day: 'numeric' }) : '';
+            const date = dateLabel(r.created_at);
             return '<div class="review-card review-card--dynamic">' +
                 '<div class="review-card__header">' +
                     '<div class="review-card__rating">' +
@@ -4452,7 +4474,7 @@ window.MonetaData = {
         };
 
         const listItemHtml = (r) => {
-            const date = r.created_at ? new Date(r.created_at).toLocaleDateString(langOf() === 'en' ? 'en-US' : 'mk-MK', { month: 'short', day: 'numeric' }) : '';
+            const date = dateLabel(r.created_at);
             return '<div class="reviews-all__item">' +
                 '<div class="reviews-all__top"><span class="stars">' + starsOf(r) + '</span>' +
                 '<span class="product-tag">' + productName(r.product_slug) + '</span>' +
@@ -4504,6 +4526,7 @@ window.MonetaData = {
             // Најновите рецензии (по дата/време) први во каруселот — пред статичните картички
             const html = reviews.slice(0, visibleCount()).map(cardHtml).join('');
             carousel.insertAdjacentHTML('afterbegin', html);
+            carousel.scrollLeft = 0; // секогаш ресетирај на почеток → прва е најновата рецензија
             ensureMoreControls();
         };
 
