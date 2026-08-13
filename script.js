@@ -3593,9 +3593,28 @@ window.MonetaData = {
     const headers = { apikey: key, Authorization: 'Bearer ' + key };
 
     const discountOf = (prod) => {
-        const price = Number(prod.price) || 0;
+        // discount колона: 0 = нема попуст, 1-99 = % попуст
+        // discount_until: временска рамка (ако помине, попустот не важи)
+        const discRaw = Number(prod.discount) || 0;
+        if (discRaw <= 0 || discRaw >= 100) return 0;
+        const until = prod.discount_until ? new Date(prod.discount_until).getTime() : 0;
+        if (until && Date.now() > until) return 0;
+        return discRaw;
+    };
+
+    // Ефективна цена (со попуст) и стара цена
+    const priceInfoOf = (prod) => {
+        const base = Number(prod.price) || 0;
+        const pct = discountOf(prod);
+        if (pct > 0) {
+            return { base: base, price: Math.round(base * (1 - pct / 100)), pct: pct };
+        }
+        // backward compat: old_price колона (ако стои стара цена > цена)
         const old = prod.old_price ? Number(prod.old_price) : 0;
-        return (old > price && old > 0) ? Math.round((old - price) / old * 100) : 0;
+        if (old > base && base > 0) {
+            return { base: base, price: base, pct: Math.round((old - base) / old * 100), legacyOld: old };
+        }
+        return { base: base, price: base, pct: 0 };
     };
 
     // Вкупна залиха на производ (збир на qty по сите големини)
@@ -3629,13 +3648,10 @@ window.MonetaData = {
             const layout = sel.closest('.model-layout') || document;
             const priceEl = layout.querySelector('.model-price');
             const cart = layout.querySelector('.model-cart');
-            const price = Number(prod.price) || 0;
-            const oldRaw = prod.old_price ? Number(prod.old_price) : 0;
-            const discRaw = Number(prod.discount) || 0;
-            // discount колона: < 100 → %, ≥ 100 → денари (backward compat)
-            const discPct = discRaw > 0 ? (discRaw < 100 ? discRaw : Math.round(discRaw / price * 100)) : 0;
-            const old = oldRaw > price ? oldRaw : (discPct > 0 ? Math.round(price / (1 - discPct / 100)) : 0);
-            const pct = old > price ? Math.round((old - price) / old * 100) : 0;
+            const info = priceInfoOf(prod);
+            const price = info.price;
+            const pct = info.pct;
+            const old = info.legacyOld || (pct > 0 ? info.base : 0);
             const isEn = document.documentElement.lang === 'en';
 
             if (priceEl) {
@@ -3667,14 +3683,13 @@ window.MonetaData = {
                 if (priceEl.parentElement) {
                     badge = priceEl.parentElement.querySelector(':scope > .promo-badge');
                 }
-                const showPct = discPct || pct;
-                if (showPct > 0) {
+                if (pct > 0) {
                     if (!badge) {
                         badge = document.createElement('span');
                         badge.className = 'promo-badge';
                         priceEl.insertAdjacentElement('afterend', badge);
                     }
-                    badge.textContent = '−' + showPct + '%';
+                    badge.textContent = '−' + pct + '%';
                     badge.style.display = '';
                 } else if (badge) {
                     badge.style.display = 'none';
@@ -3730,23 +3745,18 @@ window.MonetaData = {
             if (!m) return;
             const prod = window.MonetaData.products[m[1]];
             if (!prod) return;
-            const price = Number(prod.price) || 0;
-            const oldRaw = prod.old_price ? Number(prod.old_price) : 0;
-            const discRaw = Number(prod.discount) || 0;
-            const discPct = discRaw > 0 ? (discRaw < 100 ? discRaw : Math.round(discRaw / price * 100)) : 0;
-            const old = oldRaw > price ? oldRaw : (discPct > 0 ? Math.round(price / (1 - discPct / 100)) : 0);
-            const pct = old > price ? Math.round((old - price) / old * 100) : 0;
+            const info = priceInfoOf(prod);
+            const pct = info.pct;
             // ВАЖНО: значката мора на .card (overflow:visible), НЕ на .card__image (overflow:hidden) — инаку долниот дел што виси надвор е отсечен
             const imgWrap = card;
             let badge = imgWrap.querySelector('.promo-badge--card');
-            const showPct = discPct || pct;
-            if (showPct > 0) {
+            if (pct > 0) {
                 if (!badge) {
                     badge = document.createElement('span');
                     badge.className = 'promo-badge promo-badge--card';
                     imgWrap.appendChild(badge);
                 }
-                badge.textContent = showPct + '%';
+                badge.textContent = '−' + pct + '%';
             } else if (badge) {
                 badge.remove();
             }
@@ -3784,7 +3794,37 @@ window.MonetaData = {
 
         // ---- JSON-LD Product schema (динамично од MonetaData) ----
         injectProductLD();
+
+        // ---- АКЦИЈА страна: динамична листа на попусти од Supabase ----
+        applyAkcijaPage();
     };
+
+    // Акција страна — производи со активен попуст, директно од Supabase
+    function applyAkcijaPage() {
+        const promoInner = document.querySelector('.akcija-promo__inner');
+        if (!promoInner) return;
+        const prods = Object.values(window.MonetaData.products || {});
+        const discounted = prods.filter(p => discountOf(p) > 0);
+        const isEn = document.documentElement.lang === 'en';
+
+        if (discounted.length === 0) {
+            promoInner.innerHTML = '<p style="text-align:center;padding:40px 0;color:#999;font-size:15px;" data-mk="Моментално нема активни попусти." data-sq="Aktualisht nuk ka zbritje aktive." data-en="No active discounts right now.">Моментално нема активни попусти.</p>';
+            return;
+        }
+
+        let html = '<div class="akcija-cat"><h3 data-mk="Активни попусти" data-sq="Zbritje aktive" data-en="Active discounts">Активни попусти</h3>';
+        discounted.forEach(p => {
+            const info = priceInfoOf(p);
+            const name = isEn ? (p.name_en || p.slug) : (p.name_mk || p.slug);
+            html += '<a href="./modeli/' + p.slug + '.html" class="akcija-item">' +
+                '<span class="akcija-item__name">' + name + '</span>' +
+                '<span class="akcija-item__badge">- ' + info.pct + '%</span>' +
+                '<span class="akcija-item__info">' + info.base + ' → ' + info.price + (isEn ? ' MKD' : ' ден.') + '</span>' +
+                '<span class="akcija-item__arrow">→</span></a>';
+        });
+        html += '</div>';
+        promoInner.innerHTML = html;
+    }
 
     function injectProductLD() {
         const sel = document.querySelector('.size-selector[data-model]');
