@@ -322,8 +322,11 @@ const stockTotal = (slug) => {
 };
 const stockRows = (slug) => CACHE.sizes.filter((s) => s.product_id === (prodOf(slug) || {}).id);
 const imgOf = (p) => {
-  const src = (p.image || p.thumbnail || "").replace(/^\.\//, "").replace(/^images\//, "");
-  return src || ("images/cards/" + p.slug + ".webp");
+  let src = String((p.image || p.thumbnail) || "").trim();
+  if (!src) src = "images/cards/" + p.slug + ".webp";
+  src = src.replace(/^\.\//, "");          // ./images/...  ->  images/...
+  if (src.startsWith("/")) src = src.slice(1); // /images/...  ->  images/...
+  return src;
 };
 
 /* ---------- СОРТИРАЊЕ ---------- */
