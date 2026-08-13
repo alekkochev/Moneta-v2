@@ -8384,8 +8384,9 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
     cursor: not-allowed;
 }
 .card--out-of-stock .card__image,
-.card--out-of-stock .card__image img {
-    filter: grayscale(1);
+.card--out-of-stock .card__image img,
+.categories__grid .card--out-of-stock .card__image img {
+    filter: grayscale(1) !important;
     opacity: 0.8;
 }
 .card--out-of-stock .card__link {
