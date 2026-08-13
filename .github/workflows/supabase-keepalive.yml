@@ -1,0 +1,23 @@
+# ============================================
+# Supabase Keep-Alive — дневен ping на полноќ
+# Зошто: Free Plan проектите се паузираат по 7 дена
+# без активност. Еден ping дневно ја одржува
+# сметката активна, па сајтот никогаш не „замрзнува“.
+# Распоред: секој ден во 00:00 UTC (полноќ).
+# ============================================
+name: Supabase Keep-Alive
+
+on:
+  schedule:
+    - cron: "0 0 * * *"   # секој ден на полноќ (UTC)
+  workflow_dispatch:      # можно е и рачно стартување од Actions табот
+
+jobs:
+  ping-supabase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase (продукти - 1 ред)
+        run: |
+          curl -s -o /dev/null -w "HTTP %{http_code} - supabase ping ok\n" \
+            "https://wkpkrnjrtpywuzemirbw.supabase.co/rest/v1/products?select=slug&limit=1" \
+            -H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndrcGtybmpydHB5d3V6ZW1pcmJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU5NjkwOTksImV4cCI6MjEwMTU0NTA5OX0.nkeKFm2qQYXEsHY6kkJxqfsOxiSEEQJzLOmnrdMMg8I"

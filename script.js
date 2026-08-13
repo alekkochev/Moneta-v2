@@ -4092,7 +4092,7 @@ window.MonetaData = {
 
     let salesShown = 0;
     let salesTimer = null;
-    const MAX_SALES_POPUPS = 2;               // најмногу 2 пати по посетител
+    const MAX_SALES_POPUPS = 1;               // најмногу 1 лажно скокање по посетител + реални нарачки
     const SALES_INTERVAL_MIN = 120000;         // 2 мин
     const SALES_INTERVAL_MAX = 180000;         // 3 мин
 
