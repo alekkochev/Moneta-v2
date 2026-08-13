@@ -41,7 +41,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--pink)}
 .tab{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:8px 16px;font-weight:700}
 .tab.is-active{background:var(--pink);border-color:var(--pink);color:#fff}
 main{padding:22px;max-width:1280px;margin:0 auto}
-.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+.toolbar{position:sticky;top:60px;z-index:15;display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--bg);padding:12px 0 10px;margin:0 0 12px}
 .toolbar input[type=search]{width:min(320px,60vw)}
 .spacer{flex:1}
 /* ---------- product grid ---------- */
@@ -67,7 +67,7 @@ main{padding:22px;max-width:1280px;margin:0 auto}
 /* ---------- table ---------- */
 table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:12px}
 /* Sticky хедери на табелите (Производи-табела, Залиха, Кампањи) */
-thead{position:sticky;top:60px;z-index:5;background:var(--panel2)}
+thead{position:sticky;top:118px;z-index:5;background:var(--panel2)}
 thead th:first-child{border-top-left-radius:12px}
 thead th:last-child{border-top-right-radius:12px}
 th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);font-size:13px;vertical-align:middle}
