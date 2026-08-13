@@ -4544,6 +4544,11 @@ window.MonetaData = {
 
         if (window.MonetaOnLangChange) window.MonetaOnLangChange(() => render());
         (window.MonetaData.ready || Promise.resolve()).then(load);
+
+        // Chrome ја враќа старата скрол позиција после load —
+        // присилно ресетирај го каруселот на почеток (најнова рецензија прва)
+        window.addEventListener('pageshow', () => { carousel.scrollLeft = 0; });
+        setTimeout(() => { carousel.scrollLeft = 0; }, 500);
     }
     if (document.getElementById('reviewsCarousel')) initHomeReviews();
 
