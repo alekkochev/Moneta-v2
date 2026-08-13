@@ -8430,8 +8430,10 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
     pointer-events: none;
 }
 /* Сива слика на модел страната кога производот е без залиха */
-.model-layout--out-of-stock .hero-img img {
-    filter: grayscale(1);
+.model-layout--out-of-stock .hero-img img,
+.page-sistem .model-layout--out-of-stock .hero-img img,
+.page-sistem .model-layout.model-layout--out-of-stock .hero-img img {
+    filter: grayscale(1) !important;
     opacity: 0.85;
 }
 .size-selector__hint {
