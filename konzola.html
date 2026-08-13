@@ -107,6 +107,27 @@ label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--mute
 @media (max-width:760px){
   .fgrid{grid-template-columns:1fr}
   .camp-row{grid-template-columns:1fr;padding:14px}
+  /* Мобилна оптимизација */
+  .topbar{position:static;height:auto;min-height:52px;flex-wrap:wrap;padding:8px 12px;gap:6px}
+  .topbar h1{font-size:14px;flex:1}
+  .tabs{order:5;width:100%;gap:6px}
+  .tab{flex:1;padding:8px 4px;font-size:13px;min-width:0}
+  .tab .tab-label{display:none}
+  .toolbar{top:0;padding:8px 0 8px}
+  thead{top:54px}
+  main{padding:12px 10px}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+  .pcard__img{height:110px}
+  .pcard__btns button{font-size:10.5px;padding:6px 2px;min-width:52px}
+  .toolbar .spacer{display:none}
+  .toolbar select{flex:1;min-width:0!important}
+  .toolbar input[type=search]{width:100%;flex:1;min-width:0}
+  .table-scroll, #productsView, #stockView, #campaignsView{overflow-x:auto}
+  .camp-row .camp-dt{flex-wrap:wrap}
+  .modal-card{padding:16px}
+  #modal{padding:10px 6px}
+  .size-row input{width:80px}
+  .sizes-panel{padding:10px}
 }
 </style>
 </head>
@@ -128,13 +149,13 @@ label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--mute
   <div class="topbar">
     <h1>🛠️ МОНЕТА <span>Конзола</span></h1>
     <div class="tabs">
-      <button class="tab is-active" data-tab="proizvodi">📦 Производи</button>
-      <button class="tab" data-tab="kampanji">📅 Кампањи</button>
-      <button class="tab" data-tab="zaliha">🔢 Залиха</button>
+      <button class="tab is-active" data-tab="proizvodi" title="Производи"><span class="tab-ico">📦</span><span class="tab-label">Производи</span></button>
+      <button class="tab" data-tab="kampanji" title="Кампањи"><span class="tab-ico">📅</span><span class="tab-label">Кампањи</span></button>
+      <button class="tab" data-tab="zaliha" title="Залиха"><span class="tab-ico">🔢</span><span class="tab-label">Залиха</span></button>
     </div>
     <div class="spacer"></div>
-    <button class="btn btn--ghost btn--sm" id="refreshBtn">🔄 Освежи</button>
-    <button class="btn btn--ghost btn--sm" id="logoutBtn">Излез</button>
+    <button class="btn btn--ghost btn--sm" id="refreshBtn" title="Освежи">🔄 <span class="tab-label">Освежи</span></button>
+    <button class="btn btn--ghost btn--sm" id="logoutBtn" title="Излез">🚪 <span class="tab-label">Излез</span></button>
   </div>
 
   <main>
