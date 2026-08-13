@@ -33,7 +33,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--pink)}
 .login-card .btn{width:100%;margin-top:12px;padding:12px}
 .err{color:var(--red);margin-top:12px;font-size:13px;min-height:18px}
 /* ---------- app ---------- */
-.topbar{display:flex;align-items:center;gap:16px;padding:14px 22px;background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+.topbar{display:flex;align-items:center;gap:16px;padding:0 22px;height:60px;background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
 .topbar h1{font-size:16px;letter-spacing:.4px}
 .topbar h1 span{color:var(--pink)}
 .topbar .spacer{flex:1}
@@ -65,7 +65,11 @@ main{padding:22px;max-width:1280px;margin:0 auto}
 .pcard__btns .danger{color:var(--red)}
 .pcard__btns .danger:hover{border-color:var(--red);background:var(--red);color:#fff}
 /* ---------- table ---------- */
-table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:12px}
+/* Sticky хедери на табелите (Производи-табела, Залиха, Кампањи) */
+thead{position:sticky;top:60px;z-index:5;background:var(--panel2)}
+thead th:first-child{border-top-left-radius:12px}
+thead th:last-child{border-top-right-radius:12px}
 th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);font-size:13px;vertical-align:middle}
 th{background:var(--panel2);font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
 tr:last-child td{border-bottom:none}
@@ -564,6 +568,7 @@ function goStock(slug) {
   document.querySelector('.tab[data-tab="zaliha"]').classList.add("is-active");
   ["proizvodi", "kampanji", "zaliha"].forEach((t) => $("tab-" + t).classList.add("hidden"));
   $("tab-zaliha").classList.remove("hidden");
+  OPEN_SLUGS.clear();
   OPEN_SLUGS.add(slug);
   renderStock();
 }
@@ -657,16 +662,18 @@ function bindSizesPanel(view) {
 }
 
 function toggleSizes(slug, btn) {
-  const row = document.getElementById("sizes-" + slug);
-  if (!row) return;
-  if (row.hasAttribute("hidden")) {
-    row.removeAttribute("hidden");
-    OPEN_SLUGS.add(slug);
-    btn.textContent = "▴ Сокриј";
-  } else {
-    row.setAttribute("hidden", "");
-    OPEN_SLUGS.delete(slug);
-    btn.textContent = "▾ Големини";
+  const wasOpen = OPEN_SLUGS.has(slug);
+  // Затвори ги сите — само едно dropdown отворено во исто време
+  document.querySelectorAll("#stockView .stock-sizes").forEach((r) => r.setAttribute("hidden", ""));
+  document.querySelectorAll("#stockView [data-toggle]").forEach((b) => { b.textContent = "▾ Големини"; });
+  OPEN_SLUGS.clear();
+  if (!wasOpen) {
+    const row = document.getElementById("sizes-" + slug);
+    if (row) {
+      row.removeAttribute("hidden");
+      OPEN_SLUGS.add(slug);
+      btn.textContent = "▴ Сокриј";
+    }
   }
 }
 
