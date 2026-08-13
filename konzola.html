@@ -81,6 +81,14 @@ td .btn--sm{margin-right:4px}
 .size-row{display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;padding:8px 12px;background:var(--panel);border:1px solid var(--line);border-radius:10px;margin-bottom:8px}
 .size-row .sname{font-weight:800;min-width:70px}
 .size-row input{width:110px}
+/* Залиха: панел со големини (dropdown во табелата) */
+.sizes-panel{background:var(--panel2);border-radius:12px;padding:14px}
+.sizes-grid{display:flex;flex-wrap:wrap;gap:8px}
+.sizes-panel .size-row{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--panel);border:1px solid var(--line);border-radius:8px;margin-bottom:0}
+.sizes-panel .size-row .sname{min-width:44px}
+.sizes-panel .size-row input{width:86px}
+.sizes-panel .size-row--new{margin-top:10px}
+tr.stock-zero td{opacity:.65}
 /* ---------- modal ---------- */
 #modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:flex-start;justify-content:center;z-index:50;padding:30px 14px;overflow:auto}
 .modal-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;width:min(640px,96vw);padding:24px}
@@ -130,6 +138,14 @@ label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--mute
     <section id="tab-proizvodi">
       <div class="toolbar">
         <input type="search" id="searchInput" placeholder="🔍 Пребарај производ...">
+        <select id="sortProducts" style="min-width:170px">
+          <option value="name">🔤 Азбучно А–Ј</option>
+          <option value="price-asc">💰 Цена: ниска → висока</option>
+          <option value="price-desc">💰 Цена: висока → ниска</option>
+          <option value="stock-asc">🔢 Залиха: мала → голема</option>
+          <option value="stock-desc">🔢 Залиха: голема → мала</option>
+          <option value="discount">🏷️ Попуст</option>
+        </select>
         <button class="btn btn--ghost btn--sm" id="viewGridBtn">🖼️ Мрежа</button>
         <button class="btn btn--ghost btn--sm" id="viewTableBtn">☰ Табела</button>
         <div class="spacer"></div>
@@ -149,12 +165,15 @@ label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--mute
     <!-- ===== ЗАЛИХА ===== -->
     <section id="tab-zaliha" class="hidden">
       <div class="toolbar">
-        <label style="flex-direction:row;align-items:center;gap:10px">
-          <span>Производ:</span>
-          <select id="stockSelect" style="min-width:220px"></select>
-        </label>
+        <p style="color:var(--muted)">🔢 Сите производи на еден поглед. Кликни „Големини“ на производот за да ги видиш и смениш бројчињата (qty 0 = сив/нема на залиха).</p>
         <div class="spacer"></div>
-        <button class="btn" id="stockSaveBtn">💾 Зачувај залиха</button>
+        <select id="sortStock" style="min-width:170px">
+          <option value="name">🔤 Азбучно А–Ј</option>
+          <option value="price-asc">💰 Цена: ниска → висока</option>
+          <option value="price-desc">💰 Цена: висока → ниска</option>
+          <option value="stock-asc">🔢 Залиха: мала → голема</option>
+          <option value="stock-desc">🔢 Залиха: голема → мала</option>
+        </select>
       </div>
       <div id="stockView"></div>
     </section>
@@ -187,7 +206,8 @@ label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--mute
       <label>Цена (ден.)
         <input id="fPrice" type="number" placeholder="420"></label>
       <label>Слика (патека)
-        <input id="fImage" placeholder="./images/cards/x-treme.webp"></label>
+        <input id="fImage" placeholder="./images/cards/x-treme.webp">
+        <img id="fImgPrev" class="thumb" style="width:56px;height:56px;margin-top:6px" alt=""></label>
       <label>Попуст %
         <input id="fDiscount" type="number" min="0" max="99" placeholder="0"></label>
       <label class="full">Краток опис (МК)
@@ -215,6 +235,8 @@ let PASSWORD = sessionStorage.getItem("konzola-pass") || "";
 let CACHE = { products: [], sizes: [] };
 let VIEW = "grid";
 let EDITING = null; // slug кој се едитира, null = нов
+let SORT = "name";
+const OPEN_SLUGS = new Set();
 
 const $ = (id) => document.getElementById(id);
 const toastEl = document.createElement("div");
@@ -288,7 +310,7 @@ async function loadAll() {
   CACHE.sizes = data.sizes || [];
   renderProducts();
   renderCampaigns();
-  renderStockSelect();
+  renderStock();
   toast("Податоците се освежени");
 }
 $("refreshBtn").addEventListener("click", () => loadAll().catch((e) => toast(e.message, "err")));
@@ -303,6 +325,32 @@ const imgOf = (p) => {
   const src = (p.image || p.thumbnail || "").replace(/^\.\//, "").replace(/^images\//, "");
   return src || ("images/cards/" + p.slug + ".webp");
 };
+
+/* ---------- СОРТИРАЊЕ ---------- */
+function applySort(list) {
+  const arr = [...list];
+  switch (SORT) {
+    case "name":
+      arr.sort((a, b) => String(a.name_mk || a.slug).localeCompare(String(b.name_mk || b.slug), "mk"));
+      break;
+    case "price-asc":
+      arr.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
+      break;
+    case "price-desc":
+      arr.sort((a, b) => (Number(b.price) || 0) - (Number(a.price) || 0));
+      break;
+    case "stock-asc":
+      arr.sort((a, b) => stockTotal(a.slug) - stockTotal(b.slug));
+      break;
+    case "stock-desc":
+      arr.sort((a, b) => stockTotal(b.slug) - stockTotal(a.slug));
+      break;
+    case "discount":
+      arr.sort((a, b) => (Number(b.discount) || 0) - (Number(a.discount) || 0));
+      break;
+  }
+  return arr;
+}
 
 /* ---------- ДАТУМИ ---------- */
 const pad = (n) => String(n).padStart(2, "0");
@@ -324,7 +372,7 @@ function fmtDate(iso) {
 /* ---------- ПРОИЗВОДИ: РЕНДЕР ---------- */
 function renderProducts() {
   const q = ($("searchInput").value || "").toLowerCase();
-  const list = CACHE.products.filter((p) => !q || (p.name_mk + " " + p.name_en + " " + p.slug).toLowerCase().includes(q));
+  const list = applySort(CACHE.products.filter((p) => !q || (p.name_mk + " " + p.name_en + " " + p.slug).toLowerCase().includes(q)));
   const view = $("productsView");
   if (list.length === 0) { view.innerHTML = '<p style="color:var(--muted);padding:30px 0">Нема пронајдени производи.</p>'; return; }
 
@@ -386,6 +434,7 @@ function campaignText(p) {
   return "Нема кампања";
 }
 $("searchInput").addEventListener("input", renderProducts);
+$("sortProducts").addEventListener("change", (e) => { SORT = e.target.value; renderProducts(); });
 $("viewGridBtn").addEventListener("click", () => { VIEW = "grid"; renderProducts(); });
 $("viewTableBtn").addEventListener("click", () => { VIEW = "table"; renderProducts(); });
 
@@ -403,6 +452,7 @@ function openEdit(slug) {
   $("fCat").value = p ? p.category : "sportski";
   $("fPrice").value = p ? p.price : "";
   $("fImage").value = p ? (p.image || "./images/cards/" + (p.slug) + ".webp") : "";
+  $("fImgPrev").src = $("fImage").value;
   $("fDiscount").value = p ? p.discount : 0;
   $("fDescMk").value = p ? p.short_desc_mk || "" : "";
   $("fDescEn").value = p ? p.short_desc_en || "" : "";
@@ -414,6 +464,7 @@ function openEdit(slug) {
   $("modal").classList.remove("hidden");
 }
 $("modalCancel").addEventListener("click", () => $("modal").classList.add("hidden"));
+$("fImage").addEventListener("input", () => { $("fImgPrev").src = $("fImage").value; });
 $("modalSave").addEventListener("click", async () => {
   try {
     const slug = $("fSlug").value.trim().toLowerCase().replace(/\s+/g, "-");
@@ -460,7 +511,7 @@ function renderCampaigns() {
     const from = isoToInputs(p.discount_from);
     const until = isoToInputs(p.discount_until);
     return "<div class='camp-row' data-slug='" + p.slug + "'>" +
-      "<div><div class='name'>" + p.name_mk + "</div><div class='slug'>" + p.slug + " · " + (Number(p.price) || 0) + " ден.</div></div>" +
+      "<div style='display:flex;gap:10px;align-items:center'><img class='thumb' src='" + imgOf(p) + "' onerror='this.style.opacity=.2'><div><div class='name'>" + p.name_mk + "</div><div class='slug'>" + p.slug + " · " + (Number(p.price) || 0) + " ден.</div></div></div>" +
       "<label>Попуст %<input type='number' min='0' max='99' class='c-pct' value='" + (Number(p.discount) || 0) + "'></label>" +
       "<label>Од (празно = веднаш)<span class='camp-dt'><input type='date' class='c-fromd' value='" + from.date + "'><input type='time' class='c-fromt' value='" + from.time + "'></span></label>" +
       "<label>До (празно = без крај)<span class='camp-dt'><input type='date' class='c-untild' value='" + until.date + "'><input type='time' class='c-untilt' value='" + until.time + "'></span></label>" +
@@ -502,74 +553,119 @@ function renderCampaigns() {
   );
 }
 
-/* ---------- ЗАЛИХА ---------- */
-function renderStockSelect() {
-  const sel = $("stockSelect");
-  sel.innerHTML = CACHE.products.map((p) => "<option value='" + p.slug + "'>" + p.name_mk + " (" + p.slug + ")</option>").join("");
-  if (CACHE.products.length) renderStock();
-}
-$("stockSelect").addEventListener("change", renderStock);
+/* ---------- ЗАЛИХА: сите производи + dropdown со големини ---------- */
+$("sortStock").addEventListener("change", (e) => { SORT = e.target.value; renderStock(); });
+
 function goStock(slug) {
   document.querySelectorAll(".tab").forEach((x) => x.classList.remove("is-active"));
   document.querySelector('.tab[data-tab="zaliha"]').classList.add("is-active");
   ["proizvodi", "kampanji", "zaliha"].forEach((t) => $("tab-" + t).classList.add("hidden"));
   $("tab-zaliha").classList.remove("hidden");
-  $("stockSelect").value = slug;
+  OPEN_SLUGS.add(slug);
   renderStock();
 }
+
 function renderStock() {
-  const slug = $("stockSelect").value;
-  const p = prodOf(slug);
   const view = $("stockView");
-  if (!p) { view.innerHTML = ""; return; }
-  const rows = stockRows(slug);
-  view.innerHTML =
-    "<p style='color:var(--muted);margin-bottom:10px'><b>" + p.name_mk + "</b> — вкупна залиха: <b>" + rows.reduce((a, r) => a + (Number(r.qty) || 0), 0) + "</b> · (qty 0 = сив/нема на залиха)</p>" +
-    "<div id='sizeRows'>" + rows.map((r) =>
+  const list = applySort(CACHE.products);
+  view.innerHTML = "<table><thead><tr><th></th><th>Производ</th><th>Цена</th><th>Вкупна залиха</th><th>Големини</th><th></th></tr></thead><tbody>" +
+    list.map((p) => {
+      const rows = stockRows(p.slug);
+      const total = rows.reduce((a, r) => a + (Number(r.qty) || 0), 0);
+      const avail = rows.filter((r) => (Number(r.qty) || 0) > 0).length;
+      return "<tr class='" + (total <= 0 ? "stock-zero" : "") + "'>" +
+        "<td><img class='thumb' src='" + imgOf(p) + "' onerror='this.style.opacity=.2'></td>" +
+        "<td><b>" + p.name_mk + "</b><br><span style='color:var(--muted);font-size:11px'>" + p.slug + "</span></td>" +
+        "<td>" + (Number(p.price) || 0) + " ден.</td>" +
+        "<td><b style='color:" + (total <= 0 ? "var(--red)" : "var(--green)") + "'>" + total + "</b>" + (total <= 0 ? " · нема на залиха" : "") + "</td>" +
+        "<td style='color:var(--muted)'>" + avail + " / " + rows.length + " достапни</td>" +
+        "<td><button class='btn btn--ghost btn--sm' data-toggle='" + p.slug + "'>" + (OPEN_SLUGS.has(p.slug) ? "▴ Сокриј" : "▾ Големини") + "</button></td>" +
+      "</tr>" +
+      "<tr class='stock-sizes' id='sizes-" + p.slug + "' " + (OPEN_SLUGS.has(p.slug) ? "" : "hidden") + "><td colspan='6'>" + sizesPanelHtml(p) + "</td></tr>";
+    }).join("") + "</tbody></table>";
+
+  view.querySelectorAll("[data-toggle]").forEach((b) =>
+    b.addEventListener("click", () => toggleSizes(b.dataset.toggle, b))
+  );
+  bindSizesPanel(view);
+}
+
+function sizesPanelHtml(p) {
+  const rows = stockRows(p.slug);
+  return "<div class='sizes-panel' data-panel='" + p.slug + "'>" +
+    "<div class='sizes-grid'>" + rows.map((r) =>
       "<div class='size-row' data-size='" + r.size + "'>" +
         "<span class='sname'>" + r.size + "</span>" +
         "<input type='number' min='0' class='s-qty' value='" + r.qty + "'>" +
         "<button class='btn btn--danger btn--sm' data-rm='" + r.size + "'>🗑</button>" +
-      "</div>").join("") +
-    "</div>" +
-    "<div class='size-row' style='margin-top:14px'>" +
-      "<input class='s-new-name' placeholder='Нова големина (на пр. 35 или m42-45)' style='min-width:140px'>" +
+      "</div>").join("") + "</div>" +
+    "<div class='size-row size-row--new'>" +
+      "<input class='s-new-name' placeholder='Нова големина (на пр. 35)' style='min-width:120px'>" +
       "<input type='number' min='0' class='s-new-qty' placeholder='Количина'>" +
-      "<button class='btn btn--sm' id='addSizeBtn'>➕</button>" +
-    "</div>";
+      "<button class='btn btn--sm s-add'>➕</button>" +
+    "</div>" +
+    "<div style='display:flex;gap:8px;margin-top:12px'>" +
+      "<button class='btn btn--sm s-save' data-save='" + p.slug + "'>💾 Зачувај " + p.name_mk + "</button>" +
+    "</div>" +
+  "</div>";
+}
+
+function bindSizesPanel(view) {
   view.querySelectorAll("[data-rm]").forEach((b) =>
     b.addEventListener("click", () => b.closest(".size-row").remove())
   );
-  $("addSizeBtn").addEventListener("click", () => {
-    const name = view.querySelector(".s-new-name").value.trim();
-    const qty = Number(view.querySelector(".s-new-qty").value) || 0;
-    if (!name) return;
-    const div = document.createElement("div");
-    div.className = "size-row";
-    div.dataset.size = name;
-    div.innerHTML = "<span class='sname'>" + name + "</span><input type='number' min='0' class='s-qty' value='" + qty + "'><button class='btn btn--danger btn--sm'>🗑</button>";
-    div.querySelector("button").addEventListener("click", () => div.remove());
-    $("sizeRows").appendChild(div);
-    view.querySelector(".s-new-name").value = "";
-    view.querySelector(".s-new-qty").value = "";
-  });
+  view.querySelectorAll(".s-add").forEach((b) =>
+    b.addEventListener("click", () => {
+      const panel = b.closest(".sizes-panel");
+      const name = panel.querySelector(".s-new-name").value.trim();
+      const qty = Number(panel.querySelector(".s-new-qty").value) || 0;
+      if (!name) return;
+      const div = document.createElement("div");
+      div.className = "size-row";
+      div.dataset.size = name;
+      div.innerHTML = "<span class='sname'>" + name + "</span><input type='number' min='0' class='s-qty' value='" + qty + "'><button class='btn btn--danger btn--sm'>🗑</button>";
+      div.querySelector("button").addEventListener("click", () => div.remove());
+      panel.querySelector(".sizes-grid").appendChild(div);
+      panel.querySelector(".s-new-name").value = "";
+      panel.querySelector(".s-new-qty").value = "";
+    })
+  );
+  view.querySelectorAll(".s-save").forEach((b) =>
+    b.addEventListener("click", async () => {
+      const slug = b.dataset.save;
+      const panel = b.closest(".sizes-panel");
+      try {
+        const sizes = [];
+        const seen = new Set();
+        panel.querySelectorAll(".sizes-grid .size-row").forEach((r) => {
+          const size = r.querySelector(".sname") ? r.querySelector(".sname").textContent : "";
+          if (!size || seen.has(size)) return;
+          seen.add(size);
+          sizes.push({ size, qty: Number(r.querySelector(".s-qty").value) || 0 });
+        });
+        const remove = stockRows(slug).map((r) => r.size).filter((s) => !seen.has(s));
+        toast("Се зачувува залихата...", "load");
+        await api("save_sizes", { slug, sizes, remove });
+        await loadAll();
+        toast("Залихата на " + slug + " е зачувана");
+      } catch (e) { toast(e.message, "err"); }
+    })
+  );
 }
-$("stockSaveBtn").addEventListener("click", async () => {
-  const slug = $("stockSelect").value;
-  try {
-    const sizes = [];
-    const remove = [];
-    $("stockView").querySelectorAll(".size-row").forEach((r) => {
-      const size = r.querySelector(".sname") ? r.querySelector(".sname").textContent : "";
-      if (!size) return;
-      sizes.push({ size, qty: Number(r.querySelector(".s-qty").value) || 0 });
-    });
-    toast("Се зачувува залихата...", "load");
-    await api("save_sizes", { slug, sizes, remove });
-    await loadAll();
-    toast("Залихата е зачувана");
-  } catch (e) { toast(e.message, "err"); }
-});
+
+function toggleSizes(slug, btn) {
+  const row = document.getElementById("sizes-" + slug);
+  if (!row) return;
+  if (row.hasAttribute("hidden")) {
+    row.removeAttribute("hidden");
+    OPEN_SLUGS.add(slug);
+    btn.textContent = "▴ Сокриј";
+  } else {
+    row.setAttribute("hidden", "");
+    OPEN_SLUGS.delete(slug);
+    btn.textContent = "▾ Големини";
+  }
+}
 
 /* ---------- СТАРТ ---------- */
 if (PASSWORD) {
