@@ -8314,14 +8314,18 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
 
 /* ========================================
    ПРОИЗВОД БЕЗ ЗАЛИХА (qty=0 на сите големини)
-   Картичка → сива, некликабилна
+   СЛИКАТА станува сива (и на картичката и на модел страната)
+   Картичка → некликабилна
    Модел страница → копчето „Додади" исклучено + значка „Нема на залиха"
    ======================================== */
 .card--out-of-stock {
-    opacity: 0.6;
-    filter: grayscale(0.95);
     pointer-events: none;
     cursor: not-allowed;
+}
+.card--out-of-stock .card__image,
+.card--out-of-stock .card__image img {
+    filter: grayscale(1);
+    opacity: 0.8;
 }
 .card--out-of-stock .card__link {
     background: #C0BDB8 !important;
@@ -8363,6 +8367,11 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
 .model-layout--out-of-stock .size-selector {
     opacity: 0.55;
     pointer-events: none;
+}
+/* Сива слика на модел страната кога производот е без залиха */
+.model-layout--out-of-stock .hero-img img {
+    filter: grayscale(1);
+    opacity: 0.85;
 }
 .size-selector__hint {
     font-size: 11px;
