@@ -1,27 +1,34 @@
 ﻿<!DOCTYPE html>
 <html lang="mk">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-YEDJMPTEZG"></script>
+<!-- Google tag (gtag.js) + Meta Pixel — одложено вчитување (не блокира рендерирање) -->
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-YEDJMPTEZG');
-</script>
-
-<!-- Meta Pixel Code -->
-<script>
-!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '3399617573559080');
-fbq('track', 'PageView');
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[]}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  function initMonetaAnalytics(){
+    if (window.__monetaAnalyticsLoaded) return; window.__monetaAnalyticsLoaded = true;
+    var g = document.createElement('script'); g.async = true;
+    g.src = 'https://www.googletagmanager.com/gtag/js?id=G-YEDJMPTEZG';
+    document.head.appendChild(g);
+    gtag('js', new Date());
+    gtag('config', 'G-YEDJMPTEZG');
+    var f = document.createElement('script'); f.async = true;
+    f.src = 'https://connect.facebook.net/en_US/fbevents.js';
+    document.head.appendChild(f);
+    fbq('init', '3399617573559080');
+    fbq('track', 'PageView');
+  }
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(initMonetaAnalytics, { timeout: 3000 });
+  } else if (document.readyState === 'complete') {
+    setTimeout(initMonetaAnalytics, 1500);
+  } else {
+    window.addEventListener('load', function(){ setTimeout(initMonetaAnalytics, 1000); }, { once: true, passive: true });
+  }
+  ['pointerdown', 'keydown', 'touchstart'].forEach(function (ev) {
+    window.addEventListener(ev, initMonetaAnalytics, { once: true, passive: true });
+  });
 </script>
 <noscript><img height="1" width="1" style="display:none"
 src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
@@ -402,7 +409,24 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
 
     <!-- ===== SCRIPTS ===== -->
     <script src="./vendor/aos.js" defer></script>
-    <script src="./chatbot.js?v=15" defer></script>
+    <script>
+  // Chat асистент — вчитај по idle/интеракција (не ја заглавува главната нишка)
+  (function () {
+    var done = false;
+    function loadBot() {
+      if (done) return; done = true;
+      var el = document.createElement('script');
+      el.async = true; el.src = './chatbot.js?v=15';
+      document.body.appendChild(el);
+    }
+    if ('requestIdleCallback' in window) requestIdleCallback(loadBot, { timeout: 3000 });
+    else if (document.readyState === 'complete') setTimeout(loadBot, 2000);
+    else window.addEventListener('load', function () { setTimeout(loadBot, 1500); }, { once: true, passive: true });
+    ['pointerdown', 'keydown', 'touchstart', 'scroll'].forEach(function (ev) {
+      window.addEventListener(ev, loadBot, { once: true, passive: true });
+    });
+  })();
+</script>
     <script src="./script.js?v=vmss5ib7i" defer></script>
 </body>
 </html>
