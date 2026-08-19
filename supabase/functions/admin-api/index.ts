@@ -228,6 +228,54 @@ Deno.serve(async (req) => {
       return json({ ok: true });
     }
 
+    // ---- Качи слика во Storage (product-images) ----
+    if (action === "upload_image") {
+      const filename = String(payload.filename || "").replace(/[^a-zA-Z0-9._-]/g, "").toLowerCase().slice(0, 120);
+      const b64 = String(payload.base64 || "");
+      if (!filename || !b64) return json({ ok: false, error: "Недостасува слика" }, 400);
+
+      // Дозволени типови
+      const dataUrl = b64.match(/^data:([^;]+);base64,(.+)$/);
+      let contentType = "image/webp";
+      let base64Data = b64;
+      if (dataUrl) {
+        contentType = dataUrl[1];
+        base64Data = dataUrl[2];
+      }
+      if (!/^image\/(png|jpe?g|webp|gif)$/i.test(contentType)) {
+        return json({ ok: false, error: "Дозволени се само слики (PNG/JPG/WEBP/GIF)" }, 400);
+      }
+
+      // Име: ако нема екстензија, додај од contentType
+      let safeName = filename;
+      if (!/\.(png|jpe?g|webp|gif)$/i.test(safeName)) {
+        const ext = contentType === "image/png" ? "png" : contentType === "image/jpeg" ? "jpg" : contentType === "image/gif" ? "gif" : "webp";
+        safeName = safeName + "." + ext;
+      }
+
+      // Декодирај base64 → bytes
+      let bytes: Uint8Array;
+      try {
+        const bin = atob(base64Data);
+        bytes = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      } catch (e) {
+        return json({ ok: false, error: "Невалидна слика (base64)" }, 400);
+      }
+      if (bytes.length > 5 * 1024 * 1024) {
+        return json({ ok: false, error: "Сликата е поголема од 5 MB" }, 400);
+      }
+
+      const { error } = await sb.storage.from("product-images").upload(safeName, bytes, {
+        contentType,
+        upsert: true,
+      });
+      if (error) return json({ ok: false, error: error.message }, 500);
+
+      const publicUrl = sb.storage.from("product-images").getPublicUrl(safeName).data.publicUrl;
+      return json({ ok: true, url: publicUrl });
+    }
+
     return json({ ok: false, error: "Непозната акција" }, 400);
   } catch (e) {
     return json({ ok: false, error: String((e as Error)?.message || e) }, 500);

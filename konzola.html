@@ -101,6 +101,20 @@ tr.stock-zero td{opacity:.65}
 .fgrid .full{grid-column:1/-1}
 label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted);font-weight:700}
 .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+/* Јазични табови во модалите (МК / EN / SQ — секоја картичка = еден јазик) */
+.lang-tabs{display:flex;gap:8px;margin-top:16px}
+.lang-tab{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:7px 18px;font-weight:800;font-size:12px}
+.lang-tab.is-active{background:var(--pink);border-color:var(--pink);color:#fff}
+.lang-pane .fgrid{margin-top:12px}
+/* Технички спецификации — компактни редови (не излегуваат од контролната табла) */
+.specs-wrap{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.spec-row{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:center;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px}
+.spec-row input{min-width:0}
+.spec-row .sp-rm{width:34px;height:34px;padding:0;display:flex;align-items:center;justify-content:center}
+@media (max-width:480px){
+  .spec-row{grid-template-columns:1fr;gap:6px}
+  .spec-row .sp-rm{width:100%;height:30px}
+}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--green);color:#fff;padding:12px 22px;border-radius:999px;font-weight:700;z-index:60;box-shadow:0 8px 30px rgba(0,0,0,.4)}
 .toast.is-err{background:var(--red)}
 .toast.is-load{background:var(--blue)}
@@ -224,37 +238,67 @@ label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--mute
         <input id="fSlug" placeholder="npr. x-treme"></label>
       <label>Редослед (sort_order)
         <input id="fSort" type="number" placeholder="21"></label>
-      <label>Име (МК)
-        <input id="fNameMk" placeholder="X-TREME"></label>
-      <label>Име (SQ)
-        <input id="fNameSq" placeholder="X-TREME"></label>
-      <label>Име (EN)
-        <input id="fNameEn" placeholder="X-TREME"></label>
       <label>Категорија (пиши нова или избери)
         <input id="fCat" list="catList" placeholder="sportski">
         <datalist id="catList"></datalist></label>
       <label>Цена (ден.)
         <input id="fPrice" type="number" placeholder="420"></label>
-      <label>Слика (патека)
-        <input id="fImage" placeholder="./images/cards/x-treme.webp">
+      <label class="full">Слика (патека или URL) — или качи од компјутер
+        <span style="display:flex;gap:8px;align-items:center">
+          <input id="fImage" placeholder="./images/cards/x-treme.webp" style="flex:1;min-width:0">
+          <button type="button" class="btn btn--ghost btn--sm" id="fUploadBtn" title="Качи слика од компјутер">📤 Upload</button>
+          <input type="file" id="fUploadFile" accept="image/*" hidden>
+        </span>
         <img id="fImgPrev" class="thumb" style="width:56px;height:56px;margin-top:6px" alt=""></label>
       <label>Попуст %
         <input id="fDiscount" type="number" min="0" max="99" placeholder="0"></label>
-      <label class="full">Краток опис (МК)
-        <textarea id="fDescMk" rows="2"></textarea></label>
-      <label class="full">Краток опис (SQ)
-        <textarea id="fDescSq" rows="2"></textarea></label>
-      <label class="full">Краток опис (EN)
-        <textarea id="fDescEn" rows="2"></textarea></label>
       <label>Попуст од (датум + време)
         <span class="camp-dt"><input id="fFromD" type="date"><input id="fFromT" type="time"></span></label>
       <label>Попуст до (датум + време)
         <span class="camp-dt"><input id="fUntilD" type="date"><input id="fUntilT" type="time"></span></label>
       <label style="flex-direction:row;align-items:center;gap:8px;color:var(--ink)">
         <input id="fActive" type="checkbox" checked style="width:auto"> Активен (се прикажува)</label>
-      <label class="full">Технички спецификации (карактеристика → вредност, на 3 јазика)
-        <div id="fSpecs" style="display:flex;flex-direction:column;gap:8px;margin-top:4px"></div>
-        <button type="button" class="btn btn--ghost btn--sm" id="addSpecBtn" style="align-self:flex-start;margin-top:8px">➕ Додади карактеристика</button></label>
+    </div>
+
+    <!-- Јазични табови: секоја картичка се пополнува на ЕДЕН јазик -->
+    <div class="lang-tabs">
+      <button type="button" class="lang-tab is-active" data-lang-tab="mk">МК</button>
+      <button type="button" class="lang-tab" data-lang-tab="en">EN</button>
+      <button type="button" class="lang-tab" data-lang-tab="sq">SQ</button>
+    </div>
+
+    <div class="lang-pane" data-lang-pane="mk">
+      <div class="fgrid">
+        <label>Име (МК)
+          <input id="fNameMk" placeholder="X-TREME"></label>
+        <label>Краток опис (МК)
+          <textarea id="fDescMk" rows="2"></textarea></label>
+        <label class="full">Технички спецификации (карактеристика → вредност)
+          <div id="fSpecsMk" class="specs-wrap"></div>
+          <button type="button" class="btn btn--ghost btn--sm addSpecBtn" style="align-self:flex-start;margin-top:8px">➕ Додади карактеристика</button></label>
+      </div>
+    </div>
+    <div class="lang-pane" data-lang-pane="en" hidden>
+      <div class="fgrid">
+        <label>Name (EN)
+          <input id="fNameEn" placeholder="X-TREME"></label>
+        <label>Short description (EN)
+          <textarea id="fDescEn" rows="2"></textarea></label>
+        <label class="full">Technical specifications (feature → value)
+          <div id="fSpecsEn" class="specs-wrap"></div>
+          <button type="button" class="btn btn--ghost btn--sm addSpecBtn" style="align-self:flex-start;margin-top:8px">➕ Add feature</button></label>
+      </div>
+    </div>
+    <div class="lang-pane" data-lang-pane="sq" hidden>
+      <div class="fgrid">
+        <label>Emri (SQ)
+          <input id="fNameSq" placeholder="X-TREME"></label>
+        <label>Përshkrimi i shkurtër (SQ)
+          <textarea id="fDescSq" rows="2"></textarea></label>
+        <label class="full">Specifikimet teknike (karakteristika → vlera)
+          <div id="fSpecsSq" class="specs-wrap"></div>
+          <button type="button" class="btn btn--ghost btn--sm addSpecBtn" style="align-self:flex-start;margin-top:8px">➕ Shto karakteristikë</button></label>
+      </div>
     </div>
     <div class="modal-actions">
       <button class="btn btn--ghost" id="modalCancel">Откажи</button>
@@ -276,17 +320,41 @@ label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--mute
         <select id="cParent">
           <option value="">— Главна категорија —</option>
         </select></label>
-      <label>Име (МК)
-        <input id="cNameMk" placeholder="Тенис влошки"></label>
-      <label>Име (SQ)
-        <input id="cNameSq" placeholder="Tabana tenisi"></label>
-      <label>Име (EN)
-        <input id="cNameEn" placeholder="Tennis insoles"></label>
-      <label class="full">Слика (патека)
-        <input id="cImage" placeholder="./images/cards/tenis.webp">
+      <label class="full">Слика (патека или URL) — или качи од компјутер
+        <span style="display:flex;gap:8px;align-items:center">
+          <input id="cImage" placeholder="./images/cards/tenis.webp" style="flex:1;min-width:0">
+          <button type="button" class="btn btn--ghost btn--sm" id="cUploadBtn" title="Качи слика од компјутер">📤 Upload</button>
+          <input type="file" id="cUploadFile" accept="image/*" hidden>
+        </span>
         <img id="cImgPrev" class="thumb" style="width:56px;height:56px;margin-top:6px" alt=""></label>
       <label style="flex-direction:row;align-items:center;gap:8px;color:var(--ink)">
         <input id="cActive" type="checkbox" checked style="width:auto"> Активна (се прикажува)</label>
+    </div>
+
+    <!-- Јазични табови: секоја картичка се пополнува на ЕДЕН јазик -->
+    <div class="lang-tabs">
+      <button type="button" class="lang-tab is-active" data-lang-tab="mk">МК</button>
+      <button type="button" class="lang-tab" data-lang-tab="en">EN</button>
+      <button type="button" class="lang-tab" data-lang-tab="sq">SQ</button>
+    </div>
+
+    <div class="lang-pane" data-lang-pane="mk">
+      <div class="fgrid">
+        <label>Име (МК)
+          <input id="cNameMk" placeholder="Тенис влошки"></label>
+      </div>
+    </div>
+    <div class="lang-pane" data-lang-pane="en" hidden>
+      <div class="fgrid">
+        <label>Name (EN)
+          <input id="cNameEn" placeholder="Tennis insoles"></label>
+      </div>
+    </div>
+    <div class="lang-pane" data-lang-pane="sq" hidden>
+      <div class="fgrid">
+        <label>Emri (SQ)
+          <input id="cNameSq" placeholder="Tabana tenisi"></label>
+      </div>
     </div>
     <div class="modal-actions">
       <button class="btn btn--ghost" id="catModalCancel">Откажи</button>
@@ -542,6 +610,10 @@ $("addProductBtn").addEventListener("click", () => openEdit(null));
 function openEdit(slug) {
   EDITING = slug;
   const p = slug ? prodOf(slug) : null;
+  // Ресетирај го јазичниот таб на МК
+  const card = $("modal");
+  card.querySelectorAll(".lang-tab").forEach((x) => x.classList.toggle("is-active", x.dataset.langTab === "mk"));
+  card.querySelectorAll(".lang-pane").forEach((pn) => { pn.hidden = pn.dataset.langPane !== "mk"; });
   $("modalTitle").textContent = p ? "✏️ Измени: " + p.name_mk : "➕ Нов производ";
   $("fSlug").value = p ? p.slug : "";
   $("fSlug").disabled = !!p;
@@ -609,54 +681,120 @@ async function deleteProduct(slug) {
   } catch (e) { toast(e.message, "err"); }
 }
 
-/* ---------- СПЕЦИФИКАЦИИ (specs editor) ---------- */
+/* ---------- СПЕЦИФИКАЦИИ (specs editor — по јазични табови) ---------- */
 function esc(s) {
   return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
 }
-function specRowHtml(s) {
-  s = s || { label: {}, value: {} };
-  const l = s.label || {}, v = s.value || {};
-  return "<div class='spec-row' style='display:grid;grid-template-columns:repeat(6,1fr) auto;gap:6px;align-items:center;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px'>" +
-    "<input class='sp-lm' placeholder='Каракт. МК' value='" + esc(l.mk) + "'>" +
-    "<input class='sp-ls' placeholder='Каракт. SQ' value='" + esc(l.sq) + "'>" +
-    "<input class='sp-le' placeholder='Каракт. EN' value='" + esc(l.en) + "'>" +
-    "<input class='sp-vm' placeholder='Вредност МК' value='" + esc(v.mk) + "'>" +
-    "<input class='sp-vs' placeholder='Вредност SQ' value='" + esc(v.sq) + "'>" +
-    "<input class='sp-ve' placeholder='Вредност EN' value='" + esc(v.en) + "'>" +
+function specRowHtml(lang, s) {
+  s = s || {};
+  const l = (s.label || {})[lang] || "";
+  const v = (s.value || {})[lang] || "";
+  const phL = lang === "en" ? "Feature" : lang === "sq" ? "Karakteristika" : "Карактеристика";
+  const phV = lang === "en" ? "Value" : lang === "sq" ? "Vlera" : "Вредност";
+  return "<div class='spec-row'>" +
+    "<input class='sp-l' placeholder='" + phL + "' value='" + esc(l) + "'>" +
+    "<input class='sp-v' placeholder='" + phV + "' value='" + esc(v) + "'>" +
     "<button type='button' class='btn btn--danger btn--sm sp-rm' title='Отстрани'>✖</button>" +
   "</div>";
 }
+// Секоја јазична картичка ја покажува само својата колона (нема мешање)
 function renderSpecs(specs) {
-  const box = $("fSpecs");
-  if (!box) return;
-  box.innerHTML = (Array.isArray(specs) && specs.length ? specs : [{}]).map(specRowHtml).join("");
-  box.querySelectorAll(".sp-rm").forEach((b) => b.addEventListener("click", () => b.closest(".spec-row").remove()));
+  const list = (Array.isArray(specs) && specs.length) ? specs : [{}];
+  ["mk", "en", "sq"].forEach((lang) => {
+    const box = document.getElementById("fSpecs" + lang.toUpperCase());
+    if (!box) return;
+    box.innerHTML = list.map((s) => specRowHtml(lang, s)).join("");
+    box.querySelectorAll(".sp-rm").forEach((b) => b.addEventListener("click", () => removeSpecRow(b)));
+  });
+}
+function removeSpecRow(btn) {
+  const row = btn.closest(".spec-row");
+  if (!row) return;
+  const idx = Array.prototype.indexOf.call(row.parentElement.children, row);
+  ["mk", "en", "sq"].forEach((lang) => {
+    const box = document.getElementById("fSpecs" + lang.toUpperCase());
+    if (box) {
+      const r = box.querySelectorAll(".spec-row")[idx];
+      if (r) r.remove();
+    }
+  });
 }
 function collectSpecs() {
   const out = [];
-  document.querySelectorAll("#fSpecs .spec-row").forEach((r) => {
+  const mkRows = document.querySelectorAll("#fSpecsMk .spec-row");
+  mkRows.forEach((row, i) => {
+    const enRow = document.querySelectorAll("#fSpecsEn .spec-row")[i];
+    const sqRow = document.querySelectorAll("#fSpecsSq .spec-row")[i];
     const label = {
-      mk: r.querySelector(".sp-lm").value.trim(),
-      sq: r.querySelector(".sp-ls").value.trim(),
-      en: r.querySelector(".sp-le").value.trim()
+      mk: row.querySelector(".sp-l").value.trim(),
+      sq: sqRow ? sqRow.querySelector(".sp-l").value.trim() : "",
+      en: enRow ? enRow.querySelector(".sp-l").value.trim() : ""
     };
     const value = {
-      mk: r.querySelector(".sp-vm").value.trim(),
-      sq: r.querySelector(".sp-vs").value.trim(),
-      en: r.querySelector(".sp-ve").value.trim()
+      mk: row.querySelector(".sp-v").value.trim(),
+      sq: sqRow ? sqRow.querySelector(".sp-v").value.trim() : "",
+      en: enRow ? enRow.querySelector(".sp-v").value.trim() : ""
     };
     if (label.mk || value.mk || label.sq || value.sq || label.en || value.en) out.push({ label, value });
   });
   return out;
 }
-$("addSpecBtn").addEventListener("click", () => {
-  const box = $("fSpecs");
-  if (!box) return;
-  const div = document.createElement("div");
-  div.innerHTML = specRowHtml({});
-  div.firstChild.querySelector(".sp-rm").addEventListener("click", () => div.remove());
-  box.appendChild(div.firstChild);
-});
+// „Додади карактеристика" во било кој јазик → додава ред во сите 3 картички (ист индекс)
+document.querySelectorAll(".addSpecBtn").forEach((b) =>
+  b.addEventListener("click", () => {
+    ["mk", "en", "sq"].forEach((lang) => {
+      const box = document.getElementById("fSpecs" + lang.toUpperCase());
+      if (!box) return;
+      const div = document.createElement("div");
+      div.innerHTML = specRowHtml(lang, {});
+      div.firstChild.querySelector(".sp-rm").addEventListener("click", () => removeSpecRow(div.firstChild.querySelector(".sp-rm")));
+      box.appendChild(div.firstChild);
+    });
+  })
+);
+
+/* ---------- ЈАЗИЧНИ ТАБОВИ (МК / EN / SQ во модалите) ---------- */
+function bindLangTabs(scope) {
+  scope.querySelectorAll(".lang-tab").forEach((b) =>
+    b.addEventListener("click", () => {
+      const card = b.closest(".modal-card");
+      card.querySelectorAll(".lang-tab").forEach((x) => x.classList.remove("is-active"));
+      b.classList.add("is-active");
+      card.querySelectorAll(".lang-pane").forEach((p) => {
+        p.hidden = p.dataset.langPane !== b.dataset.langTab;
+      });
+    })
+  );
+}
+bindLangTabs($("modal"));
+bindLangTabs($("catModal"));
+
+/* ---------- UPLOAD СЛИКА (преку edge function → Supabase Storage) ---------- */
+async function handleUpload(fileInput, imageInput, previewEl) {
+  const file = fileInput.files && fileInput.files[0];
+  if (!file) return;
+  if (!/^image\//.test(file.type)) { toast("Избери слика (PNG/JPG/WEBP/GIF)", "err"); return; }
+  if (file.size > 5 * 1024 * 1024) { toast("Сликата е поголема од 5 MB", "err"); return; }
+  const reader = new FileReader();
+  reader.onload = async () => {
+    try {
+      toast("Се качува сликата...", "load");
+      const extMatch = file.name.match(/\.([a-zA-Z0-9]+)$/);
+      const ext = extMatch ? extMatch[1].toLowerCase() : "webp";
+      const base = (file.name.replace(/\.[^.]+$/, "") || "image").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "image";
+      const filename = base + "-" + Date.now() + "." + ext;
+      const res = await api("upload_image", { filename, base64: reader.result });
+      imageInput.value = res.url;
+      if (previewEl) previewEl.src = res.url;
+      toast("Сликата е качена ✅");
+    } catch (e) { toast(e.message, "err"); }
+  };
+  reader.readAsDataURL(file);
+}
+$("fUploadBtn").addEventListener("click", () => $("fUploadFile").click());
+$("fUploadFile").addEventListener("change", () => handleUpload($("fUploadFile"), $("fImage"), $("fImgPrev")));
+$("cUploadBtn").addEventListener("click", () => $("cUploadFile").click());
+$("cUploadFile").addEventListener("change", () => handleUpload($("cUploadFile"), $("cImage"), $("cImgPrev")));
 
 /* ---------- КАТЕГОРИИ: РЕНДЕР + МОДАЛ ---------- */
 let EDITING_CAT = null;
@@ -690,6 +828,10 @@ $("addCategoryBtn").addEventListener("click", () => openCatEdit(null));
 function openCatEdit(slug) {
   EDITING_CAT = slug;
   const c = slug ? catOf(slug) : null;
+  // Ресетирај го јазичниот таб на МК
+  const card = $("catModal");
+  card.querySelectorAll(".lang-tab").forEach((x) => x.classList.toggle("is-active", x.dataset.langTab === "mk"));
+  card.querySelectorAll(".lang-pane").forEach((pn) => { pn.hidden = pn.dataset.langPane !== "mk"; });
   $("catModalTitle").textContent = c ? "✏️ Измени: " + (c.name_mk || c.slug) : "➕ Нова категорија";
   $("cSlug").value = c ? c.slug : "";
   $("cSlug").disabled = !!c;
