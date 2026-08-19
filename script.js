@@ -2965,6 +2965,7 @@ console.log('%c Вебсајт во развој 💪', 'color:#6B6B76;font-size
             code: ctl.getAttribute('data-code') || slug,
             price: parseFloat(ctl.getAttribute('data-price')) || 0,
             nameMk: stripSuffix(ctl.getAttribute('data-name-mk')) || slug,
+            nameSq: stripSuffix(ctl.getAttribute('data-name-sq')) || slug,
             nameEn: stripSuffix(ctl.getAttribute('data-name-en')) || slug,
             sizes: {},
             size: '',
@@ -3022,6 +3023,7 @@ console.log('%c Вебсајт во развој 💪', 'color:#6B6B76;font-size
             code: ctl.getAttribute('data-code') || slug,
             price: parseFloat(ctl.getAttribute('data-price')) || 0,
             nameMk: stripSuffix(ctl.getAttribute('data-name-mk')) || slug,
+            nameSq: stripSuffix(ctl.getAttribute('data-name-sq')) || slug,
             nameEn: stripSuffix(ctl.getAttribute('data-name-en')) || slug,
             sizes: {},
             size: '',
@@ -3600,6 +3602,7 @@ window.MONETA_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhY
 window.MonetaData = {
     products: {}, // slug -> product
     sizes: {},    // slug -> { size: qty }
+    categories: {}, // slug -> категорија
     ready: null
 };
 
@@ -3676,10 +3679,12 @@ window.MonetaData = {
                 const mk = 'Цена: ' + price + ' ден.';
                 const sq = 'Çmimi: ' + price + ' den.';
                 const en = 'Price: ' + price + ' MKD';
+                const curLang = document.documentElement.lang;
                 priceEl.setAttribute('data-mk', mk);
                 priceEl.setAttribute('data-sq', sq);
                 priceEl.setAttribute('data-en', en);
-                priceEl.textContent = mk;
+                // Почитувај го тековниот јазик (не само МК) — инаку цената не се преведува на SQ/EN
+                priceEl.textContent = curLang === 'en' ? en : (curLang === 'sq' ? sq : mk);
 
                 // стара цена (прецртана)
                 let oldEl = priceEl.nextElementSibling && priceEl.nextElementSibling.classList.contains('price-old')
@@ -3815,6 +3820,9 @@ window.MonetaData = {
 
         // ---- АКЦИЈА страна: динамична листа на попусти од Supabase ----
         applyAkcijaPage();
+
+        // ---- Нови категории/производи: динамички додавање на постоечките страници ----
+        applyDynamicCategories();
     };
 
     // Акција страна — производи со активен попуст, директно од Supabase
@@ -3889,14 +3897,125 @@ window.MonetaData = {
         el.textContent = JSON.stringify(ld);
     }
 
+    // Модели со статички страници — новите производи одат на model.html?slug=
+    const STATIC_MODELS = ['active-gel','anatomiX','carbon','duck','heel-pad','heel-pad-fix','heel-pad-grip','hunter-camo','hunter-flex','hunter-outdoor','memosole','relax','simona','snakex','soft-gel','sport-style','sportex','thermo-alu','topas','vital','x-treme'];
+    const modelPageLink = (slug) => STATIC_MODELS.indexOf(slug) !== -1
+      ? './modeli/' + slug + '.html'
+      : './model.html?slug=' + encodeURIComponent(slug);
+    const escH = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const catNameOf = (slug) => {
+      const c = window.MonetaData.categories[slug];
+      if (!c) return slug;
+      const l = document.documentElement.lang;
+      return (l === 'sq' ? (c.name_sq || c.name_mk) : l === 'en' ? (c.name_en || c.name_mk) : c.name_mk) || slug;
+    };
+
+    // Картичка во ист стил како постоечките (.card card--image)
+    function cardHtml(p) {
+      const l = document.documentElement.lang;
+      const nmMk = p.name_mk || p.slug, nmSq = p.name_sq || nmMk, nmEn = p.name_en || nmMk;
+      const nm = l === 'sq' ? nmSq : l === 'en' ? nmEn : nmMk;
+      const dmk = p.short_desc_mk || '', dsq = p.short_desc_sq || dmk, den = p.short_desc_en || dmk;
+      const d = l === 'sq' ? dsq : l === 'en' ? den : dmk;
+      const sizes = window.MonetaData.sizes[p.slug] || {};
+      const total = Object.keys(sizes).length ? Object.values(sizes).reduce((a, b) => a + (Number(b) || 0), 0) : null;
+      const out = total !== null && total <= 0;
+      const pct = discountOf(p);
+      const badge = pct > 0 ? '<span class="promo-badge promo-badge--card">−' + pct + '%</span>' : '';
+      const stock = out ? '<span class="card__stock-badge" data-mk="Нема на залиха" data-sq="Mbaruar" data-en="Out of stock">Нема на залиха</span>' : '';
+      return '<a href="' + escH(modelPageLink(p.slug)) + '" class="card card--image' + (out ? ' card--out-of-stock' : '') + '">' +
+        '<div class="card__image"><img src="' + escH(p.image || './images/cards/' + p.slug + '.webp') + '" alt="' + escH(nmMk) + '" class="card__img" width="400" height="300" loading="lazy" decoding="async"></div>' +
+        badge + stock +
+        '<div class="card__overlay">' +
+          '<h4 data-mk="' + escH(nmMk) + '" data-sq="' + escH(nmSq) + '" data-en="' + escH(nmEn) + '">' + escH(nm) + '</h4>' +
+          '<p class="card__desc" data-mk="' + escH(dmk) + '" data-sq="' + escH(dsq) + '" data-en="' + escH(den) + '">' + escH(d) + '</p>' +
+          '<span class="card__link" data-mk="' + escH(nmMk) + '" data-sq="' + escH(nmSq) + '" data-en="' + escH(nmEn) + '">' + escH(nm) + '</span>' +
+        '</div></a>';
+    }
+
+    // Додај нови производи на категориските страници, нови категории на почетна + навбар
+    function applyDynamicCategories() {
+      const prods = window.MonetaData.products;
+      const slugs = Object.keys(prods);
+      if (!slugs.length) return;
+      const page = (location.pathname.split('/').pop() || '').replace(/\.html$/, '');
+      const catPageMap = { sportski: 1, kozni: 1, letni: 1, zimski: 1, hunter: 1, detski: 1, heelpad: 1, outdoor: 1 };
+      const l = document.documentElement.lang;
+
+      // 1) Категориска страница → нови производи во таа категорија
+      const grid = document.querySelector('.categories-section .categories__grid');
+      if (grid && catPageMap[page]) {
+        const existing = new Set();
+        grid.querySelectorAll('a[href*="modeli/"], a[href*="model.html"]').forEach((a) => {
+          const h = a.getAttribute('href') || '';
+          const m = h.match(/modeli\/([^\/]+)\.html/) || h.match(/model\.html\?slug=([^&]+)/);
+          if (m) existing.add(m[1]);
+        });
+        const toAdd = slugs
+          .filter((s) => prods[s].active !== false && prods[s].category === page && !existing.has(s))
+          .sort((a, b) => (Number(prods[a].sort_order) || 0) - (Number(prods[b].sort_order) || 0));
+        if (toAdd.length) grid.insertAdjacentHTML('beforeend', toAdd.map((s) => cardHtml(prods[s])).join(''));
+      }
+
+      // 2) Почетна → нови категории-картички
+      if (page === 'index') {
+        const catGrid = document.querySelector('#kategorii .categories__grid');
+        if (catGrid) {
+          const existingCats = new Set();
+          catGrid.querySelectorAll('a[href]').forEach((a) => {
+            const h = a.getAttribute('href') || '';
+            const m = h.match(/(sportski|kozni|letni|zimski|hunter|detski|heelpad|outdoor)\.html/) || h.match(/kategorija\.html\?cat=([^&]+)/);
+            if (m) existingCats.add(m[1]);
+          });
+          const newCats = Object.values(window.MonetaData.categories)
+            .filter((c) => c.active !== false && c.slug !== 'ostanato' && !c.parent_id && !existingCats.has(c.slug));
+          if (newCats.length) {
+            catGrid.insertAdjacentHTML('beforeend', newCats.map((c) => {
+              const nm = (l === 'sq' ? (c.name_sq || c.name_mk) : l === 'en' ? (c.name_en || c.name_mk) : c.name_mk) || c.slug;
+              return '<a href="./kategorija.html?cat=' + encodeURIComponent(c.slug) + '" class="card card--image">' +
+                '<div class="card__image"><img src="' + escH(c.image || './images/cards/' + c.slug + '.webp') + '" alt="' + escH(nm) + '" class="card__img" width="400" height="300" loading="lazy" decoding="async"></div>' +
+                '<div class="card__overlay"><h4>' + escH(nm) + '</h4><span class="card__link">' + escH(nm) + '</span></div></a>';
+            }).join(''));
+          }
+        }
+      }
+
+      // 3) Навбар „Влошки" → нови категории
+      const ddMenu = document.querySelector('.navbar__dd-menu');
+      if (ddMenu) {
+        const existingCats = new Set();
+        ddMenu.querySelectorAll('a').forEach((a) => {
+          const h = a.getAttribute('href') || '';
+          const m = h.match(/kategorija\.html\?cat=([^&]+)/) || h.match(/(sportski|kozni|letni|zimski|hunter|detski|heelpad|outdoor)\.html/);
+          if (m) existingCats.add(m[1]);
+        });
+        Object.values(window.MonetaData.categories)
+          .filter((c) => c.active !== false && c.slug !== 'ostanato' && !c.parent_id && !existingCats.has(c.slug))
+          .forEach((c) => {
+            const nm = (l === 'sq' ? (c.name_sq || c.name_mk) : l === 'en' ? (c.name_en || c.name_mk) : c.name_mk) || c.slug;
+            const a = document.createElement('a');
+            a.href = './kategorija.html?cat=' + encodeURIComponent(c.slug);
+            a.setAttribute('role', 'menuitem');
+            a.setAttribute('data-mk', escH(c.name_mk || c.slug));
+            a.setAttribute('data-sq', escH(c.name_sq || c.name_mk || c.slug));
+            a.setAttribute('data-en', escH(c.name_en || c.name_mk || c.slug));
+            a.textContent = nm;
+            ddMenu.appendChild(a);
+          });
+      }
+    }
+
     window.MonetaData.ready = (async () => {
         try {
-            const [prods, sizes] = await Promise.all([
+            const [prods, sizes, cats] = await Promise.all([
                 fetch(url + '/rest/v1/products?select=*&order=sort_order', { headers }).then(r => r.json()),
-                fetch(url + '/rest/v1/product_sizes?select=product_id,size,qty', { headers }).then(r => r.json())
+                fetch(url + '/rest/v1/product_sizes?select=product_id,size,qty', { headers }).then(r => r.json()),
+                fetch(url + '/rest/v1/categories?select=*&order=sort_order', { headers }).then(r => r.json()).catch(() => [])
             ]);
+            const catList = Array.isArray(cats) ? cats : [];
             const idToSlug = {};
             (prods || []).forEach(p => { window.MonetaData.products[p.slug] = p; idToSlug[p.id] = p.slug; });
+            catList.forEach(c => { window.MonetaData.categories[c.slug] = c; });
             (sizes || []).forEach(s => {
                 const slug = idToSlug[s.product_id];
                 if (slug) (window.MonetaData.sizes[slug] = window.MonetaData.sizes[slug] || {})[s.size] = s.qty;

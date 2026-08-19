@@ -151,6 +151,7 @@ label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--mute
       <button class="tab is-active" data-tab="proizvodi" title="Производи"><span class="tab-ico">📦</span><span class="tab-label">Производи</span></button>
       <button class="tab" data-tab="kampanji" title="Кампањи"><span class="tab-ico">📅</span><span class="tab-label">Кампањи</span></button>
       <button class="tab" data-tab="zaliha" title="Залиха"><span class="tab-ico">🔢</span><span class="tab-label">Залиха</span></button>
+      <button class="tab" data-tab="kategorii" title="Категории"><span class="tab-ico">📂</span><span class="tab-label">Категории</span></button>
     </div>
     <div class="spacer"></div>
     <button class="btn btn--ghost btn--sm" id="refreshBtn" title="Освежи">🔄 <span class="tab-label">Освежи</span></button>
@@ -189,7 +190,7 @@ label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--mute
     <!-- ===== ЗАЛИХА ===== -->
     <section id="tab-zaliha" class="hidden">
       <div class="toolbar">
-        <p style="color:var(--muted)">🔢 Сите производи на еден поглед. Кликни „Големини“ на производот за да ги видиш и смениш бројчињата (qty 0 = сив/нема на залиха).</p>
+        <p style="color:var(--muted)">🔢 Сите производи на еден поглед. Кликни „Големини“ на производот за да ги видиш и смениш бројчињата (qty 0 = сив/нема на залиха). Користи <b>+/−</b> за брзо додавање/одземање.</p>
         <div class="spacer"></div>
         <select id="sortStock" style="min-width:170px">
           <option value="name">🔤 Азбучно А–Ј</option>
@@ -200,6 +201,16 @@ label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--mute
         </select>
       </div>
       <div id="stockView"></div>
+    </section>
+
+    <!-- ===== КАТЕГОРИИ ===== -->
+    <section id="tab-kategorii" class="hidden">
+      <div class="toolbar">
+        <p style="color:var(--muted)">📂 Управувај со категориите и под-категориите. Новата категорија веднаш се појавува на сајтот (динамичка страница), а во менито „Влошки“.</p>
+        <div class="spacer"></div>
+        <button class="btn" id="addCategoryBtn">➕ Нова категорија</button>
+      </div>
+      <div id="categoriesView"></div>
     </section>
   </main>
 </div>
@@ -215,18 +226,13 @@ label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--mute
         <input id="fSort" type="number" placeholder="21"></label>
       <label>Име (МК)
         <input id="fNameMk" placeholder="X-TREME"></label>
+      <label>Име (SQ)
+        <input id="fNameSq" placeholder="X-TREME"></label>
       <label>Име (EN)
         <input id="fNameEn" placeholder="X-TREME"></label>
-      <label>Категорија
-        <select id="fCat">
-          <option value="sportski">sportski</option>
-          <option value="kozni">kozni</option>
-          <option value="letni">letni</option>
-          <option value="zimski">zimski</option>
-          <option value="hunter">hunter</option>
-          <option value="detski">detski</option>
-          <option value="ostanato">ostanato</option>
-        </select></label>
+      <label>Категорија (пиши нова или избери)
+        <input id="fCat" list="catList" placeholder="sportski">
+        <datalist id="catList"></datalist></label>
       <label>Цена (ден.)
         <input id="fPrice" type="number" placeholder="420"></label>
       <label>Слика (патека)
@@ -236,6 +242,8 @@ label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--mute
         <input id="fDiscount" type="number" min="0" max="99" placeholder="0"></label>
       <label class="full">Краток опис (МК)
         <textarea id="fDescMk" rows="2"></textarea></label>
+      <label class="full">Краток опис (SQ)
+        <textarea id="fDescSq" rows="2"></textarea></label>
       <label class="full">Краток опис (EN)
         <textarea id="fDescEn" rows="2"></textarea></label>
       <label>Попуст од (датум + време)
@@ -244,6 +252,9 @@ label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--mute
         <span class="camp-dt"><input id="fUntilD" type="date"><input id="fUntilT" type="time"></span></label>
       <label style="flex-direction:row;align-items:center;gap:8px;color:var(--ink)">
         <input id="fActive" type="checkbox" checked style="width:auto"> Активен (се прикажува)</label>
+      <label class="full">Технички спецификации (карактеристика → вредност, на 3 јазика)
+        <div id="fSpecs" style="display:flex;flex-direction:column;gap:8px;margin-top:4px"></div>
+        <button type="button" class="btn btn--ghost btn--sm" id="addSpecBtn" style="align-self:flex-start;margin-top:8px">➕ Додади карактеристика</button></label>
     </div>
     <div class="modal-actions">
       <button class="btn btn--ghost" id="modalCancel">Откажи</button>
@@ -252,11 +263,43 @@ label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--mute
   </div>
 </div>
 
+<!-- ===== МОДАЛ: КАТЕГОРИЈА ===== -->
+<div id="catModal" class="hidden">
+  <div class="modal-card">
+    <h2 id="catModalTitle">Категорија</h2>
+    <div class="fgrid">
+      <label>Код (slug) — англиски, без празни места
+        <input id="cSlug" placeholder="npr. tenis"></label>
+      <label>Редослед (sort_order)
+        <input id="cSort" type="number" placeholder="10"></label>
+      <label class="full">Над-категорија (празно = главна категорија)
+        <select id="cParent">
+          <option value="">— Главна категорија —</option>
+        </select></label>
+      <label>Име (МК)
+        <input id="cNameMk" placeholder="Тенис влошки"></label>
+      <label>Име (SQ)
+        <input id="cNameSq" placeholder="Tabana tenisi"></label>
+      <label>Име (EN)
+        <input id="cNameEn" placeholder="Tennis insoles"></label>
+      <label class="full">Слика (патека)
+        <input id="cImage" placeholder="./images/cards/tenis.webp">
+        <img id="cImgPrev" class="thumb" style="width:56px;height:56px;margin-top:6px" alt=""></label>
+      <label style="flex-direction:row;align-items:center;gap:8px;color:var(--ink)">
+        <input id="cActive" type="checkbox" checked style="width:auto"> Активна (се прикажува)</label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn--ghost" id="catModalCancel">Откажи</button>
+      <button class="btn" id="catModalSave">💾 Зачувај</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const API = "https://wkpkrnjrtpywuzemirbw.supabase.co/functions/v1/admin-api";
 const ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndrcGtybmpydHB5d3V6ZW1pcmJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU5NjkwOTksImV4cCI6MjEwMTU0NTA5OX0.nkeKFm2qQYXEsHY6kkJxqfsOxiSEEQJzLOmnrdMMg8I";
 let PASSWORD = sessionStorage.getItem("konzola-pass") || "";
-let CACHE = { products: [], sizes: [] };
+let CACHE = { products: [], sizes: [], categories: [] };
 let VIEW = "grid";
 let EDITING = null; // slug кој се едитира, null = нов
 let SORT = "name";
@@ -320,9 +363,10 @@ document.querySelectorAll(".tab").forEach((b) =>
   b.addEventListener("click", () => {
     document.querySelectorAll(".tab").forEach((x) => x.classList.remove("is-active"));
     b.classList.add("is-active");
-    ["proizvodi", "kampanji", "zaliha"].forEach((t) => $("tab-" + t).classList.add("hidden"));
+    ["proizvodi", "kampanji", "zaliha", "kategorii"].forEach((t) => $("tab-" + t).classList.add("hidden"));
     $("tab-" + b.dataset.tab).classList.remove("hidden");
     if (b.dataset.tab === "zaliha") renderStock();
+    if (b.dataset.tab === "kategorii") renderCategories();
   })
 );
 
@@ -332,12 +376,40 @@ async function loadAll() {
   const data = await api("list_all");
   CACHE.products = data.products || [];
   CACHE.sizes = data.sizes || [];
+  CACHE.categories = data.categories || [];
+  buildCatList();
   renderProducts();
   renderCampaigns();
   renderStock();
+  renderCategories();
   toast("Податоците се освежени");
 }
 $("refreshBtn").addEventListener("click", () => loadAll().catch((e) => toast(e.message, "err")));
+
+/* ---------- КАТЕГОРИИ: помощници ---------- */
+const catOf = (slug) => CACHE.categories.find((c) => c.slug === slug);
+const catName = (slug, lang) => {
+  const c = catOf(slug);
+  if (!c) return slug;
+  return (lang === "sq" ? (c.name_sq || c.name_mk) : lang === "en" ? (c.name_en || c.name_mk) : c.name_mk) || slug;
+};
+const catChildren = (id) => CACHE.categories.filter((c) => c.parent_id === id);
+const catPath = (c) => {
+  const parts = [];
+  let cur = c;
+  const guard = new Set();
+  while (cur && !guard.has(cur.id)) {
+    guard.add(cur.id);
+    parts.unshift(cur.name_mk || cur.slug);
+    cur = CACHE.categories.find((x) => x.id === cur.parent_id) || null;
+  }
+  return parts.join(" → ");
+};
+function buildCatList() {
+  const dl = $("catList");
+  if (!dl) return;
+  dl.innerHTML = CACHE.categories.map((c) => "<option value='" + c.slug + "'>" + (c.name_mk || c.slug) + "</option>").join("");
+}
 
 const prodOf = (slug) => CACHE.products.find((p) => p.slug === slug);
 const stockTotal = (slug) => {
@@ -427,7 +499,7 @@ function renderProducts() {
         "<div class='pcard__img'><img src='" + imgOf(p) + "' onerror='this.style.opacity=.2'></div>" +
         "<div class='pcard__body'>" +
           "<div class='pcard__name'>" + p.name_mk + " <span class='badge " + (p.active ? "" : "badge--off") + "'>" + (p.active ? "активен" : "скриен") + "</span></div>" +
-          "<div class='pcard__slug'>" + p.slug + " · " + p.category + "</div>" +
+          "<div class='pcard__slug'>" + p.slug + " · " + catName(p.category, "mk") + "</div>" +
           "<div class='pcard__price'>" + (Number(p.price) || 0) + " ден." + (p.discount > 0 ? "<span class='badge'>-" + p.discount + "%</span>" : "") + "</div>" +
           "<div class='pcard__meta'>Залиха: <b>" + stockTotal(p.slug) + "</b></div>" +
           "<div class='pcard__camp " + (cam.startsWith("📅") ? "" : "pcard__camp--off") + "'>" + cam + "</div>" +
@@ -475,6 +547,7 @@ function openEdit(slug) {
   $("fSlug").disabled = !!p;
   $("fSort").value = p ? p.sort_order : Math.max(0, ...CACHE.products.map((x) => Number(x.sort_order) || 0)) + 1;
   $("fNameMk").value = p ? p.name_mk : "";
+  $("fNameSq").value = p ? p.name_sq || "" : "";
   $("fNameEn").value = p ? p.name_en : "";
   $("fCat").value = p ? p.category : "sportski";
   $("fPrice").value = p ? p.price : "";
@@ -482,7 +555,9 @@ function openEdit(slug) {
   $("fImgPrev").src = $("fImage").value;
   $("fDiscount").value = p ? p.discount : 0;
   $("fDescMk").value = p ? p.short_desc_mk || "" : "";
+  $("fDescSq").value = p ? p.short_desc_sq || "" : "";
   $("fDescEn").value = p ? p.short_desc_en || "" : "";
+  renderSpecs(p ? p.specs : []);
   const from = isoToInputs(p && p.discount_from);
   const until = isoToInputs(p && p.discount_until);
   $("fFromD").value = from.date; $("fFromT").value = from.time;
@@ -499,10 +574,13 @@ $("modalSave").addEventListener("click", async () => {
     const product = {
       slug,
       name_mk: $("fNameMk").value.trim() || slug,
+      name_sq: $("fNameSq").value.trim(),
       name_en: $("fNameEn").value.trim() || slug,
-      category: $("fCat").value,
+      category: $("fCat").value.trim().toLowerCase().replace(/\s+/g, "-") || "ostanato",
       short_desc_mk: $("fDescMk").value.trim(),
+      short_desc_sq: $("fDescSq").value.trim(),
       short_desc_en: $("fDescEn").value.trim(),
+      specs: collectSpecs(),
       price: Number($("fPrice").value) || 0,
       image: $("fImage").value.trim(),
       thumbnail: $("fImage").value.trim().replace(/^\.\//, ""),
@@ -528,6 +606,145 @@ async function deleteProduct(slug) {
     await api("delete_product", { slug });
     await loadAll();
     toast("Производот е избришан");
+  } catch (e) { toast(e.message, "err"); }
+}
+
+/* ---------- СПЕЦИФИКАЦИИ (specs editor) ---------- */
+function esc(s) {
+  return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+}
+function specRowHtml(s) {
+  s = s || { label: {}, value: {} };
+  const l = s.label || {}, v = s.value || {};
+  return "<div class='spec-row' style='display:grid;grid-template-columns:repeat(6,1fr) auto;gap:6px;align-items:center;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px'>" +
+    "<input class='sp-lm' placeholder='Каракт. МК' value='" + esc(l.mk) + "'>" +
+    "<input class='sp-ls' placeholder='Каракт. SQ' value='" + esc(l.sq) + "'>" +
+    "<input class='sp-le' placeholder='Каракт. EN' value='" + esc(l.en) + "'>" +
+    "<input class='sp-vm' placeholder='Вредност МК' value='" + esc(v.mk) + "'>" +
+    "<input class='sp-vs' placeholder='Вредност SQ' value='" + esc(v.sq) + "'>" +
+    "<input class='sp-ve' placeholder='Вредност EN' value='" + esc(v.en) + "'>" +
+    "<button type='button' class='btn btn--danger btn--sm sp-rm' title='Отстрани'>✖</button>" +
+  "</div>";
+}
+function renderSpecs(specs) {
+  const box = $("fSpecs");
+  if (!box) return;
+  box.innerHTML = (Array.isArray(specs) && specs.length ? specs : [{}]).map(specRowHtml).join("");
+  box.querySelectorAll(".sp-rm").forEach((b) => b.addEventListener("click", () => b.closest(".spec-row").remove()));
+}
+function collectSpecs() {
+  const out = [];
+  document.querySelectorAll("#fSpecs .spec-row").forEach((r) => {
+    const label = {
+      mk: r.querySelector(".sp-lm").value.trim(),
+      sq: r.querySelector(".sp-ls").value.trim(),
+      en: r.querySelector(".sp-le").value.trim()
+    };
+    const value = {
+      mk: r.querySelector(".sp-vm").value.trim(),
+      sq: r.querySelector(".sp-vs").value.trim(),
+      en: r.querySelector(".sp-ve").value.trim()
+    };
+    if (label.mk || value.mk || label.sq || value.sq || label.en || value.en) out.push({ label, value });
+  });
+  return out;
+}
+$("addSpecBtn").addEventListener("click", () => {
+  const box = $("fSpecs");
+  if (!box) return;
+  const div = document.createElement("div");
+  div.innerHTML = specRowHtml({});
+  div.firstChild.querySelector(".sp-rm").addEventListener("click", () => div.remove());
+  box.appendChild(div.firstChild);
+});
+
+/* ---------- КАТЕГОРИИ: РЕНДЕР + МОДАЛ ---------- */
+let EDITING_CAT = null;
+function renderCategories() {
+  const view = $("categoriesView");
+  const roots = CACHE.categories.filter((c) => !c.parent_id);
+  const prodCount = (slug) => CACHE.products.filter((p) => p.category === slug).length;
+  const renderCat = (c, depth) => {
+    const kids = catChildren(c.id);
+    const cnt = prodCount(c.slug);
+    return "<div class='camp-row' style='grid-template-columns:1fr auto;margin-left:" + (depth * 26) + "px' data-cat='" + c.slug + "'>" +
+      "<div style='display:flex;gap:10px;align-items:center'>" +
+        "<img class='thumb' src='" + (c.image || "images/cards/" + c.slug + ".webp") + "' onerror='this.style.opacity=.2'>" +
+        "<div><div class='name'>" + (depth > 0 ? "↳ " : "") + (c.name_mk || c.slug) +
+          " <span class='badge " + (c.active ? "" : "badge--off") + "'>" + (c.active ? "активна" : "скриена") + "</span></div>" +
+          "<div class='slug'>" + c.slug + " · MK: " + (c.name_mk || "—") + " · SQ: " + (c.name_sq || "—") + " · EN: " + (c.name_en || "—") +
+          (cnt ? " · <b style='color:var(--pink)'>" + cnt + " произ.</b>" : "") + "</div></div></div>" +
+      "<div style='display:flex;gap:8px'>" +
+        "<button class='btn btn--ghost btn--sm' data-cat-edit='" + c.slug + "'>✏️ Измени</button>" +
+        (cnt === 0 ? "<button class='btn btn--danger btn--sm' data-cat-del='" + c.slug + "'>🗑</button>" : "") +
+      "</div></div>" +
+      kids.map((k) => renderCat(k, depth + 1)).join("");
+  };
+  if (roots.length === 0) { view.innerHTML = '<p style="color:var(--muted);padding:30px 0">Нема категории. Додади нова.</p>'; return; }
+  view.innerHTML = roots.map((c) => renderCat(c, 0)).join("");
+
+  view.querySelectorAll("[data-cat-edit]").forEach((b) => b.addEventListener("click", () => openCatEdit(b.dataset.catEdit)));
+  view.querySelectorAll("[data-cat-del]").forEach((b) => b.addEventListener("click", () => deleteCategory(b.dataset.catDel)));
+}
+$("addCategoryBtn").addEventListener("click", () => openCatEdit(null));
+function openCatEdit(slug) {
+  EDITING_CAT = slug;
+  const c = slug ? catOf(slug) : null;
+  $("catModalTitle").textContent = c ? "✏️ Измени: " + (c.name_mk || c.slug) : "➕ Нова категорија";
+  $("cSlug").value = c ? c.slug : "";
+  $("cSlug").disabled = !!c;
+  $("cSort").value = c ? c.sort_order : Math.max(0, ...CACHE.categories.map((x) => Number(x.sort_order) || 0)) + 1;
+  // Над-категорија: само други категории (без самата себе и без нејзините деца)
+  const parentSel = $("cParent");
+  parentSel.innerHTML = '<option value="">— Главна категорија —</option>' + CACHE.categories
+    .filter((x) => x.slug !== slug && !(c && x.parent_id === c.id))
+    .map((x) => "<option value='" + x.slug + "'>" + catPath(x) + "</option>").join("");
+  const parent = c ? CACHE.categories.find((x) => x.id === c.parent_id) : null;
+  parentSel.value = parent ? parent.slug : "";
+  $("cNameMk").value = c ? c.name_mk : "";
+  $("cNameSq").value = c ? c.name_sq || "" : "";
+  $("cNameEn").value = c ? c.name_en || "" : "";
+  $("cImage").value = c ? (c.image || "") : "";
+  $("cImgPrev").src = $("cImage").value || "";
+  $("cActive").checked = c ? c.active : true;
+  $("catModal").classList.remove("hidden");
+}
+$("catModalCancel").addEventListener("click", () => $("catModal").classList.add("hidden"));
+$("cImage").addEventListener("input", () => { $("cImgPrev").src = $("cImage").value; });
+$("catModalSave").addEventListener("click", async () => {
+  try {
+    const slug = $("cSlug").value.trim().toLowerCase().replace(/\s+/g, "-");
+    if (!slug) { toast("Внеси код (slug)", "err"); return; }
+    if (!$("cNameMk").value.trim()) { toast("Внеси име (МК)", "err"); return; }
+    const category = {
+      slug,
+      parent_id: $("cParent").value,
+      name_mk: $("cNameMk").value.trim(),
+      name_sq: $("cNameSq").value.trim(),
+      name_en: $("cNameEn").value.trim(),
+      image: $("cImage").value.trim(),
+      sort_order: Number($("cSort").value) || 0,
+      active: $("cActive").checked
+    };
+    toast("Се зачувува...", "load");
+    await api("save_category", { category });
+    $("catModal").classList.add("hidden");
+    await loadAll();
+    toast("Категоријата е зачувана");
+  } catch (e) { toast(e.message, "err"); }
+});
+async function deleteCategory(slug) {
+  const c = catOf(slug);
+  if (!c) return;
+  const cnt = CACHE.products.filter((p) => p.category === slug).length;
+  const msg = "Сигурно да се избрише категоријата \"" + (c.name_mk || slug) + "\"?" +
+    (cnt > 0 ? "\n⚠️ " + cnt + " производи во неа ќе бидат префрлени во „Останато“." : "");
+  if (!confirm(msg)) return;
+  try {
+    toast("Се брише...", "load");
+    await api("delete_category", { slug });
+    await loadAll();
+    toast("Категоријата е избришана");
   } catch (e) { toast(e.message, "err"); }
 }
 
@@ -586,7 +803,7 @@ $("sortStock").addEventListener("change", (e) => { SORT = e.target.value; render
 function goStock(slug) {
   document.querySelectorAll(".tab").forEach((x) => x.classList.remove("is-active"));
   document.querySelector('.tab[data-tab="zaliha"]').classList.add("is-active");
-  ["proizvodi", "kampanji", "zaliha"].forEach((t) => $("tab-" + t).classList.add("hidden"));
+  ["proizvodi", "kampanji", "zaliha", "kategorii"].forEach((t) => $("tab-" + t).classList.add("hidden"));
   $("tab-zaliha").classList.remove("hidden");
   OPEN_SLUGS.clear();
   OPEN_SLUGS.add(slug);
@@ -624,7 +841,9 @@ function sizesPanelHtml(p) {
     "<div class='sizes-grid'>" + rows.map((r) =>
       "<div class='size-row' data-size='" + r.size + "'>" +
         "<span class='sname'>" + r.size + "</span>" +
+        "<button type='button' class='btn btn--ghost btn--sm s-dec' title='Одземи 1'>−</button>" +
         "<input type='number' min='0' class='s-qty' value='" + r.qty + "'>" +
+        "<button type='button' class='btn btn--ghost btn--sm s-inc' title='Додај 1'>+</button>" +
         "<button class='btn btn--danger btn--sm' data-rm='" + r.size + "'>🗑</button>" +
       "</div>").join("") + "</div>" +
     "<div class='size-row size-row--new'>" +
@@ -639,6 +858,18 @@ function sizesPanelHtml(p) {
 }
 
 function bindSizesPanel(view) {
+  view.querySelectorAll(".s-inc").forEach((b) =>
+    b.addEventListener("click", () => {
+      const inp = b.closest(".size-row").querySelector(".s-qty");
+      if (inp) inp.value = Math.max(0, (Number(inp.value) || 0) + 1);
+    })
+  );
+  view.querySelectorAll(".s-dec").forEach((b) =>
+    b.addEventListener("click", () => {
+      const inp = b.closest(".size-row").querySelector(".s-qty");
+      if (inp) inp.value = Math.max(0, (Number(inp.value) || 0) - 1);
+    })
+  );
   view.querySelectorAll("[data-rm]").forEach((b) =>
     b.addEventListener("click", () => b.closest(".size-row").remove())
   );
@@ -651,8 +882,20 @@ function bindSizesPanel(view) {
       const div = document.createElement("div");
       div.className = "size-row";
       div.dataset.size = name;
-      div.innerHTML = "<span class='sname'>" + name + "</span><input type='number' min='0' class='s-qty' value='" + qty + "'><button class='btn btn--danger btn--sm'>🗑</button>";
-      div.querySelector("button").addEventListener("click", () => div.remove());
+      div.innerHTML = "<span class='sname'>" + name + "</span>" +
+        "<button type='button' class='btn btn--ghost btn--sm s-dec' title='Одземи 1'>−</button>" +
+        "<input type='number' min='0' class='s-qty' value='" + qty + "'>" +
+        "<button type='button' class='btn btn--ghost btn--sm s-inc' title='Додај 1'>+</button>" +
+        "<button class='btn btn--danger btn--sm'>🗑</button>";
+      div.querySelector(".s-inc").addEventListener("click", () => {
+        const inp = div.querySelector(".s-qty");
+        inp.value = Math.max(0, (Number(inp.value) || 0) + 1);
+      });
+      div.querySelector(".s-dec").addEventListener("click", () => {
+        const inp = div.querySelector(".s-qty");
+        inp.value = Math.max(0, (Number(inp.value) || 0) - 1);
+      });
+      div.querySelector("button:last-child").addEventListener("click", () => div.remove());
       panel.querySelector(".sizes-grid").appendChild(div);
       panel.querySelector(".s-new-name").value = "";
       panel.querySelector(".s-new-qty").value = "";

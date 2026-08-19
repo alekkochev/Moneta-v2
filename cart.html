@@ -230,6 +230,8 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
             if (!container || !window.MonetaCart) return;
 
             const isEn = () => document.documentElement.lang === 'en';
+            const isSq = () => document.documentElement.lang === 'sq';
+            const itemName = (l) => (isSq() ? (l.nameSq || l.nameMk) : isEn() ? l.nameEn : l.nameMk) || l.slug;
             const fmt = (n) => n.toLocaleString('mk-MK') + ' ' + (isEn() ? 'MKD' : 'ден.');
 
             // Неактивни ставки (чекбокс) — се исклучуваат од нарачката
@@ -294,7 +296,7 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
                 const lines = [];
                 Object.values(cart).filter((it) => it.qty > 0).forEach((it) => {
                     Object.entries(it.sizes || {}).filter(([, q]) => q > 0).forEach(([sz, q]) => {
-                        lines.push({ slug: it.slug, code: it.code || '—', price: it.price, nameMk: it.nameMk || it.titleMk || it.slug, nameEn: it.nameEn || it.titleEn || it.slug, size: sz, qty: q });
+                        lines.push({ slug: it.slug, code: it.code || '—', price: it.price, nameMk: it.nameMk || it.titleMk || it.slug, nameSq: it.nameSq || it.titleSq || it.nameMk || it.slug, nameEn: it.nameEn || it.titleEn || it.slug, size: sz, qty: q });
                     });
                 });
                 const active = lines.filter((l) => !isInactive(l.slug, l.size));
@@ -324,13 +326,13 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                         </button>
                         <div class="cart__thumb-wrap">
-                            <a href="./modeli/${l.slug}.html" class="cart__item-thumb" aria-label="${isEn() ? l.nameEn : l.nameMk}">
-                                <img src="./images/cards/${l.slug}.webp" alt="${isEn() ? l.nameEn : l.nameMk}" loading="lazy" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=%27http://www.w3.org/2000/svg%27 width=%27120%27 height=%27120%27><rect width=%27120%27 height=%27120%27 fill=%27%23f1eef0%27/><text x=%2760%27 y=%2768%27 font-size=%2734%27 text-anchor=%27middle%27>👟</text></svg>'">
+                            <a href="./modeli/${l.slug}.html" class="cart__item-thumb" aria-label="${itemName(l)}">
+                                <img src="./images/cards/${l.slug}.webp" alt="${itemName(l)}" loading="lazy" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=%27http://www.w3.org/2000/svg%27 width=%27120%27 height=%27120%27><rect width=%27120%27 height=%27120%27 fill=%27%23f1eef0%27/><text x=%2760%27 y=%2768%27 font-size=%2734%27 text-anchor=%27middle%27>👟</text></svg>'">
                             </a>
                             <button type="button" class="cart__thumb-remove" data-cart-remove data-size="${l.size}" aria-label="${isEn() ? 'Remove' : 'Отстрани'}" title="${isEn() ? 'Remove' : 'Отстрани'}"${inact ? ' disabled' : ''}>✕</button>
                         </div>
                         <div>
-                            <a href="./modeli/${l.slug}.html" class="cart__item-name">${isEn() ? l.nameEn : l.nameMk} — ${isEn() ? 'Size' : 'Бр.'} ${l.size || (isEn() ? 'Universal' : 'Универзална')}</a>
+                            <a href="./modeli/${l.slug}.html" class="cart__item-name">${itemName(l)} — ${isEn() ? 'Size' : isSq() ? 'Madhësia' : 'Бр.'} ${l.size || (isEn() ? 'Universal' : isSq() ? 'Universale' : 'Универзална')}</a>
                             <div class="cart__item-code">${isEn() ? 'Code' : 'Код'}: ${l.code}</div>
                             <div class="cart__item-price">${fmt(l.price)} / ${isEn() ? 'pair' : 'пар'}</div>
                             <div class="cart__line-qty">

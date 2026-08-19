@@ -44,14 +44,88 @@ Deno.serve(async (req) => {
 
     if (action === "auth") return json({ ok: true });
 
-    // ---- Листа: сите производи + залихи ----
+    // ---- Листа: сите производи + залихи + категории ----
     if (action === "list_all") {
       const [{ data: products, error: e1 }, { data: sizes, error: e2 }] = await Promise.all([
         sb.from("products").select("*").order("sort_order", { ascending: true }),
         sb.from("product_sizes").select("product_id,size,qty"),
       ]);
       if (e1 || e2) return json({ ok: false, error: (e1 || e2)?.message || "list error" }, 500);
-      return json({ ok: true, products: products || [], sizes: sizes || [] });
+      // Категориите не смеат да го блокираат list_all ако табелата уште не е креирана
+      let categories: unknown[] = [];
+      const { data: cats, error: e3 } = await sb
+        .from("categories")
+        .select("*")
+        .order("sort_order", { ascending: true });
+      if (!e3) categories = cats || [];
+      return json({ ok: true, products: products || [], sizes: sizes || [], categories });
+    }
+
+    // ---- Листа само категории ----
+    if (action === "list_categories") {
+      const { data: categories, error } = await sb
+        .from("categories")
+        .select("*")
+        .order("sort_order", { ascending: true });
+      if (error) return json({ ok: false, error: error.message }, 500);
+      return json({ ok: true, categories: categories || [] });
+    }
+
+    // ---- Зачувај категорија (нова или изменета, под-категорија преку parent_id) ----
+    if (action === "save_category") {
+      const c = payload.category || {};
+      const slug = String(c.slug || "").trim().toLowerCase().replace(/\s+/g, "-");
+      if (!slug) return json({ ok: false, error: "Недостасува код (slug)" }, 400);
+      if (!String(c.name_mk || "").trim()) return json({ ok: false, error: "Внеси име (МК)" }, 400);
+
+      const row: Record<string, unknown> = {
+        slug,
+        name_mk: String(c.name_mk || slug).trim(),
+        name_sq: String(c.name_sq || "").trim(),
+        name_en: String(c.name_en || "").trim(),
+        image: String(c.image || "").trim(),
+        sort_order: num(c.sort_order),
+        active: c.active !== false,
+        updated_at: new Date().toISOString(),
+      };
+      const parent = String(c.parent_id || "").trim();
+      if (parent) {
+        // Ако parent е slug → пронајди id; ако е id → користи директно
+        const { data: parentCat } = await sb
+          .from("categories")
+          .select("id")
+          .or(`slug.eq.${parent},id.eq.${parent}`)
+          .maybeSingle();
+        if (parentCat) row.parent_id = parentCat.id;
+      } else {
+        row.parent_id = null;
+      }
+
+      const { data: existing } = await sb.from("categories").select("id").eq("slug", slug).maybeSingle();
+      if (existing) {
+        await sb.from("categories").update(row).eq("id", existing.id);
+      } else {
+        await sb.from("categories").insert(row);
+      }
+      const { data: cat } = await sb.from("categories").select("*").eq("slug", slug).maybeSingle();
+      return json({ ok: true, category: cat || null });
+    }
+
+    // ---- Избриши категорија: производите одат во „ostanato“ ----
+    if (action === "delete_category") {
+      const slug = String(payload.slug || "");
+      if (!slug) return json({ ok: false, error: "Недостасува код (slug)" }, 400);
+      const { data: cat } = await sb.from("categories").select("id").eq("slug", slug).maybeSingle();
+      if (!cat) return json({ ok: true, deleted: 0 });
+
+      // Под-категориите стануваат корен категории
+      await sb.from("categories").update({ parent_id: null }).eq("parent_id", cat.id);
+      // Производите одат во „ostanato“ (доколку постои)
+      const { data: ostanato } = await sb.from("categories").select("slug").eq("slug", "ostanato").maybeSingle();
+      await sb.from("products").update({ category: ostanato ? "ostanato" : slug }).eq("category", slug);
+      const { error } = await sb.from("categories").delete().eq("id", cat.id);
+      if (error) return json({ ok: false, error: error.message }, 500);
+      return json({ ok: true, deleted: 1 });
     }
 
     // ---- Зачувај производ (нов или изменет) ----
@@ -60,12 +134,16 @@ Deno.serve(async (req) => {
       const slug = String(p.slug || "").trim().toLowerCase().replace(/\s+/g, "-");
       if (!slug) return json({ ok: false, error: "Недостасува код (slug)" }, 400);
 
+      const cat = String(p.category || "ostanato").trim().toLowerCase().replace(/\s+/g, "-") || "ostanato";
+
       const row: Record<string, unknown> = {
         slug,
         name_mk: String(p.name_mk || slug),
+        name_sq: String(p.name_sq || ""),
         name_en: String(p.name_en || slug),
-        category: String(p.category || "ostanato"),
+        category: cat,
         short_desc_mk: String(p.short_desc_mk || ""),
+        short_desc_sq: String(p.short_desc_sq || ""),
         short_desc_en: String(p.short_desc_en || ""),
         price: num(p.price),
         image: String(p.image || `./images/cards/${slug}.webp`),
@@ -74,11 +152,31 @@ Deno.serve(async (req) => {
         sort_order: num(p.sort_order),
         discount: num(p.discount),
       };
+      // Спецификации: jsonb array [{label:{mk,sq,en}, value:{mk,sq,en}}]
+      if (Array.isArray(p.specs)) {
+        row.specs = JSON.stringify(p.specs.filter((s: any) => s && (s.label?.mk || s.value?.mk)));
+      } else if (p.specs !== undefined) {
+        row.specs = JSON.stringify([]);
+      }
       if (p.discount_from !== undefined) {
         row.discount_from = p.discount_from ? new Date(p.discount_from).toISOString() : null;
       }
       if (p.discount_until !== undefined) {
         row.discount_until = p.discount_until ? new Date(p.discount_until).toISOString() : null;
+      }
+
+      // Ако категоријата е нова (ја нема во categories) → автоматски ја создаваме
+      const { data: catRow } = await sb.from("categories").select("id").eq("slug", cat).maybeSingle();
+      if (!catRow && cat !== "ostanato") {
+        await sb.from("categories").insert({
+          slug: cat,
+          name_mk: cat,
+          name_sq: "",
+          name_en: "",
+          sort_order: 50,
+        }).select().then(async ({ error }) => {
+          if (error) console.warn("auto-create category failed", error.message);
+        });
       }
 
       const { data: existing } = await sb.from("products").select("id").eq("slug", slug).maybeSingle();
