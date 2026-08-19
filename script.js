@@ -3040,6 +3040,11 @@ console.log('%c Вебсајт во развој 💪', 'color:#6B6B76;font-size
                 if (sel && sel.getAttribute('data-model') === slugAttr) {
                     const t = b.textContent.trim();
                     if (t && b.dataset.size) labelMap[t] = b.dataset.size;
+                    // Јазични варијанти (MK/SQ/EN) → истата големина останува валидна
+                    ['data-mk', 'data-sq', 'data-en'].forEach((attr) => {
+                        const alt = b.getAttribute(attr);
+                        if (alt && b.dataset.size && !labelMap[alt]) labelMap[alt] = b.dataset.size;
+                    });
                 }
             });
             if (Object.keys(labelMap).length) item.sizeKeys = labelMap;
