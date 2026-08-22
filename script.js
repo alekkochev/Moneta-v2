@@ -3263,25 +3263,25 @@ console.log('%c Вебсајт во развој 💪', 'color:#6B6B76;font-size
     };
 
     const MODELS = {
-        'memosole':       { cat: ['sport'],  pain: ['celo', 'nema'], prio: ['amort', 'prirodni'], job: ['sportist', 'nastavnik', 'zdravstvo'], icons: ['anatomska', 'pritisok', 'mirisi', 'univerzalen'], price: 400, sys: 'memory', nameMk: 'MEMOSOLE', nameEn: 'MEMOSOLE' },
-        'active-gel':     { cat: ['sport'],  pain: ['peta', 'nema'], prio: ['amort'], job: ['sportist', 'zdravstvo'], icons: ['gel', 'pritisok', 'univerzalen', 'anatomska'], price: 620, sys: 'absorb', nameMk: 'Active Gel', nameEn: 'Active Gel' },
-        'sport-style':    { cat: ['sport'],  pain: ['nema'], prio: ['cena', 'prirodni'], job: ['sportist', 'nastavnik'], icons: ['prirodni', 'anatomska', 'apsorpcija'], price: 300, sys: 'anatomic', nameMk: 'Sport Style', nameEn: 'Sport Style' },
-        'sportex':        { cat: ['sport'],  pain: ['nema'], prio: ['cena', 'fresina'], job: ['sportist', 'rabotnik', 'nastavnik'], icons: ['pritisok', 'higienski', 'anatomska'], price: 230, sys: 'absorb', nameMk: 'Sportex', nameEn: 'Sportex' },
-        'x-treme':        { cat: ['sport'],  pain: ['peta', 'celo'], prio: ['amort', 'poddrshka'], job: ['sportist', 'rabotnik'], icons: ['pritisok', 'anatomska', 'apsorpcija', 'higienski'], price: 420, sys: 'anatomic', nameMk: 'X-TREME', nameEn: 'X-TREME' },
-        'heel-pad':       { cat: ['kozni'],  pain: ['peta'], prio: ['poddrshka'], job: ['kancelarija', 'zdravstvo', 'nastavnik'], icons: ['koza', 'pritisok', 'anatomska'], price: 250, sys: 'ortho', nameMk: 'Heel Pad', nameEn: 'Heel Pad' },
-        'heel-pad-fix':   { cat: ['kozni'],  pain: ['peta'], prio: ['poddrshka'], job: ['kancelarija', 'zdravstvo'], icons: ['koza', 'pritisok'], price: 210, sys: 'ortho', nameMk: 'Heel Pad FIX', nameEn: 'Heel Pad FIX' },
-        'heel-pad-grip':  { cat: ['kozni'],  pain: ['peta'], prio: ['cena', 'poddrshka'], job: ['kancelarija', 'nastavnik'], icons: ['koza', 'univerzalen', 'pritisok'], price: 100, sys: 'ortho', nameMk: 'Heel Pad Grip', nameEn: 'Heel Pad Grip' },
-        'topas':          { cat: ['kozni'],  pain: ['lac', 'peta'], prio: ['poddrshka', 'prirodni'], job: ['kancelarija', 'nastavnik', 'zdravstvo'], icons: ['koza', 'anatomska', 'medicinski'], price: 490, sys: 'ortho', nameMk: 'Topas', nameEn: 'Topas' },
-        'soft-gel':       { cat: ['kozni'],  pain: ['celo', 'peta'], prio: ['amort', 'fresina'], job: ['zdravstvo', 'nastavnik'], icons: ['koza', 'gel', 'mirisi', 'anatomska'], price: 820, sys: 'memory', nameMk: 'Soft Gel', nameEn: 'Soft Gel' },
-        'vital':          { cat: ['kozni'],  pain: ['lac'], prio: ['poddrshka'], job: ['kancelarija', 'nastavnik'], icons: ['koza', 'apsorpcija', 'anatomska'], price: 450, sys: 'anatomic', nameMk: 'Vital', nameEn: 'Vital' },
-        'relax':          { cat: ['kozni'],  pain: ['celo', 'lac'], prio: ['prirodni', 'amort'], job: ['kancelarija', 'zdravstvo', 'nastavnik'], icons: ['koza', 'prirodni', 'anatomska'], price: 570, sys: 'anatomic', nameMk: 'Relax', nameEn: 'Relax' },
-        'simona':         { cat: ['letni'],  pain: ['nema', 'celo'], prio: ['fresina', 'prirodni', 'cena'], job: ['kancelarija', 'nastavnik'], icons: ['aroma', 'mirisi', 'prirodni', 'apsorpcija'], price: 120, sys: 'absorb', nameMk: 'Simona', nameEn: 'Simona' },
-        'carbon':         { cat: ['letni'],  pain: ['celo', 'nema'], prio: ['fresina', 'cena'], job: ['kancelarija', 'nastavnik'], icons: ['mirisi', 'higienski', 'univerzalen', 'apsorpcija'], price: 170, sys: 'absorb', nameMk: 'Carbon', nameEn: 'Carbon' },
-        'thermo-alu':     { cat: ['zimski'], pain: ['nema', 'celo'], prio: ['prirodni'], job: ['rabotnik', 'nastavnik'], icons: ['zimski', 'polar', 'prirodni', 'anatomska'], price: 210, sys: 'thermo', nameMk: 'Thermo Alu', nameEn: 'Thermo Alu' },
-        'hunter-outdoor': { cat: ['hunter'], pain: ['lac', 'peta'], prio: ['poddrshka'], job: ['rabotnik', 'sportist'], icons: ['pritisok', 'anatomska', 'apsorpcija'], price: 330, sys: 'ortho', nameMk: 'Hunter Outdoor', nameEn: 'Hunter Outdoor' },
-        'hunter-flex':    { cat: ['hunter'], pain: ['celo'], prio: ['amort'], job: ['rabotnik', 'sportist'], icons: ['zimski', 'pritisok', 'anatomska'], price: 330, sys: 'thermo', nameMk: 'Hunter Flex', nameEn: 'Hunter Flex' },
-        'hunter-camo':    { cat: ['hunter'], pain: ['peta', 'lac'], prio: ['poddrshka'], job: ['rabotnik', 'sportist'], icons: ['mirisi', 'apsorpcija', 'anatomska'], price: 330, sys: 'absorb', nameMk: 'Hunter CAMO', nameEn: 'Hunter CAMO' },
-        'duck':           { cat: ['detski'], pain: ['nema', 'celo'], prio: ['prirodni', 'cena'], job: [], icons: ['prirodni', 'anatomska', 'medicinski'], price: 490, sys: 'anatomic', nameMk: 'Duck', nameEn: 'Duck' },
+        'memosole':       { cat: ['sport'],  pain: ['celo', 'nema'], prio: ['amort', 'prirodni'], job: ['sportist', 'nastavnik', 'zdravstvo'], akt: ['trcanje', 'pesacenje', 'sekojdenvno'], icons: ['anatomska', 'pritisok', 'mirisi', 'univerzalen'], price: 400, sys: 'memory', nameMk: 'MEMOSOLE', nameEn: 'MEMOSOLE' },
+        'active-gel':     { cat: ['sport'],  pain: ['peta', 'nema'], prio: ['amort'], job: ['sportist', 'zdravstvo'], akt: ['trcanje', 'sekojdenvno'], icons: ['gel', 'pritisok', 'univerzalen', 'anatomska'], price: 620, sys: 'absorb', nameMk: 'Active Gel', nameEn: 'Active Gel' },
+        'sport-style':    { cat: ['sport'],  pain: ['nema'], prio: ['cena', 'prirodni'], job: ['sportist', 'nastavnik'], akt: ['trcanje', 'pesacenje', 'sekojdenvno'], icons: ['prirodni', 'anatomska', 'apsorpcija'], price: 300, sys: 'anatomic', nameMk: 'Sport Style', nameEn: 'Sport Style' },
+        'sportex':        { cat: ['sport'],  pain: ['nema'], prio: ['cena', 'fresina'], job: ['sportist', 'rabotnik', 'nastavnik'], akt: ['trcanje', 'sekojdenvno'], icons: ['pritisok', 'higienski', 'anatomska'], price: 230, sys: 'absorb', nameMk: 'Sportex', nameEn: 'Sportex' },
+        'x-treme':        { cat: ['sport'],  pain: ['peta', 'celo'], prio: ['amort', 'poddrshka'], job: ['sportist', 'rabotnik'], akt: ['trcanje', 'planinarenje', 'rabota'], icons: ['pritisok', 'anatomska', 'apsorpcija', 'higienski'], price: 420, sys: 'anatomic', nameMk: 'X-TREME', nameEn: 'X-TREME' },
+        'heel-pad':       { cat: ['kozni'],  pain: ['peta'], prio: ['poddrshka'], job: ['kancelarija', 'zdravstvo', 'nastavnik'], akt: ['pesacenje', 'sekojdenvno', 'rabota'], icons: ['koza', 'pritisok', 'anatomska'], price: 250, sys: 'ortho', nameMk: 'Heel Pad', nameEn: 'Heel Pad' },
+        'heel-pad-fix':   { cat: ['kozni'],  pain: ['peta'], prio: ['poddrshka'], job: ['kancelarija', 'zdravstvo'], akt: ['pesacenje', 'sekojdenvno', 'rabota'], icons: ['koza', 'pritisok'], price: 210, sys: 'ortho', nameMk: 'Heel Pad FIX', nameEn: 'Heel Pad FIX' },
+        'heel-pad-grip':  { cat: ['kozni'],  pain: ['peta'], prio: ['cena', 'poddrshka'], job: ['kancelarija', 'nastavnik'], akt: ['pesacenje', 'sekojdenvno'], icons: ['koza', 'univerzalen', 'pritisok'], price: 100, sys: 'ortho', nameMk: 'Heel Pad Grip', nameEn: 'Heel Pad Grip' },
+        'topas':          { cat: ['kozni'],  pain: ['lac', 'peta'], prio: ['poddrshka', 'prirodni'], job: ['kancelarija', 'nastavnik', 'zdravstvo'], akt: ['pesacenje', 'sekojdenvno', 'rabota'], icons: ['koza', 'anatomska', 'medicinski'], price: 490, sys: 'ortho', nameMk: 'Topas', nameEn: 'Topas' },
+        'soft-gel':       { cat: ['kozni'],  pain: ['celo', 'peta'], prio: ['amort', 'fresina'], job: ['zdravstvo', 'nastavnik'], akt: ['pesacenje', 'sekojdenvno'], icons: ['koza', 'gel', 'mirisi', 'anatomska'], price: 820, sys: 'memory', nameMk: 'Soft Gel', nameEn: 'Soft Gel' },
+        'vital':          { cat: ['kozni'],  pain: ['lac'], prio: ['poddrshka'], job: ['kancelarija', 'nastavnik'], akt: ['pesacenje', 'sekojdenvno', 'rabota'], icons: ['koza', 'apsorpcija', 'anatomska'], price: 450, sys: 'anatomic', nameMk: 'Vital', nameEn: 'Vital' },
+        'relax':          { cat: ['kozni'],  pain: ['celo', 'lac'], prio: ['prirodni', 'amort'], job: ['kancelarija', 'zdravstvo', 'nastavnik'], akt: ['pesacenje', 'sekojdenvno'], icons: ['koza', 'prirodni', 'anatomska'], price: 570, sys: 'anatomic', nameMk: 'Relax', nameEn: 'Relax' },
+        'simona':         { cat: ['letni'],  pain: ['nema', 'celo'], prio: ['fresina', 'prirodni', 'cena'], job: ['kancelarija', 'nastavnik'], akt: ['sekojdenvno', 'pesacenje'], icons: ['aroma', 'mirisi', 'prirodni', 'apsorpcija'], price: 120, sys: 'absorb', nameMk: 'Simona', nameEn: 'Simona' },
+        'carbon':         { cat: ['letni'],  pain: ['celo', 'nema'], prio: ['fresina', 'cena'], job: ['kancelarija', 'nastavnik'], akt: ['sekojdenvno', 'pesacenje', 'trcanje'], icons: ['mirisi', 'higienski', 'univerzalen', 'apsorpcija'], price: 170, sys: 'absorb', nameMk: 'Carbon', nameEn: 'Carbon' },
+        'thermo-alu':     { cat: ['zimski'], pain: ['nema', 'celo'], prio: ['prirodni'], job: ['rabotnik', 'nastavnik'], akt: ['rabota', 'sekojdenvno', 'planinarenje'], icons: ['zimski', 'polar', 'prirodni', 'anatomska'], price: 210, sys: 'thermo', nameMk: 'Thermo Alu', nameEn: 'Thermo Alu' },
+        'hunter-outdoor': { cat: ['hunter'], pain: ['lac', 'peta'], prio: ['poddrshka'], job: ['rabotnik', 'sportist'], akt: ['planinarenje', 'rabota'], icons: ['pritisok', 'anatomska', 'apsorpcija'], price: 330, sys: 'ortho', nameMk: 'Hunter Outdoor', nameEn: 'Hunter Outdoor' },
+        'hunter-flex':    { cat: ['hunter'], pain: ['celo'], prio: ['amort'], job: ['rabotnik', 'sportist'], akt: ['planinarenje', 'rabota'], icons: ['zimski', 'pritisok', 'anatomska'], price: 330, sys: 'thermo', nameMk: 'Hunter Flex', nameEn: 'Hunter Flex' },
+        'hunter-camo':    { cat: ['hunter'], pain: ['peta', 'lac'], prio: ['poddrshka'], job: ['rabotnik', 'sportist'], akt: ['planinarenje', 'rabota'], icons: ['mirisi', 'apsorpcija', 'anatomska'], price: 330, sys: 'absorb', nameMk: 'Hunter CAMO', nameEn: 'Hunter CAMO' },
+        'duck':           { cat: ['detski'], pain: ['nema', 'celo'], prio: ['prirodni', 'cena'], job: [], akt: ['sekojdenvno', 'pesacenje'], icons: ['prirodni', 'anatomska', 'medicinski'], price: 490, sys: 'anatomic', nameMk: 'Duck', nameEn: 'Duck' },
     };
 
     function lang() {
@@ -3311,16 +3311,18 @@ console.log('%c Вебсајт во развој 💪', 'color:#6B6B76;font-size
     function scoreModels() {
         const q1 = answers['1'] || 'jas';          // за кого
         const q2 = answers['2'] || 'drugo';        // занимање
-        const q3 = answers['3'] || 'nema';         // непријатност
-        const q4 = answers['4'] || '4-8';          // часови на нозе
-        const q5 = answers['5'] || 'sport';        // обувки
+        const qA = answers['3'] || 'sekojdenvno';  // активност (НОВО)
+        const q5 = answers['4'] || 'sport';        // обувки
+        const q4 = answers['5'] || '4-8';          // часови на нозе
         const q6 = answers['6'] || 'poddrshka';    // приоритет
+        const q3 = answers['7'] || 'nema';         // непријатност
         const scored = Object.entries(MODELS).map(([slug, m]) => {
             let score = 0;
             if (m.cat.includes(q5)) score += 3;
             if (m.pain.includes(q3)) score += 2;
             if (m.prio.includes(q6)) score += 2;
             if (m.job && m.job.includes(q2)) score += 2;
+            if (m.akt && m.akt.includes(qA)) score += 2;
             if (q1 === 'dete' && slug === 'duck') score += 5;
             if (q4 === '8+' && (m.pain.includes('celo') || q3 === 'peta' || q3 === 'lac')) score += 1;
             return { slug, ...m, score };

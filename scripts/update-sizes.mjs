@@ -18,7 +18,7 @@ const TARGET = {
   'memosole':       SIZE_12,
   'heel-pad':       SIZE_12,
   'heel-pad-fix':   SIZE_12,
-  'hunter-camo':    SIZE_13,
+  'hunter-camo':    [...SIZE_13, ['univerzalna','Универзална']],
   'hunter-flex':    SIZE_13,
   'hunter-outdoor': SIZE_13,
   'active-gel':     [['z35-41','Женски 35–41'], ['m42-45','Машки 42–45']],

@@ -118,9 +118,9 @@
       '🧭 Udhëzuesi MONETA: kuiz për zgjedhje, udhëzues për madhësi dhe krahasim modelesh → vodic.html',
       '🧭 MONETA insole guide: quiz, size guide and model comparison → vodic.html'),
     greeting: t(
-      'Здраво! 👋 Јас сум МОНЕТА асистент. Можам да ти помогнам со големини, достава, цени и модели. Што те интересира?',
-      'Përshëndetje! 👋 Unë jam asistenti MONETA. Mund të të ndihmoj me madhësitë, dorëzimin, çmimet dhe modelet. Çfarë të intereson?',
-      'Hello! 👋 I am the MONETA assistant. I can help with sizes, delivery, prices and models. What are you interested in?'),
+      'Здраво! 👋 Јас сум МОНЕТА асистент. Можам да ти помогнам со големини, достава, цени и модели. Не знаеш која влошка да ја избереш? Прашај ме.',
+      'Përshëndetje! 👋 Unë jam asistenti MONETA. Mund të të ndihmoj me madhësitë, dorëzimin, çmimet dhe modelet. Nuk e di cilin taban ta zgjedhësh? Pyet mua!',
+      'Hello! 👋 I am the MONETA assistant. I can help with sizes, delivery, prices and models. Don\'t know which insole to choose? Ask me!'),
     fallback: t(
       'Извини, не најдов одговор на тоа прашање. 😊 Пробај да прашаш за големини, достава, цени, модели или контакт — или напиши ни на info@calivita.mk / +389 76 454 957.',
       'Më fal, nuk gjeta përgjigje për këtë pyetje. 😊 Provo të pyesësh për madhësi, dorëzim, çmime, modele ose kontakt — ose na shkruaj në info@calivita.mk / +389 76 454 957.',
