@@ -5112,10 +5112,11 @@ textarea {
         padding: 12px;
         font-size: 15px;
     }
-    /* На мобилно (широко мени): „−30%“ останува до крајот на зборот */
+    /* На мобилно (широко мени): „−30%“ останува до крајот на зборот, 50% поголема */
     .navbar__akcija-badge {
         position: static;
-        margin-left: 3px;
+        margin-left: 4px;
+        font-size: 13.5px;
     }
 }
 .navbar__search-btn,
