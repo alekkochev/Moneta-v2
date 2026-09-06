@@ -5057,6 +5057,51 @@ textarea {
     color: var(--pink) !important;
     border-radius: 8px;
 }
+/* Жива кампања: „Акција“ свети розово (суптилен неон-блур) и пулсира */
+.navbar__akcija--live {
+    position: relative;
+    color: var(--pink) !important;
+    animation: monetaAkcijaTextPulse 2.2s ease-in-out infinite;
+}
+.navbar__akcija--live:hover {
+    background: rgba(236, 23, 82, 0.12);
+}
+/* „−30%“ — РОЗЕВА буква (без балон), мала, поставена НАД крајот на „Акција“ (кај „ј“/„а“) */
+.navbar__akcija-badge {
+    position: absolute;
+    top: -5px;
+    right: 2px;
+    display: inline-block;
+    margin: 0;
+    color: var(--pink);
+    background: transparent;
+    font-size: 9px;
+    font-weight: 800;
+    line-height: 1;
+    white-space: nowrap;
+    pointer-events: none;
+    text-shadow: 0 0 5px rgba(236, 23, 82, 0.55), 0 0 11px rgba(236, 23, 82, 0.3);
+    animation: monetaAkcijaBadgePulse 1.8s ease-in-out infinite;
+}
+/* Помек неон-пулс само за „−30%“ (потивок од „Акција“) */
+@keyframes monetaAkcijaBadgePulse {
+    0%, 100% {
+        text-shadow: 0 0 4px rgba(236, 23, 82, 0.4), 0 0 9px rgba(236, 23, 82, 0.2);
+    }
+    50% {
+        text-shadow: 0 0 6px rgba(236, 23, 82, 0.55), 0 0 12px rgba(236, 23, 82, 0.3);
+    }
+}
+@keyframes monetaAkcijaTextPulse {
+    0%, 100% {
+        text-shadow: 0 0 0 rgba(236, 23, 82, 0);
+        filter: drop-shadow(0 0 0 rgba(236, 23, 82, 0));
+    }
+    50% {
+        text-shadow: 0 0 9px rgba(236, 23, 82, 0.55);
+        filter: drop-shadow(0 0 5px rgba(236, 23, 82, 0.35));
+    }
+}
 @media (max-width: 860px) {
     .navbar__coupon-item {
         width: 100%;
@@ -5066,6 +5111,11 @@ textarea {
         justify-content: center;
         padding: 12px;
         font-size: 15px;
+    }
+    /* На мобилно (широко мени): „−30%“ останува до крајот на зборот */
+    .navbar__akcija-badge {
+        position: static;
+        margin-left: 3px;
     }
 }
 .navbar__search-btn,

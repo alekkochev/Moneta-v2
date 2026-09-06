@@ -21,6 +21,35 @@ const num = (v: unknown) => {
   return Number.isFinite(n) ? n : 0;
 };
 
+// ===== Лозинка: PBKDF2 (Web Crypto, без надворешни зависности) =====
+const _enc = new TextEncoder();
+const _toHex = (u8: Uint8Array) =>
+  Array.from(u8).map((b) => b.toString(16).padStart(2, "0")).join("");
+async function pbkdf2Hex(password: string, salt: string) {
+  const key = await crypto.subtle.importKey(
+    "raw", _enc.encode(String(password)), "PBKDF2", false, ["deriveBits"]
+  );
+  const bits = await crypto.subtle.deriveBits(
+    { name: "PBKDF2", salt: _enc.encode(String(salt)), iterations: 150000, hash: "SHA-256" },
+    key, 256
+  );
+  return _toHex(new Uint8Array(bits));
+}
+const _randHex = (len: number) => _toHex(crypto.getRandomValues(new Uint8Array(len)));
+const _randSalt = () => {
+  const u8 = crypto.getRandomValues(new Uint8Array(16));
+  return btoa(String.fromCharCode.apply(null, Array.from(u8)));
+};
+async function hashPassword(plain: string) {
+  const salt = _randSalt();
+  return { salt, hash: await pbkdf2Hex(plain, salt) };
+}
+async function verifyPassword(plain: string, salt: string | null, hash: string | null) {
+  if (!salt || !hash) return false;
+  const h = await pbkdf2Hex(plain, salt);
+  return h === String(hash);
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
 
@@ -30,17 +59,85 @@ Deno.serve(async (req) => {
     const action = String(body?.action || "");
     const payload = body?.payload || {};
 
-    // ---- Проверка на лозинка ----
-    const ADMIN_PASSWORD = Deno.env.get("ADMIN_PASSWORD") || "";
-    if (!ADMIN_PASSWORD || password !== ADMIN_PASSWORD) {
-      return json({ ok: false, error: "unauthorized" }, 401);
-    }
-
     const sb = createClient(
       Deno.env.get("SUPABASE_URL") || "",
       Deno.env.get("MONETA_SERVICE_ROLE") || "",
       { auth: { persistSession: false } }
     );
+
+    // ---- Публични акции (не бараат лозинка) ----
+    if (action === "request_reset") {
+      const nowMs = Date.now();
+      const lastReq = (globalThis as any).__monetaResetLast || 0;
+      const wait = 60000 - (nowMs - lastReq);
+      if (wait > 0) {
+        return json({ ok: false, error: "Почекајте " + Math.ceil(wait / 1000) + " сек. пред ново барање" }, 429);
+      }
+      (globalThis as any).__monetaResetLast = nowMs;
+
+      const { data: row } = await sb.from("konzola_admin").select("*").eq("id", 1).maybeSingle();
+      if (!row) {
+        return json({ ok: false, error: "Ресетирањето не е конфигурирано (миграција konzola_admin)" }, 500);
+      }
+      const token = _randHex(32);
+      const expires = new Date(nowMs + 30 * 60 * 1000).toISOString();
+      await sb.from("konzola_admin").update({ reset_token: token, reset_expires: expires }).eq("id", 1);
+
+      const RESEND_KEY = Deno.env.get("RESEND_API_KEY") || "";
+      const FROM = Deno.env.get("SENDER_EMAIL") || "on@vloski.mk";
+      const TO = Deno.env.get("RESET_EMAIL") || "info@calivita.mk";
+      if (!RESEND_KEY) {
+        return json({ ok: false, error: "Email испраќачот не е конфигуриран (RESEND_API_KEY)" }, 500);
+      }
+      const link = "https://vloski.mk/konzola.html?reset=" + token;
+      const mail = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: { Authorization: "Bearer " + RESEND_KEY, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          from: FROM,
+          to: [TO],
+          subject: "🔑 МОНЕТА Конзола — ресетирање на лозинка",
+          html:
+            "<p>Добиено е барање за ресетирање на лозинката за МОНЕТА Конзола.</p>" +
+            "<p>Кликни за да поставиш нова лозинка (линкот важи 30 минути):</p>" +
+            "<p><a href='" + link + "'>🔑 Ресетирај ја лозинката</a></p>" +
+            "<p style='color:#888;word-break:break-all'>" + link + "</p>",
+        }),
+      });
+      if (!mail.ok) {
+        return json({ ok: false, error: "Не успеавме да го испратиме мејлот. Обиди се повторно." }, 502);
+      }
+      return json({ ok: true });
+    }
+
+    if (action === "reset_password") {
+      const token = String((payload as any)?.token || "");
+      const newPass = String((payload as any)?.password || "");
+      if (token.length < 20) return json({ ok: false, error: "Невалиден линк" }, 400);
+      if (newPass.length < 8) return json({ ok: false, error: "Лозинката мора да има барем 8 знаци" }, 400);
+      const { data: row } = await sb.from("konzola_admin").select("*").eq("id", 1).maybeSingle();
+      if (!row || !row.reset_token || row.reset_token !== token) {
+        return json({ ok: false, error: "Невалиден или искористен линк" }, 400);
+      }
+      const exp = row.reset_expires ? new Date(row.reset_expires).getTime() : 0;
+      if (!exp || Date.now() > exp) {
+        return json({ ok: false, error: "Линкот е истечен. Побарајте нов." }, 400);
+      }
+      const { salt, hash } = await hashPassword(newPass);
+      await sb.from("konzola_admin")
+        .update({ salt, hash, reset_token: null, reset_expires: null })
+        .eq("id", 1);
+      return json({ ok: true });
+    }
+
+    // ---- Проверка на лозинка: env ADMIN_PASSWORD или DB hash (по првото ресетирање) ----
+    const ADMIN_PASSWORD = Deno.env.get("ADMIN_PASSWORD") || "";
+    const { data: authRow } = await sb.from("konzola_admin").select("*").eq("id", 1).maybeSingle().catch(() => ({ data: null }));
+    const useDb = !!(authRow && authRow.hash && authRow.salt);
+    let authed = false;
+    if (useDb) authed = await verifyPassword(password, authRow.salt, authRow.hash);
+    else authed = !!(ADMIN_PASSWORD && password === ADMIN_PASSWORD);
+    if (!authed) return json({ ok: false, error: "unauthorized" }, 401);
 
     if (action === "auth") return json({ ok: true });
 

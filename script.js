@@ -3658,8 +3658,190 @@ window.MonetaData = {
         return lang === 'en' ? 'Out of stock' : (lang === 'sq' ? 'Mbaruar' : 'Нема на залиха');
     };
 
-    // Праг на ниска залиха — кога qty е ≤ 3, големината се оневозможува (сива)
+    // Праг на ниска залиха — кога qty е ≤ 3, големината се оневозможува (сива);
+    // кога залихата ќе се врати над 3, големината повторно е достапна. (Правило на клиентот — сите модели.)
     const LOW_STOCK_THRESHOLD = 3;
+
+    // ===== Големини — СЕКОГАШ од Supabase (конзолата), за СИТЕ модели =====
+    // Ако во конзолата се додаде/избрише/промени големина, страницата ја прикажува истата состојба.
+    const HUNTER_SLUGS = ['hunter-flex', 'hunter-camo', 'hunter-outdoor'];
+    // Клучеви внесени рачно во конзолата (Hunter) → канонски пар (само приказ; базата не се менува)
+    const HUNTER_SIZE_ALIASES = { '35-36-37': '35-37', '42-42': '42-43' };
+    const UNIVERSAL_SIZE_KEYS = { univerzalna: 1, univerzalen: 1, univerzalno: 1, universal: 1, uni: 1 };
+
+    const isUniversalSizeKey = (k) => !!UNIVERSAL_SIZE_KEYS[String(k || '').toLowerCase().replace(/\s+/g, '')];
+
+    const universalLabel = (lang) =>
+        lang === 'en' ? 'Universal' : (lang === 'sq' ? 'Universale' : 'Универзална');
+
+    // Етикета на копче/ќелија за клуч од залихата (локализирана „Универзална“, „Женски/Машки“ за z/m)
+    const sizeLabelOf = (k, lang) => {
+        if (isUniversalSizeKey(k)) return universalLabel(lang);
+        const zm = /^([zm])(.+)$/i.exec(k);
+        if (zm) {
+            const pre = zm[1].toLowerCase() === 'z'
+                ? (lang === 'en' ? 'Women' : lang === 'sq' ? 'Femra' : 'Женски')
+                : (lang === 'en' ? 'Men' : lang === 'sq' ? 'Meshkuj' : 'Машки');
+            return pre + ' ' + zm[2];
+        }
+        return k;
+    };
+
+    // Подредување: нумерички растечки; „Универзална“/не-нумерички секогаш на крај (за Hunter)
+    const sizeKeySort = (a, b) => {
+        const na = parseFloat(a), nb = parseFloat(b);
+        const ia = isFinite(na) ? na : Infinity;
+        const ib = isFinite(nb) ? nb : Infinity;
+        if (ia !== ib) return ia - ib;
+        return a < b ? -1 : a > b ? 1 : 0;
+    };
+
+    // Редослед на копчињата:
+    //  - нумеричките клучеви растечки (35-36, 37, 38, 39-40, …);
+    //  - не-нумеричките (z35-41/m42-45/„Универзална“) на крај, по редослед од конзолата.
+    const orderedSizeKeys = (slug, sizes) => {
+        const keys = Object.keys(sizes || {});
+        return keys.filter((k) => /^\d/.test(k)).sort(sizeKeySort)
+                   .concat(keys.filter((k) => !/^\d/.test(k)));
+    };
+
+    // Синхронизирај ги копчињата за големина со Supabase (сите модели).
+    const syncModelSizes = (sel, slug, sizes) => {
+        const keys = Object.keys(sizes || {});
+        if (!keys.length) return; // нема податоци → задржи ја HTML верзијата
+        const grid = sel.querySelector('[data-size-grid]');
+        if (!grid) return;
+        const lang = document.documentElement.lang || 'mk';
+        const ordered = orderedSizeKeys(slug, sizes);
+        const current = Array.prototype.map.call(grid.querySelectorAll('.size-btn'), (b) => b.dataset.size);
+        const isSame = current.length === ordered.length && current.every((k, i) => k === ordered[i]);
+        if (isSame) {
+            // Без структурна промена — освежи ги само етикетите на „Универзална“ (при промена на јазик)
+            grid.querySelectorAll('.size-btn').forEach((b) => {
+                if (!isUniversalSizeKey(b.dataset.size)) return;
+                const lbl = universalLabel(lang);
+                b.textContent = lbl;
+                b.setAttribute('data-mk', 'Универзална');
+                b.setAttribute('data-sq', 'Universale');
+                b.setAttribute('data-en', 'Universal');
+                if (b.classList.contains('size-btn--selected')) {
+                    const ctl = b.closest('[data-model]');
+                    if (ctl) ctl.dataset.size = lbl;
+                }
+            });
+            return;
+        }
+        const hadSelection = !!grid.querySelector('.size-btn--selected');
+        grid.innerHTML = '';
+        ordered.forEach((k) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'size-btn';
+            btn.dataset.size = k;
+            if (isUniversalSizeKey(k)) {
+                btn.dataset.mk = 'Универзална';
+                btn.dataset.sq = 'Universale';
+                btn.dataset.en = 'Universal';
+            }
+            btn.textContent = sizeLabelOf(k, lang);
+            grid.appendChild(btn);
+        });
+        // Ако порано имаше избор што повеќе не постои → ресетирај го „Додади“
+        if (hadSelection) {
+            const layout = sel.closest('.model-layout');
+            const cartEl = layout ? layout.querySelector('.model-cart') : null;
+            if (cartEl) {
+                cartEl.classList.add('model-cart--disabled');
+                delete cartEl.dataset.size;
+            }
+        }
+    };
+
+    // Споредбени табели (категориски страници): редот „Големини“ се пополнува од Supabase.
+    const syncCompareTables = () => {
+        const lang = document.documentElement.lang || 'mk';
+        document.querySelectorAll('.compare-table').forEach((table) => {
+            // Ред со линкови „Види модел“ → мапирање колона → slug
+            let linkRow = null;
+            table.querySelectorAll('tbody tr').forEach((tr) => {
+                if (tr.querySelector('a[href*="modeli/"], a[href*="model.html"]')) {
+                    if (!linkRow) linkRow = tr;
+                }
+            });
+            if (!linkRow) return;
+            // Ред со „Големини“
+            let sizeRow = null;
+            table.querySelectorAll('tbody tr').forEach((tr) => {
+                const td0 = tr.querySelector('td');
+                if (!td0) return;
+                const txt = ((td0.textContent || '') + ' ' + (td0.getAttribute('data-mk') || '') + ' ' + (td0.getAttribute('data-sq') || '') + ' ' + (td0.getAttribute('data-en') || '')).trim();
+                if (/Големини|Sizes|Madhës/i.test(txt)) sizeRow = tr;
+            });
+            if (!sizeRow) return;
+            const linkTds = linkRow.querySelectorAll(':scope > td');
+            const sizeTds = sizeRow.querySelectorAll(':scope > td');
+            for (let i = 1; i < linkTds.length && i < sizeTds.length; i++) {
+                const a = linkTds[i].querySelector('a[href*="modeli/"], a[href*="model.html"]');
+                if (!a) continue;
+                const href = a.getAttribute('href') || '';
+                const m = href.match(/modeli\/([^/?]+)\.html/) || href.match(/model\.html\?slug=([^&]+)/);
+                if (!m) continue;
+                const slug = m[1];
+                const sizes = window.MonetaData.sizes[slug] || {};
+                if (!Object.keys(sizes).length) continue;
+                const labels = orderedSizeKeys(slug, sizes).map((k) => sizeLabelOf(k, lang));
+                sizeTds[i].textContent = labels.join(', ');
+            }
+        });
+    };
+
+    // Навбар „Акција“: кога има активна кампања → розев сјај + беџ со НАЈГОЛЕМИОТ % попуст во моментот.
+    const updateNavAkcija = () => {
+        const link = document.querySelector('.navbar__akcija, a[href*="akcija.html"]');
+        if (!link) return;
+        let maxPct = 0;
+        Object.keys(window.MonetaData.products || {}).forEach((slug) => {
+            const p = window.MonetaData.products[slug];
+            if (!p || p.active === false) return;
+            const pc = discountOf(p);
+            if (pc > maxPct) maxPct = pc;
+        });
+        let badge = link.querySelector('.navbar__akcija-badge');
+        if (maxPct > 0) {
+            link.classList.add('navbar__akcija--live');
+            if (!badge) {
+                badge = document.createElement('span');
+                badge.className = 'navbar__akcija-badge';
+                badge.setAttribute('aria-hidden', 'true');
+                link.appendChild(badge);
+            }
+            badge.textContent = '−' + maxPct + '%';
+        } else {
+            link.classList.remove('navbar__akcija--live');
+            if (badge) badge.remove();
+        }
+    };
+
+    // Автоматско гасење на кампањите: штом помине крајниот датум/час на некоја активна
+    // кампања, веднаш се освежува страницата (се трга беџот и цената се враќа). Без исклучок.
+    const scheduleCampaignRefresh = () => {
+        let next = Infinity;
+        const now = Date.now();
+        Object.keys(window.MonetaData.products || {}).forEach((slug) => {
+            const p = window.MonetaData.products[slug];
+            if (!p) return;
+            const disc = Number(p.discount) || 0;
+            if (disc <= 0 || disc >= 100) return;
+            const u = p.discount_until ? new Date(p.discount_until).getTime() : 0;
+            if (u && u > now && u < next) next = u;
+        });
+        if (next === Infinity) return;
+        clearTimeout(window.__monetaCampaignTimer);
+        window.__monetaCampaignTimer = setTimeout(() => {
+            try { apply(); } catch (e) { /* ignore */ }
+            scheduleCampaignRefresh();
+        }, Math.max(1000, next - Date.now() + 1500));
+    };
 
     const apply = () => {
         // ---- Модел-страници: цена, стара цена, значка, залиха ----
@@ -3668,6 +3850,8 @@ window.MonetaData = {
             const prod = window.MonetaData.products[slug];
             if (!prod) return;
             const sizes = window.MonetaData.sizes[slug] || {};
+            // Копчињата секогаш одговараат на Supabase (конзолата)
+            syncModelSizes(sel, slug, sizes);
             const layout = sel.closest('.model-layout') || document;
             const priceEl = layout.querySelector('.model-price');
             const cart = layout.querySelector('.model-cart');
@@ -3726,7 +3910,7 @@ window.MonetaData = {
                 if (prod.code) cart.dataset.code = prod.code;
             }
 
-            // залиха: оневозможи големини со qty ≤ 3 (ниска залиха → сива големина)
+            // залиха: оневозможи големини со qty ≤ 3 (сива големина); > 3 → достапна.
             sel.querySelectorAll('.size-btn').forEach((btn) => {
                 const qty = sizes[btn.dataset.size];
                 if (qty === undefined) return;
@@ -3825,6 +4009,10 @@ window.MonetaData = {
 
         // ---- Нови категории/производи: динамички додавање на постоечките страници ----
         applyDynamicCategories();
+
+        // ---- Навбар „Акција“ (најголем активен %) + споредбени табели „Големини“ ----
+        updateNavAkcija();
+        syncCompareTables();
     };
 
     // Акција страна — производи со активен попуст, директно од Supabase
@@ -4022,7 +4210,21 @@ window.MonetaData = {
                 const slug = idToSlug[s.product_id];
                 if (slug) (window.MonetaData.sizes[slug] = window.MonetaData.sizes[slug] || {})[s.size] = s.qty;
             });
+            // Hunter: нормализирај ги клучевите внесени во конзолата (35-36-37 → 35-37, 42-42 → 42-43)
+            HUNTER_SLUGS.forEach((slug) => {
+                const m = window.MonetaData.sizes[slug];
+                if (!m) return;
+                Object.keys(m).forEach((k) => {
+                    const canon = HUNTER_SIZE_ALIASES[k];
+                    if (canon && canon !== k) {
+                        m[canon] = (m[canon] || 0) + (Number(m[k]) || 0);
+                        delete m[k];
+                    }
+                });
+            });
             apply();
+            // Автоматско гасење на кампањите на крајниот датум/час (без refresh од корисник)
+            scheduleCampaignRefresh();
         } catch (e) {
             console.warn('Supabase data load error', e);
         }

@@ -58,7 +58,7 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
     <link href="../vendor/aos.css" rel="stylesheet" media="print" onload="this.media='all'" />
     <noscript><link rel="stylesheet" href="../vendor/aos.css" /></noscript>
     <link rel="icon" type="image/svg+xml" href="../images/favicon/favicon.svg" />
-    <link rel="stylesheet" href="../styles.css?v=v20260822a" />
+    <link rel="stylesheet" href="../styles.css?v=v20260906e" />
 </head>
 <body class="page-sistem">
 
@@ -496,7 +496,7 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
     });
   })();
 </script>
-    <script src="../script.js?v=v20260822a" defer></script>
+    <script src="../script.js?v=v20260906e" defer></script>
 
     <!-- SIZE SELECTOR LOGIC (inline - does not modify script.js) -->
     <script>
@@ -507,34 +507,9 @@ src="https://www.facebook.com/tr?id=3399617573559080&ev=PageView&noscript=1"
         const hint = document.querySelector("[data-size-hint]");
         const cart = document.querySelector(".model-cart");
         let selectedSize = null;
-        fetch("../stock.json")
-            .then(r => r.json())
-            .then(data => {
-                const model = data[MODEL];
-                if (!model) return;
-                const priceEl = document.querySelector(".model-price");
-                if (priceEl) {
-                    const mk = "Цена: " + model.price + " ден.";
-                    const sq = "Çmimi: " + model.price + " den.";
-                    const en = "Price: " + model.price + " MKD";
-                    priceEl.setAttribute("data-mk", mk);
-                    priceEl.setAttribute("data-sq", sq);
-                    priceEl.setAttribute("data-en", en);
-                    priceEl.textContent = mk;
-                }
-                if (cart) { cart.dataset.price = model.price; cart.dataset.code = model.code; }
-                const sizes = model.sizes;
-                grid.querySelectorAll(".size-btn").forEach(btn => {
-                    const sz = btn.dataset.size;
-                    if (!sizes[sz] || sizes[sz] <= 0) {
-                        btn.classList.add("size-btn--disabled");
-                        btn.setAttribute("aria-disabled", "true");
-                        btn.tabIndex = -1;
-                    }
-                });
-                if (cart) cart.classList.add("model-cart--disabled");
-            })
-            .catch(() => { if (hint) { hint.textContent = "Грешка при вчитување на залихите."; hint.classList.add("error"); } });
+        // Големините и залихата ги вчитува script.js директно од Supabase (конзолата) —
+        // тука нема stock.json (двоен извор предизвикуваше race со цените/попустите).
+        if (cart) cart.classList.add("model-cart--disabled");
         grid.addEventListener("click", (e) => {
             const btn = e.target.closest(".size-btn");
             if (!btn || btn.classList.contains("size-btn--disabled")) return;
