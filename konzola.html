@@ -7,9 +7,24 @@
 <title>МОНЕТА Конзола</title>
 <style>
 :root{
+  color-scheme: dark; /* светли (бели) икони во date/time полињата на темна позадина */
   --bg:#0f1117; --panel:#161a24; --panel2:#1d2230; --line:#2a3040;
   --ink:#e8ebf3; --muted:#9aa3b5; --pink:#EC1752; --pink2:#ff4d7d;
   --green:#22c55e; --amber:#f59e0b; --red:#ef4444; --blue:#3b82f6;
+}
+/* Дополнителна сигурност: date/time полињата секогаш со светли икони */
+input[type="date"], input[type="time"], input[type="datetime-local"], select {
+  color-scheme: dark;
+}
+/* „✖“ (тргни попуст) и копчето „Затвори“ — јасно видливи на крајот од редот */
+.camp-row [data-clear] {
+  color: var(--red) !important;
+  border-color: rgba(239, 68, 68, 0.45) !important;
+  font-weight: 800;
+}
+.camp-row [data-clear]:hover {
+  background: var(--red) !important;
+  color: #fff !important;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;min-height:100vh}
