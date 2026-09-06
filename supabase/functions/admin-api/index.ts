@@ -283,10 +283,17 @@ Deno.serve(async (req) => {
       }
 
       const { data: existing } = await sb.from("products").select("id").eq("slug", slug).maybeSingle();
+      let writeErr: { message?: string } | null = null;
       if (existing) {
-        await sb.from("products").update(row).eq("id", existing.id);
+        const { error } = await sb.from("products").update(row).eq("id", existing.id);
+        writeErr = error;
       } else {
-        await sb.from("products").insert(row);
+        const { error } = await sb.from("products").insert(row);
+        writeErr = error;
+      }
+      if (writeErr) {
+        console.error("save_product WRITE error:", writeErr);
+        return json({ ok: false, error: "Грешка при зачувување на производот: " + String((writeErr as { message?: string })?.message || writeErr) }, 500);
       }
       const { data: prod } = await sb.from("products").select("*").eq("slug", slug).maybeSingle();
       return json({ ok: true, product: prod || null });
