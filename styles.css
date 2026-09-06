@@ -2604,7 +2604,7 @@ a {
 .back-to-top {
     position: fixed;
     bottom: 98px; /* подигнато над AI асистентот (monetaBotBtn) за да не го покрива */
-    right: 88px;
+    right: 28px; /* центрирано на иста вертикала со AI копчето (60px @ right:22px) */
     width: 48px;
     height: 48px;
     border-radius: 50%;
@@ -2642,9 +2642,14 @@ a {
 @media (max-width: 560px) {
     .back-to-top {
         bottom: 88px; /* над AI асистентот */
-        right: 68px;
+        right: 31px; /* центрирано со AI копчето (60px @ right:22px) */
         width: 42px;
         height: 42px;
+    }
+}
+@media (max-width: 480px) {
+    .back-to-top {
+        right: 25px; /* AI копчето е 60px @ right:16px */
     }
 }
 
@@ -8525,8 +8530,9 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
 }
 .promo-badge--card {
     position: absolute;
-    bottom: -15px;
-    right: 16px;
+    top: 12px;
+    right: 12px;
+    bottom: auto;
     z-index: 6;
     font-size: 13px;
     padding: 7px 14px;
