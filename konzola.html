@@ -16,6 +16,11 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(
 button{font-family:inherit;cursor:pointer}
 input,select,textarea{font-family:inherit;background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 10px;font-size:13px;outline:none}
 input:focus,select:focus,textarea:focus{border-color:var(--pink)}
+/* Прикажи/скриј лозинка (око) */
+.pass-wrap{position:relative;display:block}
+.pass-wrap input{width:100%;padding-right:44px}
+.pass-eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);font-size:17px;line-height:1;cursor:pointer;padding:6px 8px;border-radius:8px}
+.pass-eye:hover{color:var(--pink)}
 .btn{background:var(--pink);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-weight:700;font-size:13px}
 .btn:hover{background:var(--pink2)}
 .btn--ghost{background:transparent;border:1px solid var(--line);color:var(--muted)}
@@ -170,7 +175,10 @@ tr.is-camp-live td:first-child{box-shadow:inset 4px 0 0 0 #EC1752}
   <div class="login-card">
     <h1>🔐 МОНЕТА <span style="color:var(--pink)">Конзола</span></h1>
     <p>Внеси ја лозинката за управување со производите, залихите и кампањите.</p>
-    <input type="password" id="loginPass" placeholder="Лозинка" autocomplete="current-password">
+    <span class="pass-wrap">
+      <input type="password" id="loginPass" placeholder="Лозинка" autocomplete="current-password">
+      <button type="button" class="pass-eye" id="loginPassEye" aria-label="Прикажи/скриј лозинка" tabindex="-1">👁</button>
+    </span>
     <button class="btn" id="loginBtn">Најава</button>
     <button type="button" class="btn btn--ghost" id="forgotBtn" style="width:100%;margin-top:10px">🔑 Заборавена лозинка?</button>
     <div class="err" id="loginErr"></div>
@@ -180,8 +188,14 @@ tr.is-camp-live td:first-child{box-shadow:inset 4px 0 0 0 #EC1752}
   <div class="login-card hidden" id="resetCard">
     <h1>🔑 МОНЕТА <span style="color:var(--pink)">Конзола</span></h1>
     <p>Постави нова лозинка (мин. 8 знаци).</p>
-    <input type="password" id="resetPass1" placeholder="Нова лозинка" autocomplete="new-password">
-    <input type="password" id="resetPass2" placeholder="Повтори ја лозинката" autocomplete="new-password" style="margin-top:10px">
+    <span class="pass-wrap">
+      <input type="password" id="resetPass1" placeholder="Нова лозинка" autocomplete="new-password">
+      <button type="button" class="pass-eye" id="resetPass1Eye" aria-label="Прикажи/скриј лозинка" tabindex="-1">👁</button>
+    </span>
+    <span class="pass-wrap" style="margin-top:10px">
+      <input type="password" id="resetPass2" placeholder="Повтори ја лозинката" autocomplete="new-password">
+      <button type="button" class="pass-eye" id="resetPass2Eye" aria-label="Прикажи/скриј лозинка" tabindex="-1">👁</button>
+    </span>
     <button class="btn" id="resetBtn" style="width:100%;margin-top:12px">💾 Постави нова лозинка</button>
     <div class="err" id="resetErr"></div>
     <button type="button" class="btn btn--ghost" id="resetBackLogin" style="width:100%;margin-top:8px">← Назад на најава</button>
@@ -483,6 +497,18 @@ $("forgotBtn").addEventListener("click", async () => {
 $("resetBackLogin").addEventListener("click", () => {
   history.replaceState(null, "", location.pathname);
   showLoginForm();
+});
+// Око: прикажи/скриј лозинка
+["loginPass", "resetPass1", "resetPass2"].forEach((id) => {
+  const input = document.getElementById(id);
+  const eye = document.getElementById(id + "Eye");
+  if (!input || !eye) return;
+  eye.addEventListener("click", () => {
+    const show = input.type === "password";
+    input.type = show ? "text" : "password";
+    eye.textContent = show ? "🙈" : "👁";
+    input.focus();
+  });
 });
 $("resetBtn").addEventListener("click", async () => {
   const p1 = $("resetPass1").value, p2 = $("resetPass2").value;

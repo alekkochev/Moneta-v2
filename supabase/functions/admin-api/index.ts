@@ -132,7 +132,13 @@ Deno.serve(async (req) => {
 
     // ---- Проверка на лозинка: env ADMIN_PASSWORD или DB hash (по првото ресетирање) ----
     const ADMIN_PASSWORD = Deno.env.get("ADMIN_PASSWORD") || "";
-    const { data: authRow } = await sb.from("konzola_admin").select("*").eq("id", 1).maybeSingle().catch(() => ({ data: null }));
+    let authRow: Record<string, unknown> | null = null;
+    try {
+      const { data } = await sb.from("konzola_admin").select("*").eq("id", 1).maybeSingle();
+      authRow = (data as Record<string, unknown>) || null;
+    } catch (e) {
+      authRow = null; // табелата сè уште не постои → env лозинка
+    }
     const useDb = !!(authRow && authRow.hash && authRow.salt);
     let authed = false;
     if (useDb) authed = await verifyPassword(password, authRow.salt, authRow.hash);
