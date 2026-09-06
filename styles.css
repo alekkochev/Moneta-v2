@@ -5066,8 +5066,8 @@ textarea {
 .navbar__akcija--live:hover {
     background: rgba(236, 23, 82, 0.12);
 }
-/* „−30%“ — РОЗЕВА буква (без балон), 50% поголема, НАД крајот на „Акција“;
-   пулсира БЕЗ blur (само „чука“ со големина, како кошничката) */
+/* „−30%“ — РОЗЕВА буква (без балон), +30% на десктоп, НАД крајот на „Акција“;
+   БЕЗ blur/неон — само пулсирање (scale, како кошничката) */
 .navbar__akcija-badge {
     position: absolute;
     top: -5px;
@@ -5076,7 +5076,8 @@ textarea {
     margin: 0;
     color: var(--pink);
     background: transparent;
-    font-size: 13.5px;
+    text-shadow: none;
+    font-size: 11.7px;
     font-weight: 800;
     line-height: 1;
     white-space: nowrap;
