@@ -472,9 +472,10 @@ function showResetCard() {
 }
 if (resetToken) showResetCard();
 $("forgotBtn").addEventListener("click", async () => {
+  // Попапот светнува ВЕДНАШ на клик и трае 5 секунди
+  toast("✅ Линк за ресетирање е испратен на info@calivita.mk (провери и во спам).", null, 5000);
   try {
     await api("request_reset", {});
-    toast("✅ Линк за ресетирање е испратен на info@calivita.mk (провери и во спам).", null, 5000);
   } catch (e) {
     toast((e.message || "Грешка") + " — обидете се повторно по 1 мин.", "err", 5000);
   }
