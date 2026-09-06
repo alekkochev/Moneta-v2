@@ -442,7 +442,12 @@ async function api(action, payload = {}) {
     logout(true);
     throw new Error("unauthorized");
   }
-  if (!data.ok) throw new Error(data.error || "Грешка на серверот");
+  if (!data.ok) {
+    const raw = String(data.error || "Грешка на серверот");
+    // Никогаш не прикажувај технички/внатрешни пораки на корисникот
+    const technical = /sb\.from|is not a function|TypeError|ReferenceError|at Object\.|fetch failed|Unexpected token|JSON\.parse/i.test(raw);
+    throw new Error(technical ? "Грешка на серверот. Обиди се повторно." : raw);
+  }
   return data;
 }
 

@@ -381,6 +381,8 @@ Deno.serve(async (req) => {
 
     return json({ ok: false, error: "Непозната акција" }, 400);
   } catch (e) {
-    return json({ ok: false, error: String((e as Error)?.message || e) }, 500);
+    // Техничкиот детал останува во логовите — конзолата никогаш не смее да го види
+    console.error("admin-api error:", e);
+    return json({ ok: false, error: "Грешка на серверот. Обиди се повторно." }, 500);
   }
 });
