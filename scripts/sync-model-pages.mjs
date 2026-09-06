@@ -44,7 +44,7 @@ const STOCK_BLOCK_NEW = `        let selectedSize = null;
         // тука нема stock.json (двоен извор предизвикуваше race со цените/попустите).
         if (cart) cart.classList.add("model-cart--disabled");`;
 
-const NEW_VER = "v20260906l";
+const NEW_VER = "v20260906m";
 const EOL = (c) => (c.includes("\r\n") ? "\r\n" : "\n");
 
 let changed = 0;

@@ -3719,6 +3719,7 @@ window.MonetaData = {
             // Без структурна промена — освежи ги само етикетите на „Универзална“ (при промена на јазик)
             grid.querySelectorAll('.size-btn').forEach((b) => {
                 if (!isUniversalSizeKey(b.dataset.size)) return;
+                b.classList.add('size-btn--universal');
                 const lbl = universalLabel(lang);
                 b.textContent = lbl;
                 b.setAttribute('data-mk', 'Универзална');
@@ -3739,6 +3740,7 @@ window.MonetaData = {
             btn.className = 'size-btn';
             btn.dataset.size = k;
             if (isUniversalSizeKey(k)) {
+                btn.classList.add('size-btn--universal');
                 btn.dataset.mk = 'Универзална';
                 btn.dataset.sq = 'Universale';
                 btn.dataset.en = 'Universal';
