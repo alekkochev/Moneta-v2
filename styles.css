@@ -8392,6 +8392,7 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
     transition: all 0.18s ease;
     text-align: center;
     user-select: none;
+    white-space: nowrap; /* „35-36“ секогаш во ЕДЕН ред */
 }
 .size-btn:hover:not(.size-btn--disabled):not(.size-btn--selected) {
     border-color: var(--pink);
@@ -8504,7 +8505,9 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
 .size-selector__hint.error { color: #E53E3E; }
 .size-selector__hint.success { color: #10B981; }
 @media (max-width: 480px) {
-    .size-selector__grid { grid-template-columns: repeat(4, 1fr); }
+    /* Мобилно: копчињата сами се шират за секој број (и паровите „35-36“) да стои во ЕДЕН ред */
+    .size-selector__grid { grid-template-columns: repeat(auto-fit, minmax(56px, 1fr)); }
+    .size-btn { white-space: nowrap; }
 }
 /* Копчињата секогаш во ЕДЕН ред — според бројот на големини (опсези) */
 .size-selector__grid--4 { grid-template-columns: repeat(4, 1fr); }
