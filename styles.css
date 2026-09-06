@@ -8518,8 +8518,9 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
     /* Мобилно: еднаква мрежа (потврдено — паровите во ЕДЕН ред) */
     .size-selector__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(56px, 1fr)); }
     .size-btn { white-space: nowrap; }
-    /* „Универзална“ е долг збор → на мобилно зема ЦЕЛ ред за да стои ЦЕЛО ИМЕ во копчето */
-    .size-btn--universal { grid-column: 1 / -1; }
+    /* Долги етикети („Универзална“, „Женски/Машки …“) → на мобилно земаат ЦЕЛ ред
+       за да стои ЦЕЛОТО ИМЕ внатре во копчето (не излегува надвор) */
+    .size-btn--wide { grid-column: 1 / -1; }
 }
 /* Копчињата секогаш во ЕДЕН ред — според бројот на големини (опсези) */
 .size-selector__grid--4 { grid-template-columns: repeat(4, 1fr); }
