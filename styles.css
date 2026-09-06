@@ -7471,6 +7471,12 @@ p { color: var(--ink-700); }
 @media (max-width: 1060px) {
     .model-layout { grid-template-columns: 1fr; }
     .model-layout__media { position: relative; top: auto; }
+    /* МОБИЛНО/ТАБЛЕТ: редослед = слика → цена/инфо → рецензии.
+       (Десктоп >1060px не се менува — рецензиите остануваат под сликата во левата колона) */
+    .model-layout__media { display: contents; }
+    .model-layout__media > .hero-img { order: 1; }
+    .model-layout__info { order: 2; }
+    .model-layout__media > .model-reviews { order: 3; }
 }
 @media (max-width: 680px) {
     .page-sistem .system-hero:has(.model-layout) { padding: 112px 14px 62px; }
@@ -8374,13 +8380,17 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
 }
 .size-selector__label svg { color: var(--pink); }
 .size-selector__grid {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    /* Десктоп/таблет: копчињата се ширина според содржината (flex-wrap),
+       па паровите „35-36“/„39-40“/„43-44“ НИКОГАШ не можат да се препоклопат */
+    display: flex;
+    flex-wrap: wrap;
     gap: 8px;
-    max-width: 380px;
+    max-width: 420px;
 }
 .size-btn {
     padding: 10px 4px;
+    min-width: 56px;
+    flex: 0 0 auto; /* flex-режим: ширина по содржина, без препоклопување */
     border-radius: var(--radius-sm);
     border: 2px solid var(--card-border);
     background: #fff;
@@ -8505,8 +8515,8 @@ html[lang="sq"] .cart__frame::before { content: 'Shportë e sigurt'; }
 .size-selector__hint.error { color: #E53E3E; }
 .size-selector__hint.success { color: #10B981; }
 @media (max-width: 480px) {
-    /* Мобилно: копчињата сами се шират за секој број (и паровите „35-36“) да стои во ЕДЕН ред */
-    .size-selector__grid { grid-template-columns: repeat(auto-fit, minmax(56px, 1fr)); }
+    /* Мобилно: еднаква мрежа (потврдено — паровите во ЕДЕН ред) */
+    .size-selector__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(56px, 1fr)); }
     .size-btn { white-space: nowrap; }
 }
 /* Копчињата секогаш во ЕДЕН ред — според бројот на големини (опсези) */
